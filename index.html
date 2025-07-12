@@ -447,7 +447,634 @@
         </main>
     </div>
 
-    <!-- Universal Add Modal (same structure) -->
+   <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Professional wealth tracking and financial management PWA">
+    <title>WealthTracker Pro</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <!-- Stylesheets -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <style>
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 10px;
+        }
+        
+        .chart-container canvas {
+            max-height: 280px !important;
+        }
+        
+        .sidebar-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover {
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .progress-bar {
+            transition: width 0.8s ease-in-out;
+        }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .offline-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ef4444;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .offline-banner.show {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="text-center">
+            <div class="loading-spinner border-4 border-blue-200 border-t-blue-600 rounded-full w-12 h-12 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading WealthTracker...</p>
+        </div>
+    </div>
+    
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner">
+        <span>⚠️ You're offline. Changes will sync when connection is restored.</span>
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="installPrompt" class="hidden fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-3">
+            <div>
+                <p class="font-medium">Install WealthTracker</p>
+                <p class="text-sm opacity-90">Add to home screen for easier access</p>
+            </div>
+            <div class="flex space-x-2">
+                <button id="installCancel" class="px-3 py-1 bg-blue-500 rounded text-sm">Later</button>
+                <button id="installAccept" class="px-3 py-1 bg-white text-blue-600 rounded text-sm font-medium">Install</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl sidebar-transition" id="sidebar">
+        <div class="flex h-full flex-col">
+            <!-- Logo -->
+            <div class="flex h-16 items-center justify-center px-6 gradient-bg">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-white/20 rounded-lg">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white">WealthTracker Pro</span>
+                </div>
+            </div>
+
+            <!-- Language & Currency -->
+            <div class="px-4 py-3 bg-gray-50 border-b">
+                <div class="flex items-center justify-between mb-2">
+                    <select id="languageSelect" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="en">English</option>
+                        <option value="el">Ελληνικά</option>
+                    </select>
+                    <select id="currencySelect" class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="EUR">EUR (€)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+                <div class="text-xs text-gray-500 flex items-center">
+                    <div id="syncStatus" class="flex items-center">
+                        <div id="syncIcon" class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                        <span id="syncText">Synced</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <button data-tab="dashboard" class="nav-item active w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span data-translate="dashboard">Dashboard</span>
+                </button>
+                <button data-tab="assets" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    <span data-translate="assets">Assets</span>
+                </button>
+                <button data-tab="investments" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span data-translate="investments">Investments</span>
+                </button>
+                <button data-tab="real-estate" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span data-translate="real_estate">Real Estate</span>
+                </button>
+                <button data-tab="accounts" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    <span data-translate="accounts">Accounts</span>
+                </button>
+                <button data-tab="liabilities" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="minus-circle" class="w-5 h-5"></i>
+                    <span data-translate="liabilities">Liabilities</span>
+                </button>
+                <button data-tab="income" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    <span data-translate="income">Income</span>
+                </button>
+                <button data-tab="expenses" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                    <span data-translate="expenses">Expenses</span>
+                </button>
+                <button data-tab="budgets" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="target" class="w-5 h-5"></i>
+                    <span data-translate="budgets">Budgets</span>
+                </button>
+                <button data-tab="analytics" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                    <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                    <span data-translate="analytics">Analytics</span>
+                </button>
+            </nav>
+
+            <!-- Export Button -->
+            <div class="p-4 border-t">
+                <button id="exportBtn" class="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span data-translate="export">Export</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64 min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b sticky top-0 z-40">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900" id="pageTitle" data-translate="dashboard">Dashboard</h1>
+                        <p class="text-sm text-gray-500" data-translate="welcome_message">Welcome to your financial overview</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="addItemBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span data-translate="add_item">Add Item</span>
+                        </button>
+                        <div class="text-sm text-gray-500">
+                            <span data-translate="last_updated">Last Updated:</span> <span id="lastUpdated"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-content" class="tab-content fade-in">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500" data-translate="net_worth">Net Worth</p>
+                                <p class="text-2xl font-bold text-gray-900" id="netWorthValue">€0</p>
+                                <p class="text-sm text-green-600 mt-1 flex items-center">
+                                    <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
+                                    <span data-translate="total_wealth">Total Wealth</span>
+                                </p>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-xl">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500" data-translate="total_assets">Total Assets</p>
+                                <p class="text-2xl font-bold text-gray-900" id="totalAssetsValue">€0</p>
+                                <p class="text-sm text-gray-500 mt-1" data-translate="all_holdings">All Holdings</p>
+                            </div>
+                            <div class="p-3 bg-green-50 rounded-xl">
+                                <i data-lucide="arrow-up-right" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500" data-translate="monthly_income">Monthly Income</p>
+                                <p class="text-2xl font-bold text-gray-900" id="monthlyIncomeValue">€0</p>
+                                <p class="text-sm text-gray-500 mt-1" data-translate="after_taxes">After Taxes</p>
+                            </div>
+                            <div class="p-3 bg-indigo-50 rounded-xl">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-indigo-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500" data-translate="monthly_expenses">Monthly Expenses</p>
+                                <p class="text-2xl font-bold text-gray-900" id="monthlyExpensesValue">€0</p>
+                                <p class="text-sm text-red-600 mt-1" data-translate="this_month">This Month</p>
+                            </div>
+                            <div class="p-3 bg-red-50 rounded-xl">
+                                <i data-lucide="arrow-down-right" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="asset_allocation">Asset Allocation</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="assetAllocationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="net_worth_trend">Net Worth Trend</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="netWorthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="recent_transactions">Recent Transactions</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="recentTransactions" class="space-y-4">
+                                <!-- Transactions will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="budget_overview">Budget Overview</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="budgetOverview" class="space-y-4">
+                                <!-- Budget overview will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets Tab -->
+            <div id="assets-content" class="tab-content hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900" data-translate="asset_breakdown">Asset Breakdown</h3>
+                                <button id="addAssetBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span data-translate="add_asset">Add Asset</span>
+                                </button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="assetBreakdownChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="asset_summary">Asset Summary</h3>
+                            <div id="assetSummary" class="space-y-4">
+                                <!-- Asset summary will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investments Tab -->
+            <div id="investments-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="investment_portfolio">Investment Portfolio</h3>
+                            <button id="addInvestmentBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_investment">Add Investment</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="investment">Investment</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="type">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="quantity">Quantity</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="purchase_price">Purchase Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="current_price">Current Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="total_value">Total Value</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="gain_loss">Gain/Loss</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="investmentsTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Investment rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real Estate Tab -->
+            <div id="real-estate-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="real_estate_portfolio">Real Estate Portfolio</h3>
+                            <button id="addPropertyBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_property">Add Property</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6" id="propertiesGrid">
+                            <!-- Property cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accounts Tab -->
+            <div id="accounts-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="bank_accounts">Bank Accounts</h3>
+                            <button id="addAccountBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_account">Add Account</span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6" id="accountsGrid">
+                            <!-- Account cards will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liabilities Tab -->
+            <div id="liabilities-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="liabilities_debts">Liabilities & Debts</h3>
+                            <button id="addLiabilityBtn" class="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_liability">Add Liability</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="liability">Liability</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="type">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="balance">Balance</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="interest_rate">Interest Rate</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="monthly_payment">Monthly Payment</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liabilitiesTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Liability rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Income Tab -->
+            <div id="income-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="income_sources">Income Sources</h3>
+                            <button id="addIncomeBtn" class="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_income">Add Income</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="source">Source</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="type">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="monthly_gross">Monthly Gross</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="monthly_net">Monthly Net</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="annual_net">Annual Net</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="incomeTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Income rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div id="expenses-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="expense_tracking">Expense Tracking</h3>
+                            <button id="addExpenseBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_expense">Add Expense</span>
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="date">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="description">Description</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="category">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="amount">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expensesTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Expense rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budgets Tab -->
+            <div id="budgets-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="monthly_budgets">Monthly Budgets</h3>
+                            <button id="addBudgetBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="add_budget">Add Budget</span>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div id="budgetsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Budget cards will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics-content" class="tab-content hidden fade-in">
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-900" data-translate="expense_breakdown">Expense Breakdown</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="expenseBreakdownChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-900" data-translate="income_vs_expenses">Income vs Expenses</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="incomeVsExpensesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="financial_health">Financial Health</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="financialHealthMetrics" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Financial health metrics will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Universal Add Modal -->
     <div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-gray-200">
@@ -476,7 +1103,7 @@
         // 🔥 FIREBASE CONFIGURATION
         // ΑΝΤΙΚΑΤΕΣΤΗ ΤΑ ΣΤΟΙΧΕΙΑ ΜΕ ΤΑ ΔΙΚΑ ΣΟΥ ΑΠΟ FIREBASE CONSOLE
         const firebaseConfig = {
-      apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
+         apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
     authDomain: "wealth-tracker-app-4209f.firebaseapp.com",
     projectId: "wealth-tracker-app-4209f",
     storageBucket: "wealth-tracker-app-4209f.firebasestorage.app",
@@ -644,7 +1271,50 @@
                     { name: 'Rental Property', address: '456 Oak Ave, Thessaloniki', purchasePrice: 150000, currentValue: 180000, type: 'rental', monthlyRent: 800, currency: 'EUR' }
                 ];
 
-                // Continue with other sample data...
+                // Sample accounts
+                const sampleAccounts = [
+                    { name: 'Alpha Bank Checking', bank: 'Alpha Bank', balance: 8500, type: 'checking', currency: 'EUR' },
+                    { name: 'Eurobank Savings', bank: 'Eurobank', balance: 25000, type: 'savings', currency: 'EUR' },
+                    { name: 'Piraeus Term Deposit', bank: 'Piraeus Bank', balance: 50000, type: 'term_deposit', currency: 'EUR' }
+                ];
+
+                // Sample liabilities
+                const sampleLiabilities = [
+                    { name: 'Home Mortgage', type: 'mortgage', balance: 195000, interestRate: 2.5, monthlyPayment: 950, currency: 'EUR' },
+                    { name: 'Car Loan', type: 'car_loan', balance: 15000, interestRate: 4.2, monthlyPayment: 320, currency: 'EUR' }
+                ];
+
+                // Sample incomes
+                const sampleIncomes = [
+                    { name: 'Primary Salary', type: 'salary', monthlyGross: 4500, taxRate: 35, employer: 'Tech Company Ltd', currency: 'EUR' },
+                    { name: 'Rental Income', type: 'rental', monthlyGross: 800, taxRate: 15, employer: 'Rental Property', currency: 'EUR' },
+                    { name: 'Freelance Work', type: 'freelance', monthlyGross: 1200, taxRate: 20, employer: 'Various Clients', currency: 'EUR' }
+                ];
+
+                // Sample expenses
+                const sampleExpenses = [
+                    { date: '2025-01-10', description: 'Supermarket Shopping', category: 'groceries', amount: 125.50, currency: 'EUR' },
+                    { date: '2025-01-09', description: 'Gasoline', category: 'transportation', amount: 65.00, currency: 'EUR' },
+                    { date: '2025-01-08', description: 'Restaurant Dinner', category: 'dining', amount: 85.00, currency: 'EUR' },
+                    { date: '2025-01-07', description: 'Electricity Bill', category: 'utilities', amount: 95.00, currency: 'EUR' },
+                    { date: '2025-01-06', description: 'Netflix Subscription', category: 'entertainment', amount: 12.99, currency: 'EUR' }
+                ];
+
+                // Sample budgets
+                const sampleBudgets = [
+                    { category: 'groceries', amount: 600, spent: 425.50, currency: 'EUR' },
+                    { category: 'transportation', amount: 400, spent: 285.00, currency: 'EUR' },
+                    { category: 'dining', amount: 300, spent: 185.50, currency: 'EUR' },
+                    { category: 'utilities', amount: 200, spent: 95.00, currency: 'EUR' },
+                    { category: 'entertainment', amount: 150, spent: 67.99, currency: 'EUR' }
+                ];
+
+                // Additional asset categories
+                const sampleOtherAssets = [
+                    { name: 'Life Insurance Policy', type: 'life_insurance', value: 25000, currency: 'EUR' },
+                    { name: 'Car - BMW 3 Series', type: 'vehicle', value: 35000, currency: 'EUR' },
+                    { name: 'Jewelry Collection', type: 'jewelry', value: 8000, currency: 'EUR' }
+                ];
                 
                 try {
                     for (const investment of sampleInvestments) {
@@ -657,7 +1327,36 @@
                         properties.push(property);
                     }
 
-                    // Continue with other collections...
+                    for (const account of sampleAccounts) {
+                        await this.saveData('accounts', account);
+                        accounts.push(account);
+                    }
+
+                    for (const liability of sampleLiabilities) {
+                        await this.saveData('liabilities', liability);
+                        liabilities.push(liability);
+                    }
+
+                    for (const income of sampleIncomes) {
+                        await this.saveData('incomes', income);
+                        incomes.push(income);
+                    }
+
+                    for (const expense of sampleExpenses) {
+                        await this.saveData('expenses', expense);
+                        expenses.push(expense);
+                    }
+
+                    for (const budget of sampleBudgets) {
+                        await this.saveData('budgets', budget);
+                        budgets.push(budget);
+                    }
+
+                    for (const asset of sampleOtherAssets) {
+                        await this.saveData('otherAssets', asset);
+                        otherAssets.push(asset);
+                    }
+
                 } catch (error) {
                     console.error('Error creating sample data:', error);
                 }
@@ -674,7 +1373,31 @@
                     { id: 'prop1', name: 'Main Residence', address: '123 Main St, Athens', purchasePrice: 300000, currentValue: 375000, type: 'residential', currency: 'EUR' }
                 ];
 
-                // Continue with minimal sample data...
+                accounts = [
+                    { id: 'acc1', name: 'Alpha Bank Checking', bank: 'Alpha Bank', balance: 8500, type: 'checking', currency: 'EUR' }
+                ];
+
+                liabilities = [
+                    { id: 'lib1', name: 'Home Mortgage', type: 'mortgage', balance: 195000, interestRate: 2.5, monthlyPayment: 950, currency: 'EUR' }
+                ];
+
+                incomes = [
+                    { id: 'inc1', name: 'Primary Salary', type: 'salary', monthlyGross: 4500, taxRate: 35, employer: 'Tech Company Ltd', currency: 'EUR' }
+                ];
+
+                expenses = [
+                    { id: 'exp1', date: '2025-01-10', description: 'Supermarket Shopping', category: 'groceries', amount: 125.50, currency: 'EUR' },
+                    { id: 'exp2', date: '2025-01-09', description: 'Gasoline', category: 'transportation', amount: 65.00, currency: 'EUR' }
+                ];
+
+                budgets = [
+                    { id: 'bud1', category: 'groceries', amount: 600, spent: 425.50, currency: 'EUR' },
+                    { id: 'bud2', category: 'transportation', amount: 400, spent: 285.00, currency: 'EUR' }
+                ];
+
+                otherAssets = [
+                    { id: 'other1', name: 'Life Insurance Policy', type: 'life_insurance', value: 25000, currency: 'EUR' }
+                ];
             }
         }
 
@@ -751,7 +1474,274 @@
             }
         }
 
-        // 🎨 UI UTILITY FUNCTIONS (keeping all original functions)
+        // Translation object
+        const translations = {
+            en: {
+                dashboard: 'Dashboard',
+                assets: 'Assets',
+                investments: 'Investments',
+                real_estate: 'Real Estate',
+                accounts: 'Accounts',
+                liabilities: 'Liabilities',
+                income: 'Income',
+                expenses: 'Expenses',
+                budgets: 'Budgets',
+                analytics: 'Analytics',
+                export: 'Export',
+                welcome_message: 'Welcome to your financial overview',
+                add_item: 'Add Item',
+                last_updated: 'Last Updated',
+                net_worth: 'Net Worth',
+                total_wealth: 'Total Wealth',
+                total_assets: 'Total Assets',
+                all_holdings: 'All Holdings',
+                monthly_income: 'Monthly Income',
+                after_taxes: 'After Taxes',
+                monthly_expenses: 'Monthly Expenses',
+                this_month: 'This Month',
+                asset_allocation: 'Asset Allocation',
+                net_worth_trend: 'Net Worth Trend',
+                recent_transactions: 'Recent Transactions',
+                budget_overview: 'Budget Overview',
+                asset_breakdown: 'Asset Breakdown',
+                add_asset: 'Add Asset',
+                asset_summary: 'Asset Summary',
+                investment_portfolio: 'Investment Portfolio',
+                add_investment: 'Add Investment',
+                investment: 'Investment',
+                type: 'Type',
+                quantity: 'Quantity',
+                purchase_price: 'Purchase Price',
+                current_price: 'Current Price',
+                total_value: 'Total Value',
+                gain_loss: 'Gain/Loss',
+                actions: 'Actions',
+                real_estate_portfolio: 'Real Estate Portfolio',
+                add_property: 'Add Property',
+                bank_accounts: 'Bank Accounts',
+                add_account: 'Add Account',
+                liabilities_debts: 'Liabilities & Debts',
+                add_liability: 'Add Liability',
+                liability: 'Liability',
+                balance: 'Balance',
+                interest_rate: 'Interest Rate',
+                monthly_payment: 'Monthly Payment',
+                income_sources: 'Income Sources',
+                add_income: 'Add Income',
+                source: 'Source',
+                monthly_gross: 'Monthly Gross',
+                monthly_net: 'Monthly Net',
+                annual_net: 'Annual Net',
+                expense_tracking: 'Expense Tracking',
+                add_expense: 'Add Expense',
+                date: 'Date',
+                description: 'Description',
+                category: 'Category',
+                amount: 'Amount',
+                monthly_budgets: 'Monthly Budgets',
+                add_budget: 'Add Budget',
+                expense_breakdown: 'Expense Breakdown',
+                income_vs_expenses: 'Income vs Expenses',
+                financial_health: 'Financial Health',
+                cancel: 'Cancel',
+                save: 'Save',
+                name: 'Name',
+                address: 'Address',
+                bank: 'Bank',
+                employer: 'Employer',
+                tax_rate: 'Tax Rate (%)',
+                monthly_rent: 'Monthly Rent',
+                purchase_date: 'Purchase Date',
+                current_value: 'Current Value',
+                budget_limit: 'Budget Limit',
+                spent_amount: 'Spent Amount',
+                remaining: 'Remaining',
+                over_budget: 'Over Budget',
+                debt_to_asset_ratio: 'Debt-to-Asset Ratio',
+                debt_to_income_ratio: 'Debt-to-Income Ratio',
+                savings_rate: 'Savings Rate',
+                emergency_fund: 'Emergency Fund',
+                months_of_expenses: 'Months of Expenses Covered',
+                // Asset Types
+                stocks: 'Stocks',
+                bonds: 'Bonds',
+                etf: 'ETF',
+                mutual_fund: 'Mutual Fund',
+                cryptocurrency: 'Cryptocurrency',
+                index_fund: 'Index Fund',
+                life_insurance: 'Life Insurance',
+                vehicle: 'Vehicle',
+                jewelry: 'Jewelry',
+                // Property Types
+                residential: 'Residential',
+                rental: 'Rental',
+                commercial: 'Commercial',
+                // Account Types
+                checking: 'Checking',
+                savings: 'Savings',
+                term_deposit: 'Term Deposit',
+                // Liability Types
+                mortgage: 'Mortgage',
+                car_loan: 'Car Loan',
+                personal_loan: 'Personal Loan',
+                credit_card: 'Credit Card',
+                student_loan: 'Student Loan',
+                // Income Types
+                salary: 'Salary',
+                freelance: 'Freelance',
+                business: 'Business',
+                rental: 'Rental',
+                dividends: 'Dividends',
+                pension: 'Pension',
+                // Expense Categories
+                groceries: 'Groceries',
+                transportation: 'Transportation',
+                dining: 'Dining',
+                utilities: 'Utilities',
+                entertainment: 'Entertainment',
+                health: 'Health',
+                shopping: 'Shopping',
+                travel: 'Travel',
+                education: 'Education',
+                insurance: 'Insurance',
+                other: 'Other'
+            },
+            el: {
+                dashboard: 'Πίνακας Ελέγχου',
+                assets: 'Περιουσιακά Στοιχεία',
+                investments: 'Επενδύσεις',
+                real_estate: 'Ακίνητα',
+                accounts: 'Λογαριασμοί',
+                liabilities: 'Υποχρεώσεις',
+                income: 'Εισόδημα',
+                expenses: 'Έξοδα',
+                budgets: 'Προϋπολογισμοί',
+                analytics: 'Αναλυτικά',
+                export: 'Εξαγωγή',
+                welcome_message: 'Καλώς ήρθατε στην οικονομική σας επισκόπηση',
+                add_item: 'Προσθήκη Στοιχείου',
+                last_updated: 'Τελευταία Ενημέρωση',
+                net_worth: 'Καθαρή Αξία',
+                total_wealth: 'Συνολικός Πλούτος',
+                total_assets: 'Συνολικά Περιουσιακά',
+                all_holdings: 'Όλες οι Συμμετοχές',
+                monthly_income: 'Μηνιαίο Εισόδημα',
+                after_taxes: 'Μετά από Φόρους',
+                monthly_expenses: 'Μηνιαία Έξοδα',
+                this_month: 'Τον Μήνα',
+                asset_allocation: 'Κατανομή Περιουσίας',
+                net_worth_trend: 'Τάση Καθαρής Αξίας',
+                recent_transactions: 'Πρόσφατες Συναλλαγές',
+                budget_overview: 'Επισκόπηση Προϋπολογισμού',
+                asset_breakdown: 'Ανάλυση Περιουσίας',
+                add_asset: 'Προσθήκη Περιουσιακού',
+                asset_summary: 'Περίληψη Περιουσίας',
+                investment_portfolio: 'Επενδυτικό Χαρτοφυλάκιο',
+                add_investment: 'Προσθήκη Επένδυσης',
+                investment: 'Επένδυση',
+                type: 'Τύπος',
+                quantity: 'Ποσότητα',
+                purchase_price: 'Τιμή Αγοράς',
+                current_price: 'Τρέχουσα Τιμή',
+                total_value: 'Συνολική Αξία',
+                gain_loss: 'Κέρδος/Ζημία',
+                actions: 'Ενέργειες',
+                real_estate_portfolio: 'Χαρτοφυλάκιο Ακινήτων',
+                add_property: 'Προσθήκη Ακινήτου',
+                bank_accounts: 'Τραπεζικοί Λογαριασμοί',
+                add_account: 'Προσθήκη Λογαριασμού',
+                liabilities_debts: 'Υποχρεώσεις & Χρέη',
+                add_liability: 'Προσθήκη Υποχρέωσης',
+                liability: 'Υποχρέωση',
+                balance: 'Υπόλοιπο',
+                interest_rate: 'Επιτόκιο',
+                monthly_payment: 'Μηνιαία Δόση',
+                income_sources: 'Πηγές Εισοδήματος',
+                add_income: 'Προσθήκη Εισοδήματος',
+                source: 'Πηγή',
+                monthly_gross: 'Μηνιαίο Μικτό',
+                monthly_net: 'Μηνιαίο Καθαρό',
+                annual_net: 'Ετήσιο Καθαρό',
+                expense_tracking: 'Παρακολούθηση Εξόδων',
+                add_expense: 'Προσθήκη Εξόδου',
+                date: 'Ημερομηνία',
+                description: 'Περιγραφή',
+                category: 'Κατηγορία',
+                amount: 'Ποσό',
+                monthly_budgets: 'Μηνιαίοι Προϋπολογισμοί',
+                add_budget: 'Προσθήκη Προϋπολογισμού',
+                expense_breakdown: 'Ανάλυση Εξόδων',
+                income_vs_expenses: 'Εισόδημα vs Έξοδα',
+                financial_health: 'Οικονομική Υγεία',
+                cancel: 'Ακύρωση',
+                save: 'Αποθήκευση',
+                name: 'Όνομα',
+                address: 'Διεύθυνση',
+                bank: 'Τράπεζα',
+                employer: 'Εργοδότης',
+                tax_rate: 'Φορολογικό Ποσοστό (%)',
+                monthly_rent: 'Μηνιαίο Ενοίκιο',
+                purchase_date: 'Ημερομηνία Αγοράς',
+                current_value: 'Τρέχουσα Αξία',
+                budget_limit: 'Όριο Προϋπολογισμού',
+                spent_amount: 'Ποσό που Ξοδεύτηκε',
+                remaining: 'Υπόλοιπο',
+                over_budget: 'Υπέρβαση Προϋπολογισμού',
+                debt_to_asset_ratio: 'Αναλογία Χρέους προς Περιουσία',
+                debt_to_income_ratio: 'Αναλογία Χρέους προς Εισόδημα',
+                savings_rate: 'Ποσοστό Αποταμίευσης',
+                emergency_fund: 'Ταμείο Έκτακτης Ανάγκης',
+                months_of_expenses: 'Μήνες Εξόδων που Καλύπτονται',
+                // Asset Types
+                stocks: 'Μετοχές',
+                bonds: 'Ομόλογα',
+                etf: 'ETF',
+                mutual_fund: 'Αμοιβαίο Κεφάλαιο',
+                cryptocurrency: 'Κρυπτονόμισμα',
+                index_fund: 'Κεφάλαιο Δείκτη',
+                life_insurance: 'Ασφάλεια Ζωής',
+                vehicle: 'Όχημα',
+                jewelry: 'Κοσμήματα',
+                // Property Types
+                residential: 'Κατοικία',
+                rental: 'Ενοίκιο',
+                commercial: 'Εμπορικό',
+                // Account Types
+                checking: 'Τρεχούμενος',
+                savings: 'Αποταμιεύσεων',
+                term_deposit: 'Προθεσμιακή Κατάθεση',
+                // Liability Types
+                mortgage: 'Στεγαστικό Δάνειο',
+                car_loan: 'Δάνειο Αυτοκινήτου',
+                personal_loan: 'Προσωπικό Δάνειο',
+                credit_card: 'Πιστωτική Κάρτα',
+                student_loan: 'Φοιτητικό Δάνειο',
+                // Income Types
+                salary: 'Μισθός',
+                freelance: 'Ελεύθερος Επαγγελματίας',
+                business: 'Επιχείρηση',
+                rental: 'Ενοίκιο',
+                dividends: 'Μερίσματα',
+                pension: 'Σύνταξη',
+                // Expense Categories
+                groceries: 'Παντοπωλείο',
+                transportation: 'Μεταφορά',
+                dining: 'Φαγητό',
+                utilities: 'Κοινόχρηστα',
+                entertainment: 'Διασκέδαση',
+                health: 'Υγεία',
+                shopping: 'Αγορές',
+                travel: 'Ταξίδια',
+                education: 'Εκπαίδευση',
+                insurance: 'Ασφάλιση',
+                other: 'Άλλα'
+            }
+        };
+
+        // Chart instances
+        let chartInstances = {};
+
+        // Utility functions
         function formatCurrency(amount, currency = currentCurrency) {
             return new Intl.NumberFormat('en-EU', {
                 style: 'currency',
@@ -760,108 +1750,6 @@
         }
 
         function translate(key) {
-            const translations = {
-                en: {
-                    dashboard: 'Dashboard',
-                    assets: 'Assets',
-                    investments: 'Investments',
-                    real_estate: 'Real Estate',
-                    accounts: 'Accounts',
-                    liabilities: 'Liabilities',
-                    income: 'Income',
-                    expenses: 'Expenses',
-                    budgets: 'Budgets',
-                    analytics: 'Analytics',
-                    export: 'Export',
-                    welcome_message: 'Welcome to your financial overview',
-                    add_item: 'Add Item',
-                    last_updated: 'Last Updated',
-                    net_worth: 'Net Worth',
-                    total_wealth: 'Total Wealth',
-                    total_assets: 'Total Assets',
-                    all_holdings: 'All Holdings',
-                    monthly_income: 'Monthly Income',
-                    after_taxes: 'After Taxes',
-                    monthly_expenses: 'Monthly Expenses',
-                    this_month: 'This Month',
-                    asset_allocation: 'Asset Allocation',
-                    net_worth_trend: 'Net Worth Trend',
-                    recent_transactions: 'Recent Transactions',
-                    budget_overview: 'Budget Overview',
-                    asset_breakdown: 'Asset Breakdown',
-                    add_asset: 'Add Asset',
-                    asset_summary: 'Asset Summary',
-                    investment_portfolio: 'Investment Portfolio',
-                    add_investment: 'Add Investment',
-                    investment: 'Investment',
-                    type: 'Type',
-                    quantity: 'Quantity',
-                    purchase_price: 'Purchase Price',
-                    current_price: 'Current Price',
-                    total_value: 'Total Value',
-                    gain_loss: 'Gain/Loss',
-                    actions: 'Actions',
-                    cancel: 'Cancel',
-                    save: 'Save',
-                    // Asset Types
-                    stocks: 'Stocks',
-                    bonds: 'Bonds',
-                    etf: 'ETF',
-                    mutual_fund: 'Mutual Fund',
-                    cryptocurrency: 'Cryptocurrency',
-                    index_fund: 'Index Fund'
-                },
-                el: {
-                    dashboard: 'Πίνακας Ελέγχου',
-                    assets: 'Περιουσιακά Στοιχεία',
-                    investments: 'Επενδύσεις',
-                    real_estate: 'Ακίνητα',
-                    accounts: 'Λογαριασμοί',
-                    liabilities: 'Υποχρεώσεις',
-                    income: 'Εισόδημα',
-                    expenses: 'Έξοδα',
-                    budgets: 'Προϋπολογισμοί',
-                    analytics: 'Αναλυτικά',
-                    export: 'Εξαγωγή',
-                    welcome_message: 'Καλώς ήρθατε στην οικονομική σας επισκόπηση',
-                    add_item: 'Προσθήκη Στοιχείου',
-                    last_updated: 'Τελευταία Ενημέρωση',
-                    net_worth: 'Καθαρή Αξία',
-                    total_wealth: 'Συνολικός Πλούτος',
-                    total_assets: 'Συνολικά Περιουσιακά',
-                    all_holdings: 'Όλες οι Συμμετοχές',
-                    monthly_income: 'Μηνιαίο Εισόδημα',
-                    after_taxes: 'Μετά από Φόρους',
-                    monthly_expenses: 'Μηνιαία Έξοδα',
-                    this_month: 'Τον Μήνα',
-                    asset_allocation: 'Κατανομή Περιουσίας',
-                    net_worth_trend: 'Τάση Καθαρής Αξίας',
-                    recent_transactions: 'Πρόσφατες Συναλλαγές',
-                    budget_overview: 'Επισκόπηση Προϋπολογισμού',
-                    asset_breakdown: 'Ανάλυση Περιουσίας',
-                    add_asset: 'Προσθήκη Περιουσιακού',
-                    asset_summary: 'Περίληψη Περιουσίας',
-                    investment_portfolio: 'Επενδυτικό Χαρτοφυλάκιο',
-                    add_investment: 'Προσθήκη Επένδυσης',
-                    investment: 'Επένδυση',
-                    type: 'Τύπος',
-                    quantity: 'Ποσότητα',
-                    purchase_price: 'Τιμή Αγοράς',
-                    current_price: 'Τρέχουσα Τιμή',
-                    total_value: 'Συνολική Αξία',
-                    gain_loss: 'Κέρδος/Ζημία',
-                    actions: 'Ενέργειες',
-                    cancel: 'Ακύρωση',
-                    save: 'Αποθήκευση',
-                    // Asset Types
-                    stocks: 'Μετοχές',
-                    bonds: 'Ομόλογα',
-                    etf: 'ETF',
-                    mutual_fund: 'Αμοιβαίο Κεφάλαιο',
-                    cryptocurrency: 'Κρυπτονόμισμα',
-                    index_fund: 'Κεφάλαιο Δείκτη'
-                }
-            };
             return translations[currentLanguage][key] || key;
         }
 
@@ -896,7 +1784,67 @@
             }, 3000);
         }
 
-        // 📊 CALCULATION FUNCTIONS (keeping original logic)
+        // Navigation functions
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = translate(tabName.replace('-', '_'));
+            
+            // Render content
+            renderTabContent();
+        }
+
+        function renderTabContent() {
+            switch (activeTab) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'assets':
+                    renderAssets();
+                    break;
+                case 'investments':
+                    renderInvestments();
+                    break;
+                case 'real-estate':
+                    renderRealEstate();
+                    break;
+                case 'accounts':
+                    renderAccounts();
+                    break;
+                case 'liabilities':
+                    renderLiabilities();
+                    break;
+                case 'income':
+                    renderIncome();
+                    break;
+                case 'expenses':
+                    renderExpenses();
+                    break;
+                case 'budgets':
+                    renderBudgets();
+                    break;
+                case 'analytics':
+                    renderAnalytics();
+                    break;
+            }
+        }
+
+        // Calculation functions
         function calculateTotalAssets() {
             const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
@@ -931,7 +1879,7 @@
                 .reduce((sum, expense) => sum + expense.amount, 0);
         }
 
-        // 🎨 RENDER FUNCTIONS
+        // Render functions
         function renderDashboard() {
             const totalAssets = calculateTotalAssets();
             const totalLiabilities = calculateTotalLiabilities();
@@ -945,7 +1893,7 @@
             document.getElementById('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
             document.getElementById('monthlyExpensesValue').textContent = formatCurrency(monthlyExpenses);
 
-            // Render charts (keeping original chart logic)
+            // Render charts
             renderChart('assetAllocationChart', 'doughnut', getAssetAllocationData());
             renderChart('netWorthChart', 'line', getNetWorthTrendData());
             
@@ -954,10 +1902,13 @@
             renderBudgetOverview();
         }
 
+        function renderAssets() {
+            renderChart('assetBreakdownChart', 'bar', getAssetBreakdownData());
+            renderAssetSummary();
+        }
+
         function renderInvestments() {
             const tableBody = document.getElementById('investmentsTableBody');
-            if (!tableBody) return;
-            
             tableBody.innerHTML = investments.map(investment => {
                 const totalValue = investment.quantity * investment.currentPrice;
                 const purchaseValue = investment.quantity * investment.purchasePrice;
@@ -974,42 +1925,186 @@
                                 ${translate(investment.type)}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${investment.quantity}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${formatCurrency(investment.purchasePrice, investment.currency)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <input type="number" value="${investment.currentPrice}" step="0.01" 
-                                   class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                   onchange="updateInvestmentPrice('${investment.id}', this.value)">
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            ${formatCurrency(totalValue, investment.currency)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}">
-                            ${formatCurrency(gainLoss, investment.currency)} (${gainLossPercent.toFixed(2)}%)
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <button onclick="editItem('investment', '${investment.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
-                                <i data-lucide="edit-2" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteItem('investment', '${investment.id}')" class="text-red-600 hover:text-red-900">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </td>
-                    </tr>
+                        <button onclick="editItem('expense', '${expense.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteItem('expense', '${expense.id}')" class="text-red-600 hover:text-red-900">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            createIcons();
+        }
+
+        function renderBudgets() {
+            const budgetsGrid = document.getElementById('budgetsGrid');
+            budgetsGrid.innerHTML = budgets.map(budget => {
+                const percentage = (budget.spent / budget.amount) * 100;
+                const remaining = budget.amount - budget.spent;
+                const status = percentage > 100 ? 'over' : percentage > 80 ? 'warning' : 'good';
+                
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">${translate(budget.category)}</h4>
+                            <div class="flex space-x-2">
+                                <button onclick="editItem('budget', '${budget.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteItem('budget', '${budget.id}')" class="text-red-600 hover:text-red-900">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span>${translate('spent_amount')}: ${formatCurrency(budget.spent, budget.currency)}</span>
+                                <span>${translate('budget_limit')}: ${formatCurrency(budget.amount, budget.currency)}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="progress-bar ${status === 'over' ? 'bg-red-500' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'} h-2 rounded-full" 
+                                     style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                            <div class="text-sm ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                ${remaining >= 0 ? translate('remaining') : translate('over_budget')}: ${formatCurrency(Math.abs(remaining), budget.currency)}
+                            </div>
+                        </div>
+                    </div>
                 `;
             }).join('');
             createIcons();
         }
 
-        // Continue with other render functions (keeping original logic)...
+        function renderAnalytics() {
+            renderChart('expenseBreakdownChart', 'pie', getExpenseBreakdownData());
+            renderChart('incomeVsExpensesChart', 'bar', getIncomeVsExpensesData());
+            renderFinancialHealthMetrics();
+        }
 
-        // 📊 CHART FUNCTIONS (keeping original)
-        let chartInstances = {};
+        function renderRecentTransactions() {
+            const container = document.getElementById('recentTransactions');
+            const recentExpenses = expenses.slice(-5).reverse();
+            
+            container.innerHTML = recentExpenses.map(expense => `
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-red-100 rounded-lg">
+                            <i data-lucide="minus" class="w-4 h-4 text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${expense.description}</p>
+                            <p class="text-xs text-gray-500">${expense.date} • ${translate(expense.category)}</p>
+                        </div>
+                    </div>
+                    <p class="text-sm font-medium text-red-600">${formatCurrency(expense.amount, expense.currency)}</p>
+                </div>
+            `).join('');
+            createIcons();
+        }
 
+        function renderBudgetOverview() {
+            const container = document.getElementById('budgetOverview');
+            
+            container.innerHTML = budgets.slice(0, 3).map(budget => {
+                const percentage = (budget.spent / budget.amount) * 100;
+                const status = percentage > 100 ? 'over' : percentage > 80 ? 'warning' : 'good';
+                
+                return `
+                    <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-900">${translate(budget.category)}</span>
+                            <span class="text-sm font-medium ${status === 'over' ? 'text-red-600' : 'text-gray-600'}">${percentage.toFixed(1)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="progress-bar ${status === 'over' ? 'bg-red-500' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'} h-2 rounded-full" 
+                                 style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAssetSummary() {
+            const container = document.getElementById('assetSummary');
+            
+            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
+            const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+            const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
+            
+            container.innerHTML = `
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <h4 class="font-medium text-blue-900">${translate('investments')}</h4>
+                    <p class="text-2xl font-bold text-blue-600">${formatCurrency(investmentValue)}</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <h4 class="font-medium text-green-900">${translate('real_estate')}</h4>
+                    <p class="text-2xl font-bold text-green-600">${formatCurrency(propertyValue)}</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-lg">
+                    <h4 class="font-medium text-purple-900">${translate('accounts')}</h4>
+                    <p class="text-2xl font-bold text-purple-600">${formatCurrency(accountValue)}</p>
+                </div>
+                <div class="p-4 bg-orange-50 rounded-lg">
+                    <h4 class="font-medium text-orange-900">Other Assets</h4>
+                    <p class="text-2xl font-bold text-orange-600">${formatCurrency(otherAssetsValue)}</p>
+                </div>
+            `;
+        }
+
+        function renderFinancialHealthMetrics() {
+            const container = document.getElementById('financialHealthMetrics');
+            
+            const totalAssets = calculateTotalAssets();
+            const totalLiabilities = calculateTotalLiabilities();
+            const monthlyIncome = calculateMonthlyIncome();
+            const monthlyExpenses = calculateMonthlyExpenses();
+            const monthlyDebtPayments = liabilities.reduce((sum, liability) => sum + liability.monthlyPayment, 0);
+            
+            const debtToAssetRatio = totalAssets > 0 ? (totalLiabilities / totalAssets) * 100 : 0;
+            const debtToIncomeRatio = monthlyIncome > 0 ? (monthlyDebtPayments / monthlyIncome) * 100 : 0;
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0;
+            
+            container.innerHTML = `
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium text-gray-900 mb-2">${translate('debt_to_asset_ratio')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="${debtToAssetRatio < 30 ? 'bg-green-500' : debtToAssetRatio < 50 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full progress-bar" 
+                                 style="width: ${Math.min(debtToAssetRatio, 100)}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${debtToAssetRatio.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Target: Below 30%</p>
+                </div>
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium text-gray-900 mb-2">${translate('debt_to_income_ratio')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="${debtToIncomeRatio < 28 ? 'bg-green-500' : debtToIncomeRatio < 40 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full progress-bar" 
+                                 style="width: ${Math.min(debtToIncomeRatio, 100)}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${debtToIncomeRatio.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Target: Below 28%</p>
+                </div>
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium text-gray-900 mb-2">${translate('savings_rate')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="${savingsRate > 20 ? 'bg-green-500' : savingsRate > 10 ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full progress-bar" 
+                                 style="width: ${Math.min(Math.max(savingsRate, 0), 100)}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${savingsRate.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Target: Above 20%</p>
+                </div>
+            `;
+        }
+
+        // Chart functions
         function renderChart(canvasId, type, data) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
@@ -1116,6 +2211,22 @@
             };
         }
 
+        function getAssetBreakdownData() {
+            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
+            const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+            const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
+            
+            return {
+                labels: [translate('investments'), translate('real_estate'), translate('accounts'), 'Other Assets'],
+                datasets: [{
+                    label: translate('total_value'),
+                    data: [investmentValue, propertyValue, accountValue, otherAssetsValue],
+                    backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B']
+                }]
+            };
+        }
+
         function getNetWorthTrendData() {
             // Sample data for the trend - in a real app, this would come from historical data
             return {
@@ -1131,96 +2242,376 @@
             };
         }
 
-        function renderRecentTransactions() {
-            const container = document.getElementById('recentTransactions');
-            if (!container) return;
+        function getExpenseBreakdownData() {
+            const expensesByCategory = {};
+            expenses.forEach(expense => {
+                if (!expensesByCategory[expense.category]) {
+                    expensesByCategory[expense.category] = 0;
+                }
+                expensesByCategory[expense.category] += expense.amount;
+            });
+
+            return {
+                labels: Object.keys(expensesByCategory).map(cat => translate(cat)),
+                datasets: [{
+                    data: Object.values(expensesByCategory),
+                    backgroundColor: [
+                        '#EF4444', '#F59E0B', '#10B981', '#3B82F6', 
+                        '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'
+                    ]
+                }]
+            };
+        }
+
+        function getIncomeVsExpensesData() {
+            const monthlyIncome = calculateMonthlyIncome();
+            const monthlyExpenses = calculateMonthlyExpenses();
             
-            const recentExpenses = expenses.slice(-5).reverse();
+            return {
+                labels: [translate('monthly_income'), translate('monthly_expenses')],
+                datasets: [{
+                    label: translate('amount'),
+                    data: [monthlyIncome, monthlyExpenses],
+                    backgroundColor: ['#10B981', '#EF4444']
+                }]
+            };
+        }
+
+        // Modal functions
+        function openModal(type, id = null) {
+            currentModalType = type;
+            editingId = id;
             
-            container.innerHTML = recentExpenses.map(expense => `
-                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-red-100 rounded-lg">
-                            <i data-lucide="minus" class="w-4 h-4 text-red-600"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">${expense.description}</p>
-                            <p class="text-xs text-gray-500">${expense.date} • ${translate(expense.category)}</p>
-                        </div>
-                    </div>
-                    <p class="text-sm font-medium text-red-600">${formatCurrency(expense.amount, expense.currency)}</p>
-                </div>
-            `).join('');
+            const modal = document.getElementById('addModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalForm = document.getElementById('modalForm');
+            
+            // Set modal title
+            if (id) {
+                modalTitle.textContent = `Edit ${translate(type)}`;
+            } else {
+                modalTitle.textContent = `${translate('add_item')} - ${translate(type)}`;
+            }
+            
+            // Generate form based on type
+            modalForm.innerHTML = generateForm(type, id);
+            
+            modal.classList.remove('hidden');
             createIcons();
         }
 
-        function renderBudgetOverview() {
-            const container = document.getElementById('budgetOverview');
-            if (!container) return;
-            
-            container.innerHTML = budgets.slice(0, 3).map(budget => {
-                const percentage = (budget.spent / budget.amount) * 100;
-                const status = percentage > 100 ? 'over' : percentage > 80 ? 'warning' : 'good';
-                
-                return `
-                    <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium text-gray-900">${translate(budget.category)}</span>
-                            <span class="text-sm font-medium ${status === 'over' ? 'text-red-600' : 'text-gray-600'}">${percentage.toFixed(1)}%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="progress-bar ${status === 'over' ? 'bg-red-500' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'} h-2 rounded-full" 
-                                 style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        function closeModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            currentModalType = '';
+            editingId = null;
         }
 
-        // 🎯 NAVIGATION & TAB FUNCTIONS
-        function switchTab(tabName) {
-            activeTab = tabName;
-            
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            const content = document.getElementById(`${tabName}-content`);
-            if (content) {
-                content.classList.remove('hidden');
+        function generateForm(type, id = null) {
+            let item = null;
+            if (id) {
+                switch (type) {
+                    case 'investment':
+                        item = investments.find(inv => inv.id === id);
+                        break;
+                    case 'property':
+                        item = properties.find(prop => prop.id === id);
+                        break;
+                    case 'account':
+                        item = accounts.find(acc => acc.id === id);
+                        break;
+                    case 'liability':
+                        item = liabilities.find(lib => lib.id === id);
+                        break;
+                    case 'income':
+                        item = incomes.find(inc => inc.id === id);
+                        break;
+                    case 'expense':
+                        item = expenses.find(exp => exp.id === id);
+                        break;
+                    case 'budget':
+                        item = budgets.find(bud => bud.id === id);
+                        break;
+                }
             }
-            
-            // Update page title
-            document.getElementById('pageTitle').textContent = translate(tabName.replace('-', '_'));
-            
-            // Render content
-            renderTabContent();
-        }
 
-        function renderTabContent() {
-            switch (activeTab) {
-                case 'dashboard':
-                    renderDashboard();
-                    break;
-                case 'assets':
-                    renderAssets();
-                    break;
-                case 'investments':
-                    renderInvestments();
-                    break;
-                // Add other cases...
+            switch (type) {
+                case 'investment':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
+                            <input type="text" id="investmentName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Apple Inc. (AAPL)">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
+                            <select id="investmentType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="stocks" ${item?.type === 'stocks' ? 'selected' : ''}>${translate('stocks')}</option>
+                                <option value="bonds" ${item?.type === 'bonds' ? 'selected' : ''}>${translate('bonds')}</option>
+                                <option value="etf" ${item?.type === 'etf' ? 'selected' : ''}>${translate('etf')}</option>
+                                <option value="mutual_fund" ${item?.type === 'mutual_fund' ? 'selected' : ''}>${translate('mutual_fund')}</option>
+                                <option value="cryptocurrency" ${item?.type === 'cryptocurrency' ? 'selected' : ''}>${translate('cryptocurrency')}</option>
+                                <option value="index_fund" ${item?.type === 'index_fund' ? 'selected' : ''}>${translate('index_fund')}</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('quantity')}</label>
+                                <input type="number" id="investmentQuantity" value="${item?.quantity || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('purchase_price')}</label>
+                                <input type="number" id="investmentPurchasePrice" value="${item?.purchasePrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('current_price')}</label>
+                            <input type="number" id="investmentCurrentPrice" value="${item?.currentPrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="investmentCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'property':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
+                            <input type="text" id="propertyName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Main Residence">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('address')}</label>
+                            <input type="text" id="propertyAddress" value="${item?.address || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="123 Main St, Athens">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
+                            <select id="propertyType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="residential" ${item?.type === 'residential' ? 'selected' : ''}>${translate('residential')}</option>
+                                <option value="rental" ${item?.type === 'rental' ? 'selected' : ''}>${translate('rental')}</option>
+                                <option value="commercial" ${item?.type === 'commercial' ? 'selected' : ''}>${translate('commercial')}</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('purchase_price')}</label>
+                                <input type="number" id="propertyPurchasePrice" value="${item?.purchasePrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('current_value')}</label>
+                                <input type="number" id="propertyCurrentValue" value="${item?.currentValue || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div id="rentalSection" style="display: ${item?.type === 'rental' ? 'block' : 'none'}">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('monthly_rent')}</label>
+                            <input type="number" id="propertyMonthlyRent" value="${item?.monthlyRent || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="propertyCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'account':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
+                            <input type="text" id="accountName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Alpha Bank Checking">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('bank')}</label>
+                            <input type="text" id="accountBank" value="${item?.bank || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Alpha Bank">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
+                            <select id="accountType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="checking" ${item?.type === 'checking' ? 'selected' : ''}>${translate('checking')}</option>
+                                <option value="savings" ${item?.type === 'savings' ? 'selected' : ''}>${translate('savings')}</option>
+                                <option value="term_deposit" ${item?.type === 'term_deposit' ? 'selected' : ''}>${translate('term_deposit')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('balance')}</label>
+                            <input type="number" id="accountBalance" value="${item?.balance || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="accountCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'liability':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
+                            <input type="text" id="liabilityName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Home Mortgage">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
+                            <select id="liabilityType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="mortgage" ${item?.type === 'mortgage' ? 'selected' : ''}>${translate('mortgage')}</option>
+                                <option value="car_loan" ${item?.type === 'car_loan' ? 'selected' : ''}>${translate('car_loan')}</option>
+                                <option value="personal_loan" ${item?.type === 'personal_loan' ? 'selected' : ''}>${translate('personal_loan')}</option>
+                                <option value="credit_card" ${item?.type === 'credit_card' ? 'selected' : ''}>${translate('credit_card')}</option>
+                                <option value="student_loan" ${item?.type === 'student_loan' ? 'selected' : ''}>${translate('student_loan')}</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('balance')}</label>
+                                <input type="number" id="liabilityBalance" value="${item?.balance || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('interest_rate')} (%)</label>
+                                <input type="number" id="liabilityInterestRate" value="${item?.interestRate || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('monthly_payment')}</label>
+                            <input type="number" id="liabilityMonthlyPayment" value="${item?.monthlyPayment || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="liabilityCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'income':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
+                            <input type="text" id="incomeName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Primary Salary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
+                            <select id="incomeType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="salary" ${item?.type === 'salary' ? 'selected' : ''}>${translate('salary')}</option>
+                                <option value="freelance" ${item?.type === 'freelance' ? 'selected' : ''}>${translate('freelance')}</option>
+                                <option value="business" ${item?.type === 'business' ? 'selected' : ''}>${translate('business')}</option>
+                                <option value="rental" ${item?.type === 'rental' ? 'selected' : ''}>${translate('rental')}</option>
+                                <option value="dividends" ${item?.type === 'dividends' ? 'selected' : ''}>${translate('dividends')}</option>
+                                <option value="pension" ${item?.type === 'pension' ? 'selected' : ''}>${translate('pension')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('employer')}</label>
+                            <input type="text" id="incomeEmployer" value="${item?.employer || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tech Company Ltd">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('monthly_gross')}</label>
+                                <input type="number" id="incomeMonthlyGross" value="${item?.monthlyGross || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('tax_rate')}</label>
+                                <input type="number" id="incomeTaxRate" value="${item?.taxRate || ''}" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="incomeCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'expense':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('date')}</label>
+                            <input type="date" id="expenseDate" value="${item?.date || new Date().toISOString().split('T')[0]}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('description')}</label>
+                            <input type="text" id="expenseDescription" value="${item?.description || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Supermarket Shopping">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('category')}</label>
+                            <select id="expenseCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="groceries" ${item?.category === 'groceries' ? 'selected' : ''}>${translate('groceries')}</option>
+                                <option value="transportation" ${item?.category === 'transportation' ? 'selected' : ''}>${translate('transportation')}</option>
+                                <option value="dining" ${item?.category === 'dining' ? 'selected' : ''}>${translate('dining')}</option>
+                                <option value="utilities" ${item?.category === 'utilities' ? 'selected' : ''}>${translate('utilities')}</option>
+                                <option value="entertainment" ${item?.category === 'entertainment' ? 'selected' : ''}>${translate('entertainment')}</option>
+                                <option value="health" ${item?.category === 'health' ? 'selected' : ''}>${translate('health')}</option>
+                                <option value="shopping" ${item?.category === 'shopping' ? 'selected' : ''}>${translate('shopping')}</option>
+                                <option value="travel" ${item?.category === 'travel' ? 'selected' : ''}>${translate('travel')}</option>
+                                <option value="education" ${item?.category === 'education' ? 'selected' : ''}>${translate('education')}</option>
+                                <option value="insurance" ${item?.category === 'insurance' ? 'selected' : ''}>${translate('insurance')}</option>
+                                <option value="other" ${item?.category === 'other' ? 'selected' : ''}>${translate('other')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('amount')}</label>
+                            <input type="number" id="expenseAmount" value="${item?.amount || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="expenseCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                case 'budget':
+                    return `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('category')}</label>
+                            <select id="budgetCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="groceries" ${item?.category === 'groceries' ? 'selected' : ''}>${translate('groceries')}</option>
+                                <option value="transportation" ${item?.category === 'transportation' ? 'selected' : ''}>${translate('transportation')}</option>
+                                <option value="dining" ${item?.category === 'dining' ? 'selected' : ''}>${translate('dining')}</option>
+                                <option value="utilities" ${item?.category === 'utilities' ? 'selected' : ''}>${translate('utilities')}</option>
+                                <option value="entertainment" ${item?.category === 'entertainment' ? 'selected' : ''}>${translate('entertainment')}</option>
+                                <option value="health" ${item?.category === 'health' ? 'selected' : ''}>${translate('health')}</option>
+                                <option value="shopping" ${item?.category === 'shopping' ? 'selected' : ''}>${translate('shopping')}</option>
+                                <option value="travel" ${item?.category === 'travel' ? 'selected' : ''}>${translate('travel')}</option>
+                                <option value="education" ${item?.category === 'education' ? 'selected' : ''}>${translate('education')}</option>
+                                <option value="insurance" ${item?.category === 'insurance' ? 'selected' : ''}>${translate('insurance')}</option>
+                                <option value="other" ${item?.category === 'other' ? 'selected' : ''}>${translate('other')}</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('budget_limit')}</label>
+                            <input type="number" id="budgetAmount" value="${item?.amount || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('spent_amount')}</label>
+                            <input type="number" id="budgetSpent" value="${item?.spent || 0}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <select id="budgetCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
+                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                            </select>
+                        </div>
+                    `;
+
+                default:
+                    return '<p>Unknown item type</p>';
             }
         }
 
-        // 🔧 CRUD OPERATIONS (Updated for Firebase)
         async function saveItem() {
             const formData = collectFormData(currentModalType);
             
@@ -1288,6 +2679,88 @@
                 console.error('Error saving item:', error);
                 showToast('Error saving item. Please try again.', 'error');
             }
+        }
+
+        function collectFormData(type) {
+            const data = {};
+            
+            switch (type) {
+                case 'investment':
+                    data.name = document.getElementById('investmentName')?.value || '';
+                    data.type = document.getElementById('investmentType')?.value || '';
+                    data.quantity = parseFloat(document.getElementById('investmentQuantity')?.value || 0);
+                    data.purchasePrice = parseFloat(document.getElementById('investmentPurchasePrice')?.value || 0);
+                    data.currentPrice = parseFloat(document.getElementById('investmentCurrentPrice')?.value || 0);
+                    data.currency = document.getElementById('investmentCurrency')?.value || 'EUR';
+                    break;
+                    
+                case 'property':
+                    data.name = document.getElementById('propertyName')?.value || '';
+                    data.address = document.getElementById('propertyAddress')?.value || '';
+                    data.type = document.getElementById('propertyType')?.value || '';
+                    data.purchasePrice = parseFloat(document.getElementById('propertyPurchasePrice')?.value || 0);
+                    data.currentValue = parseFloat(document.getElementById('propertyCurrentValue')?.value || 0);
+                    data.currency = document.getElementById('propertyCurrency')?.value || 'EUR';
+                    if (data.type === 'rental') {
+                        data.monthlyRent = parseFloat(document.getElementById('propertyMonthlyRent')?.value || 0);
+                    }
+                    break;
+                    
+                case 'account':
+                    data.name = document.getElementById('accountName')?.value || '';
+                    data.bank = document.getElementById('accountBank')?.value || '';
+                    data.type = document.getElementById('accountType')?.value || '';
+                    data.balance = parseFloat(document.getElementById('accountBalance')?.value || 0);
+                    data.currency = document.getElementById('accountCurrency')?.value || 'EUR';
+                    break;
+                    
+                case 'liability':
+                    data.name = document.getElementById('liabilityName')?.value || '';
+                    data.type = document.getElementById('liabilityType')?.value || '';
+                    data.balance = parseFloat(document.getElementById('liabilityBalance')?.value || 0);
+                    data.interestRate = parseFloat(document.getElementById('liabilityInterestRate')?.value || 0);
+                    data.monthlyPayment = parseFloat(document.getElementById('liabilityMonthlyPayment')?.value || 0);
+                    data.currency = document.getElementById('liabilityCurrency')?.value || 'EUR';
+                    break;
+                    
+                case 'income':
+                    data.name = document.getElementById('incomeName')?.value || '';
+                    data.type = document.getElementById('incomeType')?.value || '';
+                    data.employer = document.getElementById('incomeEmployer')?.value || '';
+                    data.monthlyGross = parseFloat(document.getElementById('incomeMonthlyGross')?.value || 0);
+                    data.taxRate = parseFloat(document.getElementById('incomeTaxRate')?.value || 0);
+                    data.currency = document.getElementById('incomeCurrency')?.value || 'EUR';
+                    break;
+                    
+                case 'expense':
+                    data.date = document.getElementById('expenseDate')?.value || '';
+                    data.description = document.getElementById('expenseDescription')?.value || '';
+                    data.category = document.getElementById('expenseCategory')?.value || '';
+                    data.amount = parseFloat(document.getElementById('expenseAmount')?.value || 0);
+                    data.currency = document.getElementById('expenseCurrency')?.value || 'EUR';
+                    break;
+                    
+                case 'budget':
+                    data.category = document.getElementById('budgetCategory')?.value || '';
+                    data.amount = parseFloat(document.getElementById('budgetAmount')?.value || 0);
+                    data.spent = parseFloat(document.getElementById('budgetSpent')?.value || 0);
+                    data.currency = document.getElementById('budgetCurrency')?.value || 'EUR';
+                    break;
+            }
+            
+            return data;
+        }
+
+        function validateFormData(data, type) {
+            // Basic validation - extend as needed
+            for (const key in data) {
+                if (key === 'monthlyRent') continue; // Optional field
+                if (data[key] === undefined || data[key] === '' || (typeof data[key] === 'number' && isNaN(data[key]))) {
+                    showToast(`Please fill in all required fields`, 'error');
+                    return false;
+                }
+            }
+            return true;
         }
 
         async function deleteItem(type, id) {
@@ -1364,132 +2837,173 @@
             }
         }
 
-        // Keep all other original functions (form generation, validation, etc.)
-        function collectFormData(type) {
-            // Keep original implementation
-            const data = {};
-            
-            switch (type) {
-                case 'investment':
-                    data.name = document.getElementById('investmentName')?.value || '';
-                    data.type = document.getElementById('investmentType')?.value || '';
-                    data.quantity = parseFloat(document.getElementById('investmentQuantity')?.value || 0);
-                    data.purchasePrice = parseFloat(document.getElementById('investmentPurchasePrice')?.value || 0);
-                    data.currentPrice = parseFloat(document.getElementById('investmentCurrentPrice')?.value || 0);
-                    data.currency = document.getElementById('investmentCurrency')?.value || 'EUR';
-                    break;
-                // Add other cases...
-            }
-            
-            return data;
-        }
+        // Export functionality
+        function exportToExcel() {
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Create summary sheet
+                const summaryData = [
+                    ['WealthTracker Pro - Financial Summary'],
+                    ['Generated on:', new Date().toLocaleDateString()],
+                    [''],
+                    ['Net Worth Summary'],
+                    ['Total Assets', calculateTotalAssets()],
+                    ['Total Liabilities', calculateTotalLiabilities()],
+                    ['Net Worth', calculateNetWorth()],
+                    [''],
+                    ['Monthly Cash Flow'],
+                    ['Monthly Income', calculateMonthlyIncome()],
+                    ['Monthly Expenses', calculateMonthlyExpenses()],
+                    ['Net Monthly Cash Flow', calculateMonthlyIncome() - calculateMonthlyExpenses()]
+                ];
+                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
 
-        function validateFormData(data, type) {
-            // Basic validation - extend as needed
-            for (const key in data) {
-                if (key === 'monthlyRent') continue; // Optional field
-                if (data[key] === undefined || data[key] === '' || (typeof data[key] === 'number' && isNaN(data[key]))) {
-                    showToast(`Please fill in all required fields`, 'error');
-                    return false;
+                // Investments sheet
+                if (investments.length > 0) {
+                    const investmentData = [
+                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price', 'Total Value', 'Gain/Loss', 'Currency'],
+                        ...investments.map(inv => [
+                            inv.name,
+                            inv.type,
+                            inv.quantity,
+                            inv.purchasePrice,
+                            inv.currentPrice,
+                            inv.quantity * inv.currentPrice,
+                            (inv.quantity * inv.currentPrice) - (inv.quantity * inv.purchasePrice),
+                            inv.currency
+                        ])
+                    ];
+                    const investmentSheet = XLSX.utils.aoa_to_sheet(investmentData);
+                    XLSX.utils.book_append_sheet(wb, investmentSheet, 'Investments');
                 }
-            }
-            return true;
-        }
 
-        // 🎬 MODAL FUNCTIONS (keep original)
-        function openModal(type, id = null) {
-            currentModalType = type;
-            editingId = id;
-            
-            const modal = document.getElementById('addModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalForm = document.getElementById('modalForm');
-            
-            // Set modal title
-            if (id) {
-                modalTitle.textContent = `Edit ${translate(type)}`;
-            } else {
-                modalTitle.textContent = `${translate('add_item')} - ${translate(type)}`;
-            }
-            
-            // Generate form based on type
-            modalForm.innerHTML = generateForm(type, id);
-            
-            modal.classList.remove('hidden');
-            createIcons();
-        }
-
-        function closeModal() {
-            document.getElementById('addModal').classList.add('hidden');
-            currentModalType = '';
-            editingId = null;
-        }
-
-        function generateForm(type, id = null) {
-            let item = null;
-            if (id) {
-                switch (type) {
-                    case 'investment':
-                        item = investments.find(inv => inv.id === id);
-                        break;
-                    // Add other cases...
+                // Properties sheet
+                if (properties.length > 0) {
+                    const propertyData = [
+                        ['Property', 'Address', 'Type', 'Purchase Price', 'Current Value', 'Appreciation', 'Monthly Rent', 'Currency'],
+                        ...properties.map(prop => [
+                            prop.name,
+                            prop.address,
+                            prop.type,
+                            prop.purchasePrice,
+                            prop.currentValue,
+                            prop.currentValue - prop.purchasePrice,
+                            prop.monthlyRent || 0,
+                            prop.currency
+                        ])
+                    ];
+                    const propertySheet = XLSX.utils.aoa_to_sheet(propertyData);
+                    XLSX.utils.book_append_sheet(wb, propertySheet, 'Real Estate');
                 }
-            }
 
-            switch (type) {
-                case 'investment':
-                    return `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
-                            <input type="text" id="investmentName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Apple Inc. (AAPL)">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
-                            <select id="investmentType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="stocks" ${item?.type === 'stocks' ? 'selected' : ''}>${translate('stocks')}</option>
-                                <option value="bonds" ${item?.type === 'bonds' ? 'selected' : ''}>${translate('bonds')}</option>
-                                <option value="etf" ${item?.type === 'etf' ? 'selected' : ''}>${translate('etf')}</option>
-                                <option value="mutual_fund" ${item?.type === 'mutual_fund' ? 'selected' : ''}>${translate('mutual_fund')}</option>
-                                <option value="cryptocurrency" ${item?.type === 'cryptocurrency' ? 'selected' : ''}>${translate('cryptocurrency')}</option>
-                                <option value="index_fund" ${item?.type === 'index_fund' ? 'selected' : ''}>${translate('index_fund')}</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('quantity')}</label>
-                                <input type="number" id="investmentQuantity" value="${item?.quantity || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('purchase_price')}</label>
-                                <input type="number" id="investmentPurchasePrice" value="${item?.purchasePrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('current_price')}</label>
-                            <input type="number" id="investmentCurrentPrice" value="${item?.currentPrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                            <select id="investmentCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
-                                <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
-                                <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
-                            </select>
-                        </div>
-                    `;
-                // Add other form types...
-                default:
-                    return '<p>Form not implemented yet</p>';
+                // Accounts sheet
+                if (accounts.length > 0) {
+                    const accountData = [
+                        ['Account Name', 'Bank', 'Type', 'Balance', 'Currency'],
+                        ...accounts.map(acc => [
+                            acc.name,
+                            acc.bank,
+                            acc.type,
+                            acc.balance,
+                            acc.currency
+                        ])
+                    ];
+                    const accountSheet = XLSX.utils.aoa_to_sheet(accountData);
+                    XLSX.utils.book_append_sheet(wb, accountSheet, 'Accounts');
+                }
+
+                // Liabilities sheet
+                if (liabilities.length > 0) {
+                    const liabilityData = [
+                        ['Liability', 'Type', 'Balance', 'Interest Rate', 'Monthly Payment', 'Currency'],
+                        ...liabilities.map(lib => [
+                            lib.name,
+                            lib.type,
+                            lib.balance,
+                            lib.interestRate,
+                            lib.monthlyPayment,
+                            lib.currency
+                        ])
+                    ];
+                    const liabilitySheet = XLSX.utils.aoa_to_sheet(liabilityData);
+                    XLSX.utils.book_append_sheet(wb, liabilitySheet, 'Liabilities');
+                }
+
+                // Income sheet
+                if (incomes.length > 0) {
+                    const incomeData = [
+                        ['Income Source', 'Type', 'Employer', 'Monthly Gross', 'Tax Rate', 'Monthly Net', 'Annual Net', 'Currency'],
+                        ...incomes.map(inc => [
+                            inc.name,
+                            inc.type,
+                            inc.employer,
+                            inc.monthlyGross,
+                            inc.taxRate,
+                            inc.monthlyGross * (1 - inc.taxRate / 100),
+                            inc.monthlyGross * 12 * (1 - inc.taxRate / 100),
+                            inc.currency
+                        ])
+                    ];
+                    const incomeSheet = XLSX.utils.aoa_to_sheet(incomeData);
+                    XLSX.utils.book_append_sheet(wb, incomeSheet, 'Income');
+                }
+
+                // Expenses sheet
+                if (expenses.length > 0) {
+                    const expenseData = [
+                        ['Date', 'Description', 'Category', 'Amount', 'Currency'],
+                        ...expenses.map(exp => [
+                            exp.date,
+                            exp.description,
+                            exp.category,
+                            exp.amount,
+                            exp.currency
+                        ])
+                    ];
+                    const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
+                    XLSX.utils.book_append_sheet(wb, expenseSheet, 'Expenses');
+                }
+
+                // Budgets sheet
+                if (budgets.length > 0) {
+                    const budgetData = [
+                        ['Category', 'Budget Amount', 'Spent Amount', 'Remaining', 'Percentage Used', 'Currency'],
+                        ...budgets.map(bud => [
+                            bud.category,
+                            bud.amount,
+                            bud.spent,
+                            bud.amount - bud.spent,
+                            ((bud.spent / bud.amount) * 100).toFixed(2) + '%',
+                            bud.currency
+                        ])
+                    ];
+                    const budgetSheet = XLSX.utils.aoa_to_sheet(budgetData);
+                    XLSX.utils.book_append_sheet(wb, budgetSheet, 'Budgets');
+                }
+
+                // Save the file
+                const fileName = `WealthTracker_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                showToast('Export completed successfully!');
+            } catch (error) {
+                console.error('Export failed:', error);
+                showToast('Export failed. Please try again.', 'error');
             }
         }
 
-        // Render placeholder functions for missing tabs
-        function renderAssets() {
-            console.log('Rendering assets...');
-            // Implement asset rendering
+        // Global functions for onclick handlers
+        window.editItem = editItem;
+        window.deleteItem = deleteItem;
+        window.updateInvestmentPrice = updateInvestmentPrice;
+
+        async function editItem(type, id) {
+            openModal(type, id);
         }
 
-        // 📱 EVENT LISTENERS & INITIALIZATION
+        // Event listeners
         document.addEventListener('DOMContentLoaded', async function() {
             // Show loading overlay
             const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1565,10 +3079,27 @@
                 });
 
                 // Specific add buttons
+                document.getElementById('addAssetBtn')?.addEventListener('click', () => openModal('asset'));
                 document.getElementById('addInvestmentBtn')?.addEventListener('click', () => openModal('investment'));
+                document.getElementById('addPropertyBtn')?.addEventListener('click', () => openModal('property'));
+                document.getElementById('addAccountBtn')?.addEventListener('click', () => openModal('account'));
+                document.getElementById('addLiabilityBtn')?.addEventListener('click', () => openModal('liability'));
+                document.getElementById('addIncomeBtn')?.addEventListener('click', () => openModal('income'));
+                document.getElementById('addExpenseBtn')?.addEventListener('click', () => openModal('expense'));
+                document.getElementById('addBudgetBtn')?.addEventListener('click', () => openModal('budget'));
 
                 // Export functionality
                 document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+
+                // Property type change handler
+                document.addEventListener('change', function(e) {
+                    if (e.target.id === 'propertyType') {
+                        const rentalSection = document.getElementById('rentalSection');
+                        if (rentalSection) {
+                            rentalSection.style.display = e.target.value === 'rental' ? 'block' : 'none';
+                        }
+                    }
+                });
 
                 // Close modal on background click
                 document.getElementById('addModal').addEventListener('click', function(e) {
@@ -1588,68 +3119,6 @@
             }
         });
 
-        // Export functionality (keeping original)
-        function exportToExcel() {
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // Create summary sheet
-                const summaryData = [
-                    ['WealthTracker Pro - Financial Summary'],
-                    ['Generated on:', new Date().toLocaleDateString()],
-                    [''],
-                    ['Net Worth Summary'],
-                    ['Total Assets', calculateTotalAssets()],
-                    ['Total Liabilities', calculateTotalLiabilities()],
-                    ['Net Worth', calculateNetWorth()],
-                    [''],
-                    ['Monthly Cash Flow'],
-                    ['Monthly Income', calculateMonthlyIncome()],
-                    ['Monthly Expenses', calculateMonthlyExpenses()],
-                    ['Net Monthly Cash Flow', calculateMonthlyIncome() - calculateMonthlyExpenses()]
-                ];
-                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
-
-                // Investments sheet
-                if (investments.length > 0) {
-                    const investmentData = [
-                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price', 'Total Value', 'Gain/Loss', 'Currency'],
-                        ...investments.map(inv => [
-                            inv.name,
-                            inv.type,
-                            inv.quantity,
-                            inv.purchasePrice,
-                            inv.currentPrice,
-                            inv.quantity * inv.currentPrice,
-                            (inv.quantity * inv.currentPrice) - (inv.quantity * inv.purchasePrice),
-                            inv.currency
-                        ])
-                    ];
-                    const investmentSheet = XLSX.utils.aoa_to_sheet(investmentData);
-                    XLSX.utils.book_append_sheet(wb, investmentSheet, 'Investments');
-                }
-
-                // Save the file
-                const fileName = `WealthTracker_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-                showToast('Export completed successfully!');
-            } catch (error) {
-                console.error('Export failed:', error);
-                showToast('Export failed. Please try again.', 'error');
-            }
-        }
-
-        // Global functions for onclick handlers
-        window.editItem = editItem;
-        window.deleteItem = deleteItem;
-        window.updateInvestmentPrice = updateInvestmentPrice;
-
-        async function editItem(type, id) {
-            openModal(type, id);
-        }
-
         // Initialize chart cleanup on page unload
         window.addEventListener('beforeunload', function() {
             Object.values(chartInstances).forEach(chart => {
@@ -1660,4 +3129,206 @@
         });
     </script>
 </body>
-</html>
+</html>-900">
+                            ${investment.quantity}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatCurrency(investment.purchasePrice, investment.currency)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <input type="number" value="${investment.currentPrice}" step="0.01" 
+                                   class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   onchange="updateInvestmentPrice('${investment.id}', this.value)">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ${formatCurrency(totalValue, investment.currency)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${gainLoss >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${formatCurrency(gainLoss, investment.currency)} (${gainLossPercent.toFixed(2)}%)
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button onclick="editItem('investment', '${investment.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteItem('investment', '${investment.id}')" class="text-red-600 hover:text-red-900">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            createIcons();
+        }
+
+        function renderRealEstate() {
+            const propertiesGrid = document.getElementById('propertiesGrid');
+            propertiesGrid.innerHTML = properties.map(property => {
+                const appreciation = property.currentValue - property.purchasePrice;
+                const appreciationPercent = (appreciation / property.purchasePrice) * 100;
+                
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">${property.name}</h4>
+                            <div class="flex space-x-2">
+                                <button onclick="editItem('property', '${property.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteItem('property', '${property.id}')" class="text-red-600 hover:text-red-900">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm text-gray-600">${property.address}</p>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">${translate('purchase_price')}:</span>
+                                <span class="text-sm font-medium">${formatCurrency(property.purchasePrice, property.currency)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">${translate('current_value')}:</span>
+                                <span class="text-sm font-medium">${formatCurrency(property.currentValue, property.currency)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">${translate('gain_loss')}:</span>
+                                <span class="text-sm font-medium ${appreciation >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                    ${formatCurrency(appreciation, property.currency)} (${appreciationPercent.toFixed(2)}%)
+                                </span>
+                            </div>
+                            ${property.type === 'rental' ? `
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-500">${translate('monthly_rent')}:</span>
+                                    <span class="text-sm font-medium text-green-600">${formatCurrency(property.monthlyRent, property.currency)}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            createIcons();
+        }
+
+        function renderAccounts() {
+            const accountsGrid = document.getElementById('accountsGrid');
+            accountsGrid.innerHTML = accounts.map(account => `
+                <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-900">${account.name}</h4>
+                        <div class="flex space-x-2">
+                            <button onclick="editItem('account', '${account.id}')" class="text-blue-600 hover:text-blue-900">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteItem('account', '${account.id}')" class="text-red-600 hover:text-red-900">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-600">${account.bank}</p>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">${translate('type')}:</span>
+                            <span class="text-sm font-medium">${translate(account.type)}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">${translate('balance')}:</span>
+                            <span class="text-lg font-bold text-green-600">${formatCurrency(account.balance, account.currency)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            createIcons();
+        }
+
+        function renderLiabilities() {
+            const tableBody = document.getElementById('liabilitiesTableBody');
+            tableBody.innerHTML = liabilities.map(liability => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${liability.name}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            ${translate(liability.type)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">
+                        ${formatCurrency(liability.balance, liability.currency)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${liability.interestRate}%
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${formatCurrency(liability.monthlyPayment, liability.currency)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button onclick="editItem('liability', '${liability.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteItem('liability', '${liability.id}')" class="text-red-600 hover:text-red-900">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            createIcons();
+        }
+
+        function renderIncome() {
+            const tableBody = document.getElementById('incomeTableBody');
+            tableBody.innerHTML = incomes.map(income => {
+                const monthlyNet = income.monthlyGross * (1 - income.taxRate / 100);
+                const annualNet = monthlyNet * 12;
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${income.name}</div>
+                            <div class="text-sm text-gray-500">${income.employer}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ${translate(income.type)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatCurrency(income.monthlyGross, income.currency)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                            ${formatCurrency(monthlyNet, income.currency)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatCurrency(annualNet, income.currency)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button onclick="editItem('income', '${income.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteItem('income', '${income.id}')" class="text-red-600 hover:text-red-900">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            createIcons();
+        }
+
+        function renderExpenses() {
+            const tableBody = document.getElementById('expensesTableBody');
+            tableBody.innerHTML = expenses.map(expense => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${expense.date}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${expense.description}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            ${translate(expense.category)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${formatCurrency(expense.amount, expense.currency)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray
