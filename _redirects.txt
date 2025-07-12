@@ -1,0 +1,35 @@
+# _redirects
+# Redirect all routes to index.html for SPA functionality
+/*    /index.html   200
+
+# API routes (για μελλοντική χρήση με Netlify Functions)
+/api/*  /.netlify/functions/:splat  200
+
+# Security redirects
+/admin/*  /index.html  200
+/login    /index.html  200
+/dashboard/*  /index.html  200
+
+# Legacy redirects (αν είχες παλιές διαδρομές)
+/old-dashboard  /  301
+/wealth-tracker  /  301
+
+# File type handling
+*.js  /index.html  200
+*.css /index.html  200
+
+# PWA specific redirects
+/manifest.json  /manifest.json  200
+/service-worker.js  /service-worker.js  200
+
+# Icon redirects
+/icons/*  /icons/:splat  200
+/screenshots/*  /screenshots/:splat  200
+
+# External redirects (αν χρειάζονται)
+/github  https://github.com/your-username/wealth-tracker  301
+/support  mailto:support@yourapp.com  301
+
+# Error pages
+/404  /index.html  404
+/500  /index.html  500
