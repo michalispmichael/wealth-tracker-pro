@@ -3313,22 +3313,33 @@
             createIcons();
         }
 
-        function renderExpenses() {
-            const tableBody = document.getElementById('expensesTableBody');
-            tableBody.innerHTML = expenses.map(expense => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${expense.date}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${expense.description}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            ${translate(expense.category)}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${formatCurrency(expense.amount, expense.currency)}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray
+   function renderExpenses() {
+    const tableBody = document.getElementById('expensesTableBody');
+    tableBody.innerHTML = expenses.map(expense => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                ${expense.date}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                ${expense.description}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    ${translate(expense.category)}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                ${formatCurrency(expense.amount, expense.currency)}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <button onclick="editItem('expense', '${expense.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                </button>
+                <button onclick="deleteItem('expense', '${expense.id}')" class="text-red-600 hover:text-red-900">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    createIcons();
+}
