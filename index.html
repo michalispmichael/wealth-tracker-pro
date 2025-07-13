@@ -3100,7 +3100,210 @@
                 PWAService.init();
                 
                 // Initialize Firebase and load data
-                await FirebaseService.initializeData();
+                document.addEventListener('DOMContentLoaded', async function() {
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    try {
+        // Initialize PWA
+        PWAService.init();
+        
+        // Initialize UI first
+        createIcons();
+        updateLanguage();
+        updateLastUpdated();
+
+        // Initialize Authentication (this will handle data loading)
+        await AuthService.initialize();
+
+        // Hide loading overlay after a delay
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+        }, 1000);
+
+        // Rest of event listeners...
+        setupEventListeners();
+
+    } catch (error) {
+        console.error('Error initializing app:', error);
+        loadingOverlay.innerHTML = `
+            <div class="text-center">
+                <div class="text-red-600 text-xl mb-4">⚠️</div>
+                <p class="text-gray-600">Error loading app. Please refresh the page.</p>
+            </div>
+        `;
+    }
+});
+
+// Separate function for event listeners
+function setupEventListeners() {
+    // Authentication Event Listeners
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('registerBtn').addEventListener('click', handleRegister);
+    document.getElementById('googleSignInBtn').addEventListener('click', handleGoogleSignIn);
+    document.getElementById('logoutBtn').addEventListener('click', AuthService.signOut);
+    
+    // Form toggle listeners
+    document.getElementById('showRegisterBtn').addEventListener('click', showRegisterForm);
+    document.getElementById('showLoginBtn').addEventListener('click', showLoginForm);
+
+    // Language switcher
+    document.getElementById('languageSelect').addEventListener('change', function() {
+        currentLanguage = this.value;
+        updateLanguage();
+        if (currentUser) renderTabContent();
+    });
+
+    // Currency switcher
+    document.getElementById('currencySelect').addEventListener('change', function() {
+        currentCurrency = this.value;
+        if (currentUser) renderTabContent();
+    });
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // Modal controls
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelModal').addEventListener('click', closeModal);
+    document.getElementById('saveModal').addEventListener('click', saveItem);
+
+    // Add Item button logic
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+        if (!currentUser) {
+            showToast('Please login first', 'error');
+            return;
+        }
+        
+        switch (activeTab) {
+            case 'capital-markets':
+                openModal('capital_market');
+                break;
+            case 'real-estate':
+                openModal('property');
+                break;
+            case 'accounts':
+                openModal('account');
+                break;
+            case 'liabilities':
+                openModal('liability');
+                break;
+            case 'income':
+                openModal('income');
+                break;
+            case 'expenses':
+                openModal('expense');
+                break;
+            case 'budgets':
+                openModal('budget');
+                break;
+            default:
+                showToast('Please navigate to a specific section to add items', 'error');
+        }
+    });
+
+    // Specific add buttons
+    const addButtons = [
+        { id: 'addCapitalMarketBtn', type: 'capital_market' },
+        { id: 'addPropertyBtn', type: 'property' },
+        { id: 'addAccountBtn', type: 'account' },
+        { id: 'addLiabilityBtn', type: 'liability' },
+        { id: 'addIncomeBtn', type: 'income' },
+        { id: 'addExpenseBtn', type: 'expense' },
+        { id: 'addBudgetBtn', type: 'budget' }
+    ];
+
+    addButtons.forEach(btn => {
+        const element = document.getElementById(btn.id);
+        if (element) {
+            element.addEventListener('click', () => {
+                if (!currentUser) {
+                    showToast('Please login first', 'error');
+                    return;
+                }
+                openModal(btn.type);
+            });
+        }
+    });
+
+    // Export functionality
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        if (!currentUser) {
+            showToast('Please login first', 'error');
+            return;
+        }
+        exportToExcel();
+    });
+
+    // Dynamic form field handlers
+    document.addEventListener('change', function(e) {
+        // Property type change handler
+        if (e.target.id === 'propertyType') {
+            const rentalSection = document.getElementById('rentalSection');
+            if (rentalSection) {
+                rentalSection.style.display = e.target.value === 'rental' ? 'block' : 'none';
+            }
+        }
+        
+        // Capital market type change handler
+        if (e.target.id === 'capitalMarketType') {
+            const quantityPriceSection = document.getElementById('quantityPriceSection');
+            const currentPriceSection = document.getElementById('currentPriceSection');
+            const lifeInsuranceSection = document.getElementById('lifeInsuranceSection');
+            
+            if (e.target.value === 'life_insurance') {
+                if (quantityPriceSection) quantityPriceSection.style.display = 'none';
+                if (currentPriceSection) currentPriceSection.style.display = 'none';
+                if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'block';
+            } else {
+                if (quantityPriceSection) quantityPriceSection.style.display = 'grid';
+                if (currentPriceSection) currentPriceSection.style.display = 'block';
+                if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'none';
+            }
+        }
+        
+        // Account type change handler
+        if (e.target.id === 'accountType') {
+            const interestSection = document.getElementById('interestSection');
+            const lockupSection = document.getElementById('lockupSection');
+            
+            if (e.target.value === 'savings' || e.target.value === 'term_deposit') {
+                if (interestSection) interestSection.style.display = 'grid';
+            } else {
+                if (interestSection) interestSection.style.display = 'none';
+            }
+            
+            if (e.target.value === 'term_deposit') {
+                if (lockupSection) lockupSection.style.display = 'block';
+            } else {
+                if (lockupSection) lockupSection.style.display = 'none';
+            }
+        }
+    });
+
+    // Close modal on background click
+    document.getElementById('addModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Handle Enter key in login forms
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (!loginForm.classList.contains('hidden')) {
+                handleLogin();
+            } else if (!registerForm.classList.contains('hidden')) {
+                handleRegister();
+            }
+        }
+    });
+}
                 
                 // Initialize UI
                 createIcons();
