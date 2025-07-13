@@ -124,6 +124,16 @@
         .offline-banner.show {
             transform: translateY(0);
         }
+
+        .risk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .risk-low { color: #10B981; }
+        .risk-medium { color: #F59E0B; }
+        .risk-high { color: #EF4444; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -198,9 +208,9 @@
                     <i data-lucide="trending-up" class="w-5 h-5"></i>
                     <span data-translate="assets">Assets</span>
                 </button>
-                <button data-tab="investments" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                <button data-tab="capital-markets" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                    <span data-translate="investments">Investments</span>
+                    <span data-translate="capital_markets">Capital Markets</span>
                 </button>
                 <button data-tab="real-estate" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
                     <i data-lucide="home" class="w-5 h-5"></i>
@@ -270,7 +280,7 @@
             <!-- Dashboard Tab -->
             <div id="dashboard-content" class="tab-content fade-in">
                 <!-- Quick Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                     <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                         <div class="flex items-center justify-between">
                             <div>
@@ -296,6 +306,19 @@
                             </div>
                             <div class="p-3 bg-green-50 rounded-xl">
                                 <i data-lucide="arrow-up-right" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500" data-translate="invested_capital">Invested Capital</p>
+                                <p class="text-2xl font-bold text-gray-900" id="investedCapitalValue">€0</p>
+                                <p class="text-sm text-blue-600 mt-1" data-translate="growing_assets">Growing Assets</p>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-xl">
+                                <i data-lucide="line-chart" class="w-6 h-6 text-purple-600"></i>
                             </div>
                         </div>
                     </div>
@@ -381,10 +404,6 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                             <div class="p-6 border-b border-gray-200 flex justify-between items-center">
                                 <h3 class="text-lg font-semibold text-gray-900" data-translate="asset_breakdown">Asset Breakdown</h3>
-                                <button id="addAssetBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
-                                    <span data-translate="add_asset">Add Asset</span>
-                                </button>
                             </div>
                             <div class="chart-container">
                                 <canvas id="assetBreakdownChart"></canvas>
@@ -402,13 +421,13 @@
                 </div>
             </div>
 
-            <!-- Investments Tab -->
-            <div id="investments-content" class="tab-content hidden fade-in">
+            <!-- Capital Markets Tab -->
+            <div id="capital-markets-content" class="tab-content hidden fade-in">
                 <div class="space-y-6">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900" data-translate="investment_portfolio">Investment Portfolio</h3>
-                            <button id="addInvestmentBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="capital_markets_portfolio">Capital Markets Portfolio</h3>
+                            <button id="addCapitalMarketBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                                 <span data-translate="add_investment">Add Investment</span>
                             </button>
@@ -419,15 +438,14 @@
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="investment">Investment</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="type">Type</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="quantity">Quantity</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="purchase_price">Purchase Price</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="current_price">Current Price</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="total_value">Total Value</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="monthly_investment">Monthly Investment</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="risk_level">Risk Level</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="current_value">Current Value</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="gain_loss">Gain/Loss</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-translate="actions">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="investmentsTableBody" class="bg-white divide-y divide-gray-200">
+                                <tbody id="capitalMarketsTableBody" class="bg-white divide-y divide-gray-200">
                                     <!-- Investment rows will be populated here -->
                                 </tbody>
                             </table>
@@ -590,6 +608,21 @@
             <!-- Analytics Tab -->
             <div id="analytics-content" class="tab-content hidden fade-in">
                 <div class="space-y-6">
+                    <!-- Investment Risk Overview -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="investment_risk_overview">Investment Risk Overview</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="investmentRiskMetrics" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <!-- Risk metrics will be populated here -->
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="riskAllocationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                             <div class="p-6 border-b border-gray-200">
@@ -676,7 +709,7 @@
         let syncInProgress = false;
 
         // 📊 DATA ARRAYS (Now will sync with Firebase)
-        let investments = [];
+        let capitalMarkets = []; // Renamed from investments
         let properties = [];
         let accounts = [];
         let liabilities = [];
@@ -762,9 +795,9 @@
 
             static async initializeData() {
                 try {
-                    // Load all data from Firebase
+                    // Load all data from Firebase (using new collection names)
                     const [
-                        investmentsData,
+                        capitalMarketsData,
                         propertiesData,
                         accountsData,
                         liabilitiesData,
@@ -773,7 +806,7 @@
                         budgetsData,
                         otherAssetsData
                     ] = await Promise.all([
-                        this.loadData('investments'),
+                        this.loadData('capitalMarkets'), // Changed from 'investments'
                         this.loadData('properties'),
                         this.loadData('accounts'),
                         this.loadData('liabilities'),
@@ -784,7 +817,7 @@
                     ]);
 
                     // Update global arrays
-                    investments = investmentsData;
+                    capitalMarkets = capitalMarketsData;
                     properties = propertiesData;
                     accounts = accountsData;
                     liabilities = liabilitiesData;
@@ -794,7 +827,7 @@
                     otherAssets = otherAssetsData;
 
                     // If no data exists, populate with sample data
-                    if (investments.length === 0 && properties.length === 0 && accounts.length === 0) {
+                    if (capitalMarkets.length === 0 && properties.length === 0 && accounts.length === 0) {
                         await this.createSampleData();
                     }
 
@@ -806,12 +839,48 @@
             }
 
             static async createSampleData() {
-                // Sample investments
-                const sampleInvestments = [
-                    { name: 'Apple Inc. (AAPL)', type: 'stocks', quantity: 50, purchasePrice: 127.50, currentPrice: 157.50, currency: 'USD' },
-                    { name: 'Bitcoin', type: 'cryptocurrency', quantity: 0.5, purchasePrice: 45000, currentPrice: 52000, currency: 'USD' },
-                    { name: 'Vanguard S&P 500 ETF', type: 'etf', quantity: 100, purchasePrice: 380, currentPrice: 420, currency: 'USD' },
-                    { name: 'Greek Government Bonds', type: 'bonds', quantity: 10, purchasePrice: 950, currentPrice: 985, currency: 'EUR' }
+                // Sample capital markets investments
+                const sampleCapitalMarkets = [
+                    { 
+                        name: 'Apple Inc. (AAPL)', 
+                        type: 'stocks', 
+                        quantity: 50, 
+                        purchasePrice: 127.50, 
+                        currentPrice: 157.50, 
+                        monthlyInvestment: 500,
+                        riskLevel: 'medium',
+                        currency: 'USD' 
+                    },
+                    { 
+                        name: 'Bitcoin', 
+                        type: 'cryptocurrency', 
+                        quantity: 0.5, 
+                        purchasePrice: 45000, 
+                        currentPrice: 52000, 
+                        monthlyInvestment: 300,
+                        riskLevel: 'high',
+                        currency: 'USD' 
+                    },
+                    { 
+                        name: 'Vanguard S&P 500 ETF', 
+                        type: 'etf', 
+                        quantity: 100, 
+                        purchasePrice: 380, 
+                        currentPrice: 420, 
+                        monthlyInvestment: 600,
+                        riskLevel: 'medium',
+                        currency: 'USD' 
+                    },
+                    { 
+                        name: 'Life Insurance Policy', 
+                        type: 'life_insurance', 
+                        quantity: 1, 
+                        purchasePrice: 25000, 
+                        currentValue: 27000, 
+                        monthlyInvestment: 150,
+                        riskLevel: 'low',
+                        currency: 'EUR' 
+                    }
                 ];
 
                 // Sample properties
@@ -820,55 +889,73 @@
                     { name: 'Rental Property', address: '456 Oak Ave, Thessaloniki', purchasePrice: 150000, currentValue: 180000, type: 'rental', monthlyRent: 800, currency: 'EUR' }
                 ];
 
-                // Sample accounts
+                // Sample accounts with enhanced features
                 const sampleAccounts = [
-                    { name: 'Alpha Bank Checking', bank: 'Alpha Bank', balance: 8500, type: 'checking', currency: 'EUR' },
-                    { name: 'Eurobank Savings', bank: 'Eurobank', balance: 25000, type: 'savings', currency: 'EUR' },
-                    { name: 'Piraeus Term Deposit', bank: 'Piraeus Bank', balance: 50000, type: 'term_deposit', currency: 'EUR' }
+                    { 
+                        name: 'Alpha Bank Checking', 
+                        bank: 'Alpha Bank', 
+                        balance: 8500, 
+                        type: 'checking', 
+                        currency: 'EUR',
+                        terms: 'No minimum balance, monthly fee €5',
+                        interestRate: 0,
+                        lockupPeriod: 0
+                    },
+                    { 
+                        name: 'Eurobank Savings', 
+                        bank: 'Eurobank', 
+                        balance: 25000, 
+                        type: 'savings', 
+                        currency: 'EUR',
+                        terms: 'Minimum balance €1000, no fees',
+                        interestRate: 1.5,
+                        lockupPeriod: 0
+                    },
+                    { 
+                        name: 'Piraeus Term Deposit', 
+                        bank: 'Piraeus Bank', 
+                        balance: 50000, 
+                        type: 'term_deposit', 
+                        currency: 'EUR',
+                        terms: '12-month term deposit',
+                        interestRate: 3.2,
+                        lockupPeriod: 12
+                    }
                 ];
 
-                // Sample liabilities
+                // Rest of sample data remains the same...
                 const sampleLiabilities = [
                     { name: 'Home Mortgage', type: 'mortgage', balance: 195000, interestRate: 2.5, monthlyPayment: 950, currency: 'EUR' },
                     { name: 'Car Loan', type: 'car_loan', balance: 15000, interestRate: 4.2, monthlyPayment: 320, currency: 'EUR' }
                 ];
 
-                // Sample incomes
                 const sampleIncomes = [
                     { name: 'Primary Salary', type: 'salary', monthlyGross: 4500, taxRate: 35, employer: 'Tech Company Ltd', currency: 'EUR' },
                     { name: 'Rental Income', type: 'rental', monthlyGross: 800, taxRate: 15, employer: 'Rental Property', currency: 'EUR' },
                     { name: 'Freelance Work', type: 'freelance', monthlyGross: 1200, taxRate: 20, employer: 'Various Clients', currency: 'EUR' }
                 ];
 
-                // Sample expenses
                 const sampleExpenses = [
                     { date: '2025-01-10', description: 'Supermarket Shopping', category: 'groceries', amount: 125.50, currency: 'EUR' },
                     { date: '2025-01-09', description: 'Gasoline', category: 'transportation', amount: 65.00, currency: 'EUR' },
-                    { date: '2025-01-08', description: 'Restaurant Dinner', category: 'dining', amount: 85.00, currency: 'EUR' },
-                    { date: '2025-01-07', description: 'Electricity Bill', category: 'utilities', amount: 95.00, currency: 'EUR' },
-                    { date: '2025-01-06', description: 'Netflix Subscription', category: 'entertainment', amount: 12.99, currency: 'EUR' }
+                    { date: '2025-01-08', description: 'Restaurant Dinner', category: 'dining', amount: 85.00, currency: 'EUR' }
                 ];
 
-                // Sample budgets
                 const sampleBudgets = [
                     { category: 'groceries', amount: 600, spent: 425.50, currency: 'EUR' },
                     { category: 'transportation', amount: 400, spent: 285.00, currency: 'EUR' },
-                    { category: 'dining', amount: 300, spent: 185.50, currency: 'EUR' },
-                    { category: 'utilities', amount: 200, spent: 95.00, currency: 'EUR' },
-                    { category: 'entertainment', amount: 150, spent: 67.99, currency: 'EUR' }
+                    { category: 'dining', amount: 300, spent: 185.50, currency: 'EUR' }
                 ];
 
-                // Additional asset categories
                 const sampleOtherAssets = [
-                    { name: 'Life Insurance Policy', type: 'life_insurance', value: 25000, currency: 'EUR' },
                     { name: 'Car - BMW 3 Series', type: 'vehicle', value: 35000, currency: 'EUR' },
                     { name: 'Jewelry Collection', type: 'jewelry', value: 8000, currency: 'EUR' }
                 ];
                 
                 try {
-                    for (const investment of sampleInvestments) {
-                        await this.saveData('investments', investment);
-                        investments.push(investment);
+                    for (const investment of sampleCapitalMarkets) {
+                        await this.saveData('capitalMarkets', investment);
+                        capitalMarkets.push(investment);
                     }
 
                     for (const property of sampleProperties) {
@@ -913,9 +1000,9 @@
 
             static loadSampleData() {
                 // Fallback sample data for offline use
-                investments = [
-                    { id: 'sample1', name: 'Apple Inc. (AAPL)', type: 'stocks', quantity: 50, purchasePrice: 127.50, currentPrice: 157.50, currency: 'USD' },
-                    { id: 'sample2', name: 'Bitcoin', type: 'cryptocurrency', quantity: 0.5, purchasePrice: 45000, currentPrice: 52000, currency: 'USD' }
+                capitalMarkets = [
+                    { id: 'sample1', name: 'Apple Inc. (AAPL)', type: 'stocks', quantity: 50, purchasePrice: 127.50, currentPrice: 157.50, monthlyInvestment: 500, riskLevel: 'medium', currency: 'USD' },
+                    { id: 'sample2', name: 'Bitcoin', type: 'cryptocurrency', quantity: 0.5, purchasePrice: 45000, currentPrice: 52000, monthlyInvestment: 300, riskLevel: 'high', currency: 'USD' }
                 ];
                 
                 properties = [
@@ -923,7 +1010,7 @@
                 ];
 
                 accounts = [
-                    { id: 'acc1', name: 'Alpha Bank Checking', bank: 'Alpha Bank', balance: 8500, type: 'checking', currency: 'EUR' }
+                    { id: 'acc1', name: 'Alpha Bank Checking', bank: 'Alpha Bank', balance: 8500, type: 'checking', currency: 'EUR', terms: 'Standard checking account', interestRate: 0, lockupPeriod: 0 }
                 ];
 
                 liabilities = [
@@ -935,17 +1022,15 @@
                 ];
 
                 expenses = [
-                    { id: 'exp1', date: '2025-01-10', description: 'Supermarket Shopping', category: 'groceries', amount: 125.50, currency: 'EUR' },
-                    { id: 'exp2', date: '2025-01-09', description: 'Gasoline', category: 'transportation', amount: 65.00, currency: 'EUR' }
+                    { id: 'exp1', date: '2025-01-10', description: 'Supermarket Shopping', category: 'groceries', amount: 125.50, currency: 'EUR' }
                 ];
 
                 budgets = [
-                    { id: 'bud1', category: 'groceries', amount: 600, spent: 425.50, currency: 'EUR' },
-                    { id: 'bud2', category: 'transportation', amount: 400, spent: 285.00, currency: 'EUR' }
+                    { id: 'bud1', category: 'groceries', amount: 600, spent: 425.50, currency: 'EUR' }
                 ];
 
                 otherAssets = [
-                    { id: 'other1', name: 'Life Insurance Policy', type: 'life_insurance', value: 25000, currency: 'EUR' }
+                    { id: 'other1', name: 'Car', type: 'vehicle', value: 25000, currency: 'EUR' }
                 ];
             }
         }
@@ -1025,12 +1110,12 @@
             }
         }
 
-        // Translation object
+        // Enhanced Translation object with new terms
         const translations = {
             en: {
                 dashboard: 'Dashboard',
                 assets: 'Assets',
-                investments: 'Investments',
+                capital_markets: 'Capital Markets',
                 real_estate: 'Real Estate',
                 accounts: 'Accounts',
                 liabilities: 'Liabilities',
@@ -1046,6 +1131,8 @@
                 total_wealth: 'Total Wealth',
                 total_assets: 'Total Assets',
                 all_holdings: 'All Holdings',
+                invested_capital: 'Invested Capital',
+                growing_assets: 'Growing Assets',
                 monthly_income: 'Monthly Income',
                 after_taxes: 'After Taxes',
                 monthly_expenses: 'Monthly Expenses',
@@ -1055,27 +1142,32 @@
                 recent_transactions: 'Recent Transactions',
                 budget_overview: 'Budget Overview',
                 asset_breakdown: 'Asset Breakdown',
-                add_asset: 'Add Asset',
                 asset_summary: 'Asset Summary',
-                investment_portfolio: 'Investment Portfolio',
+                capital_markets_portfolio: 'Capital Markets Portfolio',
                 add_investment: 'Add Investment',
                 investment: 'Investment',
                 type: 'Type',
                 quantity: 'Quantity',
                 purchase_price: 'Purchase Price',
                 current_price: 'Current Price',
+                current_value: 'Current Value',
                 total_value: 'Total Value',
                 gain_loss: 'Gain/Loss',
+                monthly_investment: 'Monthly Investment',
+                risk_level: 'Risk Level',
+                investment_risk_overview: 'Investment Risk Overview',
                 actions: 'Actions',
                 real_estate_portfolio: 'Real Estate Portfolio',
                 add_property: 'Add Property',
                 bank_accounts: 'Bank Accounts',
                 add_account: 'Add Account',
+                account_terms: 'Account Terms',
+                interest_rate: 'Interest Rate',
+                lockup_period: 'Lockup Period (months)',
                 liabilities_debts: 'Liabilities & Debts',
                 add_liability: 'Add Liability',
                 liability: 'Liability',
                 balance: 'Balance',
-                interest_rate: 'Interest Rate',
                 monthly_payment: 'Monthly Payment',
                 income_sources: 'Income Sources',
                 add_income: 'Add Income',
@@ -1103,7 +1195,6 @@
                 tax_rate: 'Tax Rate (%)',
                 monthly_rent: 'Monthly Rent',
                 purchase_date: 'Purchase Date',
-                current_value: 'Current Value',
                 budget_limit: 'Budget Limit',
                 spent_amount: 'Spent Amount',
                 remaining: 'Remaining',
@@ -1123,6 +1214,10 @@
                 life_insurance: 'Life Insurance',
                 vehicle: 'Vehicle',
                 jewelry: 'Jewelry',
+                // Risk Levels
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
                 // Property Types
                 residential: 'Residential',
                 rental: 'Rental',
@@ -1160,7 +1255,7 @@
             el: {
                 dashboard: 'Πίνακας Ελέγχου',
                 assets: 'Περιουσιακά Στοιχεία',
-                investments: 'Επενδύσεις',
+                capital_markets: 'Κεφαλαιαγορά',
                 real_estate: 'Ακίνητα',
                 accounts: 'Λογαριασμοί',
                 liabilities: 'Υποχρεώσεις',
@@ -1176,6 +1271,8 @@
                 total_wealth: 'Συνολικός Πλούτος',
                 total_assets: 'Συνολικά Περιουσιακά',
                 all_holdings: 'Όλες οι Συμμετοχές',
+                invested_capital: 'Επενδυμένο Κεφάλαιο',
+                growing_assets: 'Αυξανόμενα Περιουσιακά',
                 monthly_income: 'Μηνιαίο Εισόδημα',
                 after_taxes: 'Μετά από Φόρους',
                 monthly_expenses: 'Μηνιαία Έξοδα',
@@ -1185,27 +1282,32 @@
                 recent_transactions: 'Πρόσφατες Συναλλαγές',
                 budget_overview: 'Επισκόπηση Προϋπολογισμού',
                 asset_breakdown: 'Ανάλυση Περιουσίας',
-                add_asset: 'Προσθήκη Περιουσιακού',
                 asset_summary: 'Περίληψη Περιουσίας',
-                investment_portfolio: 'Επενδυτικό Χαρτοφυλάκιο',
+                capital_markets_portfolio: 'Χαρτοφυλάκιο Κεφαλαιαγοράς',
                 add_investment: 'Προσθήκη Επένδυσης',
                 investment: 'Επένδυση',
                 type: 'Τύπος',
                 quantity: 'Ποσότητα',
                 purchase_price: 'Τιμή Αγοράς',
                 current_price: 'Τρέχουσα Τιμή',
+                current_value: 'Τρέχουσα Αξία',
                 total_value: 'Συνολική Αξία',
                 gain_loss: 'Κέρδος/Ζημία',
+                monthly_investment: 'Μηνιαία Επένδυση',
+                risk_level: 'Επίπεδο Ρίσκου',
+                investment_risk_overview: 'Επισκόπηση Ρίσκου Επενδύσεων',
                 actions: 'Ενέργειες',
                 real_estate_portfolio: 'Χαρτοφυλάκιο Ακινήτων',
                 add_property: 'Προσθήκη Ακινήτου',
                 bank_accounts: 'Τραπεζικοί Λογαριασμοί',
                 add_account: 'Προσθήκη Λογαριασμού',
+                account_terms: 'Όροι Λογαριασμού',
+                interest_rate: 'Επιτόκιο',
+                lockup_period: 'Περίοδος Δέσμευσης (μήνες)',
                 liabilities_debts: 'Υποχρεώσεις & Χρέη',
                 add_liability: 'Προσθήκη Υποχρέωσης',
                 liability: 'Υποχρέωση',
                 balance: 'Υπόλοιπο',
-                interest_rate: 'Επιτόκιο',
                 monthly_payment: 'Μηνιαία Δόση',
                 income_sources: 'Πηγές Εισοδήματος',
                 add_income: 'Προσθήκη Εισοδήματος',
@@ -1233,7 +1335,6 @@
                 tax_rate: 'Φορολογικό Ποσοστό (%)',
                 monthly_rent: 'Μηνιαίο Ενοίκιο',
                 purchase_date: 'Ημερομηνία Αγοράς',
-                current_value: 'Τρέχουσα Αξία',
                 budget_limit: 'Όριο Προϋπολογισμού',
                 spent_amount: 'Ποσό που Ξοδεύτηκε',
                 remaining: 'Υπόλοιπο',
@@ -1253,6 +1354,10 @@
                 life_insurance: 'Ασφάλεια Ζωής',
                 vehicle: 'Όχημα',
                 jewelry: 'Κοσμήματα',
+                // Risk Levels
+                low: 'Χαμηλό',
+                medium: 'Μέτριο',
+                high: 'Υψηλό',
                 // Property Types
                 residential: 'Κατοικία',
                 rental: 'Ενοίκιο',
@@ -1335,6 +1440,21 @@
             }, 3000);
         }
 
+        function getRiskIndicator(riskLevel) {
+            const riskIcons = {
+                low: '<i data-lucide="shield" class="w-4 h-4"></i>',
+                medium: '<i data-lucide="alert-triangle" class="w-4 h-4"></i>',
+                high: '<i data-lucide="zap" class="w-4 h-4"></i>'
+            };
+            const riskColors = {
+                low: 'risk-low',
+                medium: 'risk-medium', 
+                high: 'risk-high'
+            };
+            
+            return `<span class="risk-indicator ${riskColors[riskLevel]}">${riskIcons[riskLevel]} ${translate(riskLevel)}</span>`;
+        }
+
         // Navigation functions
         function switchTab(tabName) {
             activeTab = tabName;
@@ -1374,8 +1494,8 @@
                 case 'assets':
                     renderAssets();
                     break;
-                case 'investments':
-                    renderInvestments();
+                case 'capital-markets':
+                    renderCapitalMarkets();
                     break;
                 case 'real-estate':
                     renderRealEstate();
@@ -1401,13 +1521,38 @@
             }
         }
 
-        // Calculation functions
+        // Enhanced calculation functions
         function calculateTotalAssets() {
-            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
             const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
             const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
-            return investmentValue + propertyValue + accountValue + otherAssetsValue;
+            return capitalMarketsValue + propertyValue + accountValue + otherAssetsValue;
+        }
+
+        function calculateInvestedCapital() {
+            // Capital markets investments
+            const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
+            
+            // Real estate
+            const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
+            
+            // Interest-bearing accounts
+            const interestBearingAccounts = accounts
+                .filter(acc => acc.interestRate && acc.interestRate > 0)
+                .reduce((sum, acc) => sum + acc.balance, 0);
+            
+            return capitalMarketsValue + propertyValue + interestBearingAccounts;
         }
 
         function calculateTotalLiabilities() {
@@ -1436,17 +1581,45 @@
                 .reduce((sum, expense) => sum + expense.amount, 0);
         }
 
-        // Render functions
+        function calculateRiskMetrics() {
+            const totalCapitalMarkets = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
+
+            const riskBreakdown = capitalMarkets.reduce((acc, inv) => {
+                const value = inv.type === 'life_insurance' ? 
+                    (inv.currentValue || inv.purchasePrice) : 
+                    (inv.quantity * inv.currentPrice);
+                
+                if (!acc[inv.riskLevel]) acc[inv.riskLevel] = 0;
+                acc[inv.riskLevel] += value;
+                return acc;
+            }, {});
+
+            return {
+                low: ((riskBreakdown.low || 0) / totalCapitalMarkets * 100) || 0,
+                medium: ((riskBreakdown.medium || 0) / totalCapitalMarkets * 100) || 0,
+                high: ((riskBreakdown.high || 0) / totalCapitalMarkets * 100) || 0,
+                totalValue: totalCapitalMarkets
+            };
+        }
+
+        // Enhanced render functions
         function renderDashboard() {
             const totalAssets = calculateTotalAssets();
             const totalLiabilities = calculateTotalLiabilities();
             const netWorth = calculateNetWorth();
+            const investedCapital = calculateInvestedCapital();
             const monthlyIncome = calculateMonthlyIncome();
             const monthlyExpenses = calculateMonthlyExpenses();
 
             // Update dashboard stats
             document.getElementById('netWorthValue').textContent = formatCurrency(netWorth);
             document.getElementById('totalAssetsValue').textContent = formatCurrency(totalAssets);
+            document.getElementById('investedCapitalValue').textContent = formatCurrency(investedCapital);
             document.getElementById('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
             document.getElementById('monthlyExpensesValue').textContent = formatCurrency(monthlyExpenses);
 
@@ -1464,15 +1637,23 @@
             renderAssetSummary();
         }
 
-        function renderInvestments() {
-            const tableBody = document.getElementById('investmentsTableBody');
+        function renderCapitalMarkets() {
+            const tableBody = document.getElementById('capitalMarketsTableBody');
             if (!tableBody) return;
             
-            tableBody.innerHTML = investments.map(investment => {
-                const totalValue = investment.quantity * investment.currentPrice;
-                const purchaseValue = investment.quantity * investment.purchasePrice;
-                const gainLoss = totalValue - purchaseValue;
-                const gainLossPercent = purchaseValue > 0 ? (gainLoss / purchaseValue * 100) : 0;
+            tableBody.innerHTML = capitalMarkets.map(investment => {
+                let totalValue, gainLoss, gainLossPercent;
+                
+                if (investment.type === 'life_insurance') {
+                    totalValue = investment.currentValue || investment.purchasePrice;
+                    gainLoss = totalValue - investment.purchasePrice;
+                    gainLossPercent = investment.purchasePrice > 0 ? (gainLoss / investment.purchasePrice * 100) : 0;
+                } else {
+                    totalValue = investment.quantity * investment.currentPrice;
+                    const purchaseValue = investment.quantity * investment.purchasePrice;
+                    gainLoss = totalValue - purchaseValue;
+                    gainLossPercent = purchaseValue > 0 ? (gainLoss / purchaseValue * 100) : 0;
+                }
                 
                 return `
                     <tr class="hover:bg-gray-50">
@@ -1485,15 +1666,10 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${investment.quantity}
+                            ${formatCurrency(investment.monthlyInvestment || 0, investment.currency)}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${formatCurrency(investment.purchasePrice, investment.currency)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <input type="number" value="${investment.currentPrice}" step="0.01" 
-                                   class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                   onchange="updateInvestmentPrice('${investment.id}', this.value)">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            ${getRiskIndicator(investment.riskLevel || 'medium')}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             ${formatCurrency(totalValue, investment.currency)}
@@ -1502,10 +1678,10 @@
                             ${formatCurrency(gainLoss, investment.currency)} (${gainLossPercent.toFixed(2)}%)
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <button onclick="editItem('investment', '${investment.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                            <button onclick="editItem('capital_market', '${investment.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
                                 <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </button>
-                            <button onclick="deleteItem('investment', '${investment.id}')" class="text-red-600 hover:text-red-900">
+                            <button onclick="deleteItem('capital_market', '${investment.id}')" class="text-red-600 hover:text-red-900">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </td>
@@ -1538,10 +1714,6 @@
                         </div>
                         <div class="space-y-2">
                             <p class="text-sm text-gray-600">${property.address}</p>
-                            <div class="flex justify-between">
-                                <span class="text-sm text-gray-500">${translate('purchase_price')}:</span>
-                                <span class="text-sm font-medium">${formatCurrency(property.purchasePrice, property.currency)}</span>
-                            </div>
                             <div class="flex justify-between">
                                 <span class="text-sm text-gray-500">${translate('current_value')}:</span>
                                 <span class="text-sm font-medium">${formatCurrency(property.currentValue, property.currency)}</span>
@@ -1590,8 +1762,30 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-500">${translate('balance')}:</span>
-                            <span class="text-lg font-bold text-green-600">${formatCurrency(account.balance, account.currency)}</span>
+                            <span class="text-lg font-bold ${(account.interestRate && account.interestRate > 0) ? 'text-purple-600' : 'text-green-600'}">${formatCurrency(account.balance, account.currency)}</span>
                         </div>
+                        ${account.interestRate && account.interestRate > 0 ? `
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">${translate('interest_rate')}:</span>
+                                <span class="text-sm font-medium text-blue-600">${account.interestRate}%</span>
+                            </div>
+                        ` : ''}
+                        ${account.lockupPeriod && account.lockupPeriod > 0 ? `
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">${translate('lockup_period')}:</span>
+                                <span class="text-sm font-medium">${account.lockupPeriod} months</span>
+                            </div>
+                        ` : ''}
+                        ${account.terms ? `
+                            <div class="mt-3 p-2 bg-gray-50 rounded">
+                                <p class="text-xs text-gray-600">${account.terms}</p>
+                            </div>
+                        ` : ''}
+                        ${(account.interestRate && account.interestRate > 0) ? `
+                            <div class="mt-2 p-2 bg-purple-50 rounded">
+                                <p class="text-xs text-purple-700 font-medium">💼 Invested Capital</p>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -1751,6 +1945,8 @@
         }
 
         function renderAnalytics() {
+            renderInvestmentRiskMetrics();
+            renderChart('riskAllocationChart', 'doughnut', getRiskAllocationData());
             renderChart('expenseBreakdownChart', 'pie', getExpenseBreakdownData());
             renderChart('incomeVsExpensesChart', 'bar', getIncomeVsExpensesData());
             renderFinancialHealthMetrics();
@@ -1806,15 +2002,20 @@
             const container = document.getElementById('assetSummary');
             if (!container) return;
             
-            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
             const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
             const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
             
             container.innerHTML = `
                 <div class="p-4 bg-blue-50 rounded-lg">
-                    <h4 class="font-medium text-blue-900">${translate('investments')}</h4>
-                    <p class="text-2xl font-bold text-blue-600">${formatCurrency(investmentValue)}</p>
+                    <h4 class="font-medium text-blue-900">${translate('capital_markets')}</h4>
+                    <p class="text-2xl font-bold text-blue-600">${formatCurrency(capitalMarketsValue)}</p>
                 </div>
                 <div class="p-4 bg-green-50 rounded-lg">
                     <h4 class="font-medium text-green-900">${translate('real_estate')}</h4>
@@ -1827,6 +2028,46 @@
                 <div class="p-4 bg-orange-50 rounded-lg">
                     <h4 class="font-medium text-orange-900">Other Assets</h4>
                     <p class="text-2xl font-bold text-orange-600">${formatCurrency(otherAssetsValue)}</p>
+                </div>
+            `;
+        }
+
+        function renderInvestmentRiskMetrics() {
+            const container = document.getElementById('investmentRiskMetrics');
+            if (!container) return;
+            
+            const riskMetrics = calculateRiskMetrics();
+            
+            container.innerHTML = `
+                <div class="p-6 bg-green-50 rounded-lg">
+                    <h4 class="font-medium text-green-900 mb-2">${translate('low')} ${translate('risk_level')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full progress-bar" style="width: ${riskMetrics.low}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${riskMetrics.low.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">${formatCurrency(riskMetrics.totalValue * riskMetrics.low / 100)}</p>
+                </div>
+                <div class="p-6 bg-yellow-50 rounded-lg">
+                    <h4 class="font-medium text-yellow-900 mb-2">${translate('medium')} ${translate('risk_level')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full progress-bar" style="width: ${riskMetrics.medium}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${riskMetrics.medium.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">${formatCurrency(riskMetrics.totalValue * riskMetrics.medium / 100)}</p>
+                </div>
+                <div class="p-6 bg-red-50 rounded-lg">
+                    <h4 class="font-medium text-red-900 mb-2">${translate('high')} ${translate('risk_level')}</h4>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full progress-bar" style="width: ${riskMetrics.high}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${riskMetrics.high.toFixed(1)}%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">${formatCurrency(riskMetrics.totalValue * riskMetrics.high / 100)}</p>
                 </div>
             `;
         }
@@ -1975,32 +2216,54 @@
         }
 
         function getAssetAllocationData() {
-            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
             const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
             const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
             
             return {
-                labels: [translate('investments'), translate('real_estate'), translate('accounts'), 'Other Assets'],
+                labels: [translate('capital_markets'), translate('real_estate'), translate('accounts'), 'Other Assets'],
                 datasets: [{
-                    data: [investmentValue, propertyValue, accountValue, otherAssetsValue],
+                    data: [capitalMarketsValue, propertyValue, accountValue, otherAssetsValue],
                     backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B']
                 }]
             };
         }
 
         function getAssetBreakdownData() {
-            const investmentValue = investments.reduce((sum, inv) => sum + (inv.quantity * inv.currentPrice), 0);
+            const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
+                if (inv.type === 'life_insurance') {
+                    return sum + (inv.currentValue || inv.purchasePrice);
+                }
+                return sum + (inv.quantity * inv.currentPrice);
+            }, 0);
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
             const accountValue = accounts.reduce((sum, acc) => sum + acc.balance, 0);
             const otherAssetsValue = otherAssets.reduce((sum, asset) => sum + asset.value, 0);
             
             return {
-                labels: [translate('investments'), translate('real_estate'), translate('accounts'), 'Other Assets'],
+                labels: [translate('capital_markets'), translate('real_estate'), translate('accounts'), 'Other Assets'],
                 datasets: [{
                     label: translate('total_value'),
-                    data: [investmentValue, propertyValue, accountValue, otherAssetsValue],
+                    data: [capitalMarketsValue, propertyValue, accountValue, otherAssetsValue],
                     backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B']
+                }]
+            };
+        }
+
+        function getRiskAllocationData() {
+            const riskMetrics = calculateRiskMetrics();
+            
+            return {
+                labels: [translate('low'), translate('medium'), translate('high')],
+                datasets: [{
+                    data: [riskMetrics.low, riskMetrics.medium, riskMetrics.high],
+                    backgroundColor: ['#10B981', '#F59E0B', '#EF4444']
                 }]
             };
         }
@@ -2088,8 +2351,8 @@
             let item = null;
             if (id) {
                 switch (type) {
-                    case 'investment':
-                        item = investments.find(inv => inv.id === id);
+                    case 'capital_market':
+                        item = capitalMarkets.find(inv => inv.id === id);
                         break;
                     case 'property':
                         item = properties.find(prop => prop.id === id);
@@ -2113,40 +2376,57 @@
             }
 
             switch (type) {
-                case 'investment':
+                case 'capital_market':
                     return `
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">${translate('name')}</label>
-                            <input type="text" id="investmentName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Apple Inc. (AAPL)">
+                            <input type="text" id="capitalMarketName" value="${item?.name || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Apple Inc. (AAPL)">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">${translate('type')}</label>
-                            <select id="investmentType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="capitalMarketType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="stocks" ${item?.type === 'stocks' ? 'selected' : ''}>${translate('stocks')}</option>
                                 <option value="bonds" ${item?.type === 'bonds' ? 'selected' : ''}>${translate('bonds')}</option>
                                 <option value="etf" ${item?.type === 'etf' ? 'selected' : ''}>${translate('etf')}</option>
                                 <option value="mutual_fund" ${item?.type === 'mutual_fund' ? 'selected' : ''}>${translate('mutual_fund')}</option>
                                 <option value="cryptocurrency" ${item?.type === 'cryptocurrency' ? 'selected' : ''}>${translate('cryptocurrency')}</option>
                                 <option value="index_fund" ${item?.type === 'index_fund' ? 'selected' : ''}>${translate('index_fund')}</option>
+                                <option value="life_insurance" ${item?.type === 'life_insurance' ? 'selected' : ''}>${translate('life_insurance')}</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4" id="quantityPriceSection" style="display: ${item?.type === 'life_insurance' ? 'none' : 'grid'}">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">${translate('quantity')}</label>
-                                <input type="number" id="investmentQuantity" value="${item?.quantity || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="number" id="capitalMarketQuantity" value="${item?.quantity || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">${translate('purchase_price')}</label>
-                                <input type="number" id="investmentPurchasePrice" value="${item?.purchasePrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="number" id="capitalMarketPurchasePrice" value="${item?.purchasePrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
-                        <div>
+                        <div id="currentPriceSection" style="display: ${item?.type === 'life_insurance' ? 'none' : 'block'}">
                             <label class="block text-sm font-medium text-gray-700 mb-1">${translate('current_price')}</label>
-                            <input type="number" id="investmentCurrentPrice" value="${item?.currentPrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="capitalMarketCurrentPrice" value="${item?.currentPrice || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div id="lifeInsuranceSection" style="display: ${item?.type === 'life_insurance' ? 'block' : 'none'}">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('current_value')}</label>
+                            <input type="number" id="capitalMarketCurrentValue" value="${item?.currentValue || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('monthly_investment')}</label>
+                            <input type="number" id="capitalMarketMonthlyInvestment" value="${item?.monthlyInvestment || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('risk_level')}</label>
+                            <select id="capitalMarketRiskLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="low" ${item?.riskLevel === 'low' ? 'selected' : ''}>${translate('low')}</option>
+                                <option value="medium" ${item?.riskLevel === 'medium' ? 'selected' : ''}>${translate('medium')}</option>
+                                <option value="high" ${item?.riskLevel === 'high' ? 'selected' : ''}>${translate('high')}</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-                            <select id="investmentCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="capitalMarketCurrency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="EUR" ${item?.currency === 'EUR' ? 'selected' : ''}>EUR</option>
                                 <option value="USD" ${item?.currency === 'USD' ? 'selected' : ''}>USD</option>
                                 <option value="GBP" ${item?.currency === 'GBP' ? 'selected' : ''}>GBP</option>
@@ -2217,6 +2497,20 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">${translate('balance')}</label>
                             <input type="number" id="accountBalance" value="${item?.balance || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">${translate('account_terms')}</label>
+                            <textarea id="accountTerms" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Account terms and conditions">${item?.terms || ''}</textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4" id="interestSection" style="display: ${(item?.type === 'savings' || item?.type === 'term_deposit') ? 'grid' : 'none'}">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('interest_rate')} (%)</label>
+                                <input type="number" id="accountInterestRate" value="${item?.interestRate || ''}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div id="lockupSection" style="display: ${item?.type === 'term_deposit' ? 'block' : 'none'}">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${translate('lockup_period')}</label>
+                                <input type="number" id="accountLockupPeriod" value="${item?.lockupPeriod || ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
@@ -2402,9 +2696,9 @@
                 let array;
                 
                 switch (currentModalType) {
-                    case 'investment':
-                        collection = 'investments';
-                        array = investments;
+                    case 'capital_market':
+                        collection = 'capitalMarkets';
+                        array = capitalMarkets;
                         break;
                     case 'property':
                         collection = 'properties';
@@ -2463,13 +2757,23 @@
             const data = {};
             
             switch (type) {
-                case 'investment':
-                    data.name = document.getElementById('investmentName')?.value || '';
-                    data.type = document.getElementById('investmentType')?.value || '';
-                    data.quantity = parseFloat(document.getElementById('investmentQuantity')?.value || 0);
-                    data.purchasePrice = parseFloat(document.getElementById('investmentPurchasePrice')?.value || 0);
-                    data.currentPrice = parseFloat(document.getElementById('investmentCurrentPrice')?.value || 0);
-                    data.currency = document.getElementById('investmentCurrency')?.value || 'EUR';
+                case 'capital_market':
+                    data.name = document.getElementById('capitalMarketName')?.value || '';
+                    data.type = document.getElementById('capitalMarketType')?.value || '';
+                    data.monthlyInvestment = parseFloat(document.getElementById('capitalMarketMonthlyInvestment')?.value || 0);
+                    data.riskLevel = document.getElementById('capitalMarketRiskLevel')?.value || 'medium';
+                    data.currency = document.getElementById('capitalMarketCurrency')?.value || 'EUR';
+                    
+                    if (data.type === 'life_insurance') {
+                        data.quantity = 1;
+                        data.purchasePrice = parseFloat(document.getElementById('capitalMarketPurchasePrice')?.value || 0);
+                        data.currentValue = parseFloat(document.getElementById('capitalMarketCurrentValue')?.value || 0);
+                        data.currentPrice = data.currentValue; // For compatibility
+                    } else {
+                        data.quantity = parseFloat(document.getElementById('capitalMarketQuantity')?.value || 0);
+                        data.purchasePrice = parseFloat(document.getElementById('capitalMarketPurchasePrice')?.value || 0);
+                        data.currentPrice = parseFloat(document.getElementById('capitalMarketCurrentPrice')?.value || 0);
+                    }
                     break;
                     
                 case 'property':
@@ -2489,7 +2793,15 @@
                     data.bank = document.getElementById('accountBank')?.value || '';
                     data.type = document.getElementById('accountType')?.value || '';
                     data.balance = parseFloat(document.getElementById('accountBalance')?.value || 0);
+                    data.terms = document.getElementById('accountTerms')?.value || '';
                     data.currency = document.getElementById('accountCurrency')?.value || 'EUR';
+                    
+                    if (data.type === 'savings' || data.type === 'term_deposit') {
+                        data.interestRate = parseFloat(document.getElementById('accountInterestRate')?.value || 0);
+                    }
+                    if (data.type === 'term_deposit') {
+                        data.lockupPeriod = parseInt(document.getElementById('accountLockupPeriod')?.value || 0);
+                    }
                     break;
                     
                 case 'liability':
@@ -2532,7 +2844,7 @@
         function validateFormData(data, type) {
             // Basic validation - extend as needed
             for (const key in data) {
-                if (key === 'monthlyRent') continue; // Optional field
+                if (['monthlyRent', 'terms', 'interestRate', 'lockupPeriod', 'currentValue'].includes(key)) continue; // Optional fields
                 if (data[key] === undefined || data[key] === '' || (typeof data[key] === 'number' && isNaN(data[key]))) {
                     showToast(`Please fill in all required fields`, 'error');
                     return false;
@@ -2551,9 +2863,9 @@
                 let array;
                 
                 switch (type) {
-                    case 'investment':
-                        collection = 'investments';
-                        array = investments;
+                    case 'capital_market':
+                        collection = 'capitalMarkets';
+                        array = capitalMarkets;
                         break;
                     case 'property':
                         collection = 'properties';
@@ -2599,22 +2911,6 @@
             }
         }
 
-        async function updateInvestmentPrice(id, newPrice) {
-            const investment = investments.find(inv => inv.id === id);
-            if (investment) {
-                investment.currentPrice = parseFloat(newPrice);
-                
-                try {
-                    await FirebaseService.saveData('investments', investment);
-                    renderTabContent();
-                    updateLastUpdated();
-                } catch (error) {
-                    console.error('Error updating investment price:', error);
-                    showToast('Error updating price. Please try again.', 'error');
-                }
-            }
-        }
-
         // Export functionality
         function exportToExcel() {
             try {
@@ -2629,6 +2925,7 @@
                     ['Total Assets', calculateTotalAssets()],
                     ['Total Liabilities', calculateTotalLiabilities()],
                     ['Net Worth', calculateNetWorth()],
+                    ['Invested Capital', calculateInvestedCapital()],
                     [''],
                     ['Monthly Cash Flow'],
                     ['Monthly Income', calculateMonthlyIncome()],
@@ -2638,26 +2935,39 @@
                 const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
                 XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
 
-                // Investments sheet
-                if (investments.length > 0) {
-                    const investmentData = [
-                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price', 'Total Value', 'Gain/Loss', 'Currency'],
-                        ...investments.map(inv => [
-                            inv.name,
-                            inv.type,
-                            inv.quantity,
-                            inv.purchasePrice,
-                            inv.currentPrice,
-                            inv.quantity * inv.currentPrice,
-                            (inv.quantity * inv.currentPrice) - (inv.quantity * inv.purchasePrice),
-                            inv.currency
-                        ])
+                // Capital Markets sheet
+                if (capitalMarkets.length > 0) {
+                    const capitalMarketsData = [
+                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price/Value', 'Total Value', 'Monthly Investment', 'Risk Level', 'Gain/Loss', 'Currency'],
+                        ...capitalMarkets.map(inv => {
+                            let totalValue, gainLoss;
+                            if (inv.type === 'life_insurance') {
+                                totalValue = inv.currentValue || inv.purchasePrice;
+                                gainLoss = totalValue - inv.purchasePrice;
+                            } else {
+                                totalValue = inv.quantity * inv.currentPrice;
+                                gainLoss = totalValue - (inv.quantity * inv.purchasePrice);
+                            }
+                            
+                            return [
+                                inv.name,
+                                inv.type,
+                                inv.quantity,
+                                inv.purchasePrice,
+                                inv.type === 'life_insurance' ? inv.currentValue : inv.currentPrice,
+                                totalValue,
+                                inv.monthlyInvestment || 0,
+                                inv.riskLevel,
+                                gainLoss,
+                                inv.currency
+                            ];
+                        })
                     ];
-                    const investmentSheet = XLSX.utils.aoa_to_sheet(investmentData);
-                    XLSX.utils.book_append_sheet(wb, investmentSheet, 'Investments');
+                    const capitalMarketsSheet = XLSX.utils.aoa_to_sheet(capitalMarketsData);
+                    XLSX.utils.book_append_sheet(wb, capitalMarketsSheet, 'Capital Markets');
                 }
 
-                // Properties sheet
+                // Properties sheet (unchanged)
                 if (properties.length > 0) {
                     const propertyData = [
                         ['Property', 'Address', 'Type', 'Purchase Price', 'Current Value', 'Appreciation', 'Monthly Rent', 'Currency'],
@@ -2676,15 +2986,18 @@
                     XLSX.utils.book_append_sheet(wb, propertySheet, 'Real Estate');
                 }
 
-                // Accounts sheet
+                // Enhanced Accounts sheet
                 if (accounts.length > 0) {
                     const accountData = [
-                        ['Account Name', 'Bank', 'Type', 'Balance', 'Currency'],
+                        ['Account Name', 'Bank', 'Type', 'Balance', 'Interest Rate', 'Lockup Period', 'Terms', 'Currency'],
                         ...accounts.map(acc => [
                             acc.name,
                             acc.bank,
                             acc.type,
                             acc.balance,
+                            acc.interestRate || 0,
+                            acc.lockupPeriod || 0,
+                            acc.terms || '',
                             acc.currency
                         ])
                     ];
@@ -2692,7 +3005,7 @@
                     XLSX.utils.book_append_sheet(wb, accountSheet, 'Accounts');
                 }
 
-                // Liabilities sheet
+                // Continue with other sheets as before...
                 if (liabilities.length > 0) {
                     const liabilityData = [
                         ['Liability', 'Type', 'Balance', 'Interest Rate', 'Monthly Payment', 'Currency'],
@@ -2709,7 +3022,6 @@
                     XLSX.utils.book_append_sheet(wb, liabilitySheet, 'Liabilities');
                 }
 
-                // Income sheet
                 if (incomes.length > 0) {
                     const incomeData = [
                         ['Income Source', 'Type', 'Employer', 'Monthly Gross', 'Tax Rate', 'Monthly Net', 'Annual Net', 'Currency'],
@@ -2728,7 +3040,6 @@
                     XLSX.utils.book_append_sheet(wb, incomeSheet, 'Income');
                 }
 
-                // Expenses sheet
                 if (expenses.length > 0) {
                     const expenseData = [
                         ['Date', 'Description', 'Category', 'Amount', 'Currency'],
@@ -2744,7 +3055,6 @@
                     XLSX.utils.book_append_sheet(wb, expenseSheet, 'Expenses');
                 }
 
-                // Budgets sheet
                 if (budgets.length > 0) {
                     const budgetData = [
                         ['Category', 'Budget Amount', 'Spent Amount', 'Remaining', 'Percentage Used', 'Currency'],
@@ -2775,7 +3085,6 @@
         // Global functions for onclick handlers
         window.editItem = editItem;
         window.deleteItem = deleteItem;
-        window.updateInvestmentPrice = updateInvestmentPrice;
 
         async function editItem(type, id) {
             openModal(type, id);
@@ -2827,11 +3136,11 @@
                 document.getElementById('cancelModal').addEventListener('click', closeModal);
                 document.getElementById('saveModal').addEventListener('click', saveItem);
 
-                // Add buttons
+                // Updated Add Item button logic
                 document.getElementById('addItemBtn').addEventListener('click', () => {
                     switch (activeTab) {
-                        case 'investments':
-                            openModal('investment');
+                        case 'capital-markets':
+                            openModal('capital_market');
                             break;
                         case 'real-estate':
                             openModal('property');
@@ -2856,10 +3165,9 @@
                     }
                 });
 
-                // Specific add buttons
+                // Updated specific add buttons
                 const addButtons = [
-                    { id: 'addAssetBtn', type: 'asset' },
-                    { id: 'addInvestmentBtn', type: 'investment' },
+                    { id: 'addCapitalMarketBtn', type: 'capital_market' },
                     { id: 'addPropertyBtn', type: 'property' },
                     { id: 'addAccountBtn', type: 'account' },
                     { id: 'addLiabilityBtn', type: 'liability' },
@@ -2878,12 +3186,48 @@
                 // Export functionality
                 document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 
-                // Property type change handler
+                // Dynamic form field handlers
                 document.addEventListener('change', function(e) {
+                    // Property type change handler
                     if (e.target.id === 'propertyType') {
                         const rentalSection = document.getElementById('rentalSection');
                         if (rentalSection) {
                             rentalSection.style.display = e.target.value === 'rental' ? 'block' : 'none';
+                        }
+                    }
+                    
+                    // Capital market type change handler
+                    if (e.target.id === 'capitalMarketType') {
+                        const quantityPriceSection = document.getElementById('quantityPriceSection');
+                        const currentPriceSection = document.getElementById('currentPriceSection');
+                        const lifeInsuranceSection = document.getElementById('lifeInsuranceSection');
+                        
+                        if (e.target.value === 'life_insurance') {
+                            if (quantityPriceSection) quantityPriceSection.style.display = 'none';
+                            if (currentPriceSection) currentPriceSection.style.display = 'none';
+                            if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'block';
+                        } else {
+                            if (quantityPriceSection) quantityPriceSection.style.display = 'grid';
+                            if (currentPriceSection) currentPriceSection.style.display = 'block';
+                            if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'none';
+                        }
+                    }
+                    
+                    // Account type change handler
+                    if (e.target.id === 'accountType') {
+                        const interestSection = document.getElementById('interestSection');
+                        const lockupSection = document.getElementById('lockupSection');
+                        
+                        if (e.target.value === 'savings' || e.target.value === 'term_deposit') {
+                            if (interestSection) interestSection.style.display = 'grid';
+                        } else {
+                            if (interestSection) interestSection.style.display = 'none';
+                        }
+                        
+                        if (e.target.value === 'term_deposit') {
+                            if (lockupSection) lockupSection.style.display = 'block';
+                        } else {
+                            if (lockupSection) lockupSection.style.display = 'none';
                         }
                     }
                 });
@@ -2916,4 +3260,8 @@
         });
     </script>
 </body>
-</html>
+</html>">
+                                <span class="text-sm text-gray-500">${translate('purchase_price')}:</span>
+                                <span class="text-sm font-medium">${formatCurrency(property.purchasePrice, property.currency)}</span>
+                            </div>
+                            <div class="flex justify-between
