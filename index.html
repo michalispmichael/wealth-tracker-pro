@@ -869,7 +869,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
@@ -902,7 +902,6 @@
         window.updateDoc = updateDoc;
         window.query = query;
         window.where = where;
-        window.orderBy = orderBy;
     </script>
 
     <!-- Login Modal -->
@@ -2168,14 +2167,21 @@
             try {
                 const q = window.query(
                     window.collection(window.db, collectionName),
-                    window.where("userId", "==", currentUser.uid),
-                    window.orderBy("createdAt", "desc")
+                    window.where("userId", "==", currentUser.uid)
                 );
                 const querySnapshot = await window.getDocs(q);
                 const data = [];
                 querySnapshot.forEach((doc) => {
                     data.push({ id: doc.id, ...doc.data() });
                 });
+                
+                // Sort by createdAt in frontend (newest first)
+                data.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                    const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                    return dateB - dateA;
+                });
+                
                 return data;
             } catch (error) {
                 console.error('❌ Error loading data from', collectionName, ':', error);
