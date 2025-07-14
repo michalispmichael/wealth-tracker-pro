@@ -106,7 +106,7 @@
 
         .card-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
@@ -345,6 +345,7 @@
             opacity: 0.9;
         }
 
+        /* LOGIN STYLES από το GitHub αρχείο */
         .login-modal {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -444,7 +445,7 @@
     </style>
 </head>
 <body>
-    <!-- Φόρτωση Firebase -->
+    <!-- Firebase Configuration από το GitHub αρχείο -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
@@ -489,7 +490,7 @@
         console.log('🔥 Firebase initialized successfully');
     </script>
 
-    <!-- Login Modal -->
+    <!-- Login Modal από το GitHub αρχείο -->
     <div id="loginModal" class="modal" style="display: block;">
         <div class="modal-content login-modal">
             <h2 class="login-title">
@@ -516,7 +517,7 @@
         </div>
     </div>
 
-    <!-- Email Login Form -->
+    <!-- Email Login Form από το GitHub αρχείο -->
     <div id="emailLoginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -537,7 +538,7 @@
         </div>
     </div>
 
-    <!-- Register Form -->
+    <!-- Register Form από το GitHub αρχείο -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -562,7 +563,7 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main App - ΟΛΑ από το αρχικό αρχείο -->
     <div id="app" class="hidden">
         <div class="container">
             <!-- Header -->
@@ -573,7 +574,7 @@
                         WealthTracker Pro
                     </div>
                     <div class="user-info">
-                        <img id="userAvatar" class="user-avatar" src="" alt="User">
+                        <img id="userAvatar" class="user-avatar" src="/api/placeholder/40/40" alt="User">
                         <span id="userName">User</span>
                         <button id="logoutBtn" class="logout-btn">
                             <i class="fas fa-sign-out-alt"></i>
@@ -1023,7 +1024,7 @@
         let editingId = null;
         let editingType = null;
 
-        // Authentication Functions
+        // Authentication Functions από το GitHub αρχείο
         async function initializeAuth() {
             console.log('🔐 Initializing authentication...');
             
@@ -1035,7 +1036,7 @@
                     updateUserInfo();
                     loadAllData();
                 } else {
-                    console.log('🔐 No user authenticated after initialization - ensuring login modal is visible');
+                    console.log('🔐 No user authenticated - showing login modal');
                     currentUser = null;
                     showLogin();
                 }
@@ -1051,29 +1052,6 @@
             document.getElementById('app').classList.add('hidden');
             document.getElementById('loginModal').style.display = 'block';
             console.log('✅ Login modal shown');
-            
-            // Re-attach event listeners
-            attachLoginEventListeners();
-        }
-
-        function attachLoginEventListeners() {
-            console.log('🔧 Re-attaching login button event');
-            const googleBtn = document.getElementById('googleSignIn');
-            if (googleBtn) {
-                googleBtn.onclick = signInWithGoogle;
-            }
-
-            console.log('🔧 Re-attaching register button event');
-            const registerBtn = document.getElementById('registerBtn');
-            if (registerBtn) {
-                registerBtn.onclick = () => openModal('registerModal');
-            }
-
-            console.log('🔧 Re-attaching Google sign-in button event');
-            const emailBtn = document.getElementById('emailSignIn');
-            if (emailBtn) {
-                emailBtn.onclick = () => openModal('emailLoginModal');
-            }
         }
 
         async function signInWithGoogle() {
@@ -1135,10 +1113,14 @@
         function updateUserInfo() {
             if (currentUser) {
                 document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
-                document.getElementById('userAvatar').src = currentUser.photoURL || '/api/placeholder/40/40';
+                if (currentUser.photoURL) {
+                    document.getElementById('userAvatar').src = currentUser.photoURL;
+                }
             }
         }
 
+        // Όλες οι υπόλοιπες λειτουργίες από το αρχικό αρχείο
+        
         // Modal Functions
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
@@ -1156,7 +1138,7 @@
             forms.forEach(form => form.reset());
         }
 
-        // Data Functions
+        // Data Functions με Firebase integration
         async function addData(collection, data) {
             try {
                 data.userId = currentUser.uid;
@@ -1606,14 +1588,12 @@
 
         async function updateSummary() {
             try {
-                const [investments, realEstate, deposits, loans, income, transactions, expenses] = await Promise.all([
+                const [investments, realEstate, deposits, loans, income] = await Promise.all([
                     loadData('investments'),
                     loadData('realEstate'),
                     loadData('deposits'),
                     loadData('loans'),
-                    loadData('income'),
-                    loadData('transactions'),
-                    loadData('expenses')
+                    loadData('income')
                 ]);
 
                 // Calculate totals
@@ -1747,6 +1727,11 @@
             // Close modals
             document.getElementById('closeEmailLogin').onclick = () => closeModal('emailLoginModal');
             document.getElementById('closeRegister').onclick = () => closeModal('registerModal');
+
+            // Auth buttons
+            document.getElementById('googleSignIn').onclick = signInWithGoogle;
+            document.getElementById('emailSignIn').onclick = () => openModal('emailLoginModal');
+            document.getElementById('registerBtn').onclick = () => openModal('registerModal');
 
             // Investment Form
             document.getElementById('investmentForm').onsubmit = async (e) => {
@@ -1932,6 +1917,12 @@
                 }
             });
         };
+
+        // Global functions for onclick handlers
+        window.editItem = editItem;
+        window.deleteItem = deleteItem;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
     </script>
 </body>
 </html>
