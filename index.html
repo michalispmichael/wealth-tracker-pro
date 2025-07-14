@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WealthTracker Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,158 +13,320 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            color: #2c3e50;
+            background: #f8fafc;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #1e293b;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
             padding: 20px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            border-bottom: 1px solid #334155;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #4c63d2;
+            gap: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo i {
+            color: #3b82f6;
+            font-size: 24px;
+        }
+
+        .user-section {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: 2px solid #4c63d2;
+            background: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-details h4 {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            color: #94a3b8;
+            font-size: 12px;
         }
 
         .logout-btn {
-            background: #ff4757;
+            background: #ef4444;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 12px;
+            transition: all 0.2s;
         }
 
         .logout-btn:hover {
-            background: #ff3838;
-            transform: translateY(-2px);
+            background: #dc2626;
         }
 
-        .dashboard {
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #334155;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #1e40af;
+            color: white;
+            border-left-color: #3b82f6;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        /* DASHBOARD STATS */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            transition: all 0.3s ease;
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5);
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
 
-        .card-header {
+        .stat-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e1e8ed;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
 
-        .card-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #4c63d2;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .stat-info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 4px;
         }
 
-        .add-btn {
-            background: #4c63d2;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 35px;
-            height: 35px;
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 20px;
         }
 
-        .add-btn:hover {
-            background: #3d52c7;
-            transform: scale(1.1);
+        .stat-icon.investments { background: #dbeafe; color: #1d4ed8; }
+        .stat-icon.real-estate { background: #dcfce7; color: #16a34a; }
+        .stat-icon.deposits { background: #fef3c7; color: #d97706; }
+        .stat-icon.loans { background: #fee2e2; color: #dc2626; }
+        .stat-icon.income { background: #e0f2fe; color: #0284c7; }
+        .stat-icon.net-worth { background: #f3e8ff; color: #7c3aed; }
+
+        .stat-change {
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
         }
 
-        .item {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #4c63d2;
-            transition: all 0.3s ease;
+        .positive { color: #16a34a; }
+        .negative { color: #dc2626; }
+
+        /* CARDS AND SECTIONS */
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
 
-        .item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .section-title i {
+            color: #3b82f6;
+        }
+
+        .add-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .add-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        /* ITEMS LIST */
+        .items-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .item-card:hover {
+            border-color: #3b82f6;
+            background: white;
         }
 
         .item-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
 
         .item-title {
-            font-weight: bold;
-            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .item-subtitle {
+            font-size: 14px;
+            color: #64748b;
         }
 
         .item-actions {
@@ -173,285 +334,335 @@
             gap: 8px;
         }
 
-        .edit-btn, .delete-btn {
+        .action-btn {
             background: none;
             border: none;
+            padding: 6px;
+            border-radius: 6px;
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+            font-size: 14px;
         }
 
         .edit-btn {
-            color: #17a2b8;
+            color: #3b82f6;
         }
 
         .edit-btn:hover {
-            background: #17a2b8;
-            color: white;
+            background: #dbeafe;
         }
 
         .delete-btn {
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .delete-btn:hover {
-            background: #dc3545;
-            color: white;
+            background: #fee2e2;
         }
 
         .item-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            font-size: 0.9em;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
         }
 
         .detail-item {
             display: flex;
             flex-direction: column;
+            gap: 4px;
         }
 
         .detail-label {
-            font-weight: bold;
-            color: #666;
-            font-size: 0.8em;
-            margin-bottom: 2px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .detail-value {
-            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
         }
 
+        /* MODALS */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
+            position: relative;
             background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
             max-width: 500px;
-            max-height: 80vh;
+            margin: 5% auto;
+            border-radius: 16px;
+            overflow: hidden;
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e1e8ed;
         }
 
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #64748b;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: all 0.2s;
         }
 
-        .close:hover {
-            color: #333;
+        .close-btn:hover {
+            color: #1e293b;
+        }
+
+        .modal-body {
+            padding: 24px;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
         }
 
-        .form-group input, .form-group select, .form-group textarea {
+        .form-input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
         }
 
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #4c63d2;
-            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
         }
 
         .btn {
-            background: #4c63d2;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
+            transition: all 0.2s;
+            border: none;
         }
 
-        .btn:hover {
-            background: #3d52c7;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 99, 210, 0.3);
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, #4c63d2 0%, #764ba2 100%);
+        .btn-primary {
+            background: #3b82f6;
             color: white;
-            grid-column: span 2;
         }
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        .btn-primary:hover {
+            background: #2563eb;
         }
 
-        .summary-item {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
         }
 
-        .summary-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
+        .btn-secondary:hover {
+            background: #e2e8f0;
         }
 
-        .summary-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        /* LOGIN STYLES από το GitHub αρχείο */
+        /* LOGIN MODAL */
         .login-modal {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 3000;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
             padding: 40px;
+            max-width: 400px;
+            width: 90%;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-header {
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            background: #3b82f6;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: white;
+            font-size: 24px;
         }
 
         .login-title {
-            font-size: 2em;
-            font-weight: bold;
-            color: #4c63d2;
-            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #64748b;
+            font-size: 14px;
         }
 
         .auth-buttons {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .auth-btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
         }
 
         .google-btn {
-            background: #db4437;
+            background: #ea4335;
             color: white;
         }
 
         .google-btn:hover {
-            background: #c23321;
-            transform: translateY(-2px);
+            background: #d33b2c;
         }
 
         .email-btn {
-            background: #4c63d2;
+            background: #3b82f6;
             color: white;
         }
 
         .email-btn:hover {
-            background: #3d52c7;
-            transform: translateY(-2px);
+            background: #2563eb;
         }
 
         .register-btn {
-            background: #28a745;
+            background: #059669;
             color: white;
         }
 
         .register-btn:hover {
-            background: #218838;
-            transform: translateY(-2px);
+            background: #047857;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .positive {
-            color: #28a745;
-            font-weight: bold;
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
         }
 
-        .negative {
-            color: #dc3545;
-            font-weight: bold;
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #cbd5e1;
         }
 
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            .summary-card {
-                grid-column: span 1;
+            .sidebar {
+                transform: translateX(-100%);
             }
-            
-            .header-content {
-                flex-direction: column;
-                text-align: center;
+
+            .sidebar.open {
+                transform: translateX(0);
             }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 20px;
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Firebase Configuration από το GitHub αρχείο -->
+    <!-- Firebase Configuration -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
             authDomain: "wealth-tracker-app-4209f.firebaseapp.com",
@@ -462,13 +673,11 @@
             measurementId: "G-GGNDV3ZNRD"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Καθολικές μεταβλητές
         window.auth = auth;
         window.db = db;
         window.provider = provider;
@@ -486,20 +695,18 @@
         window.query = query;
         window.where = where;
         window.orderBy = orderBy;
-
-        console.log('🔥 Firebase initialized successfully');
     </script>
 
-    <!-- Login Modal από το GitHub αρχείο -->
-    <div id="loginModal" class="modal" style="display: block;">
-        <div class="modal-content login-modal">
-            <h2 class="login-title">
-                <i class="fas fa-chart-line"></i>
-                WealthTracker Pro
-            </h2>
-            <p style="margin-bottom: 30px; color: #666;">
-                Διαχειριστείτε τα επενδυτικά σας χαρτοφυλάκια με ασφάλεια
-            </p>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h1 class="login-title">WealthTracker Pro</h1>
+                <p class="login-subtitle">Διαχειριστείτε τα επενδυτικά σας χαρτοφυλάκια με ασφάλεια</p>
+            </div>
             <div class="auth-buttons">
                 <button id="googleSignIn" class="auth-btn google-btn">
                     <i class="fab fa-google"></i>
@@ -511,212 +718,352 @@
                 </button>
                 <button id="registerBtn" class="auth-btn register-btn">
                     <i class="fas fa-user-plus"></i>
-                    Εγγραφή
+                    Εγγραφή νέου λογαριασμού
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Email Login Form από το GitHub αρχείο -->
+    <!-- Email Login Modal -->
     <div id="emailLoginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Σύνδεση με Email</h3>
-                <span class="close" id="closeEmailLogin">&times;</span>
+                <h2 class="modal-title">Σύνδεση με Email</h2>
+                <button class="close-btn" onclick="closeModal('emailLoginModal')">&times;</button>
             </div>
             <form id="emailLoginForm">
-                <div class="form-group">
-                    <label for="loginEmail">Email:</label>
-                    <input type="email" id="loginEmail" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Email:</label>
+                        <input type="email" id="loginEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Κωδικός:</label>
+                        <input type="password" id="loginPassword" class="form-input" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="loginPassword">Κωδικός:</label>
-                    <input type="password" id="loginPassword" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('emailLoginModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Σύνδεση</button>
                 </div>
-                <button type="submit" class="btn">Σύνδεση</button>
             </form>
         </div>
     </div>
 
-    <!-- Register Form από το GitHub αρχείο -->
+    <!-- Register Modal -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Εγγραφή</h3>
-                <span class="close" id="closeRegister">&times;</span>
+                <h2 class="modal-title">Εγγραφή νέου λογαριασμού</h2>
+                <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
             </div>
             <form id="registerForm">
-                <div class="form-group">
-                    <label for="registerEmail">Email:</label>
-                    <input type="email" id="registerEmail" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Email:</label>
+                        <input type="email" id="registerEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Κωδικός:</label>
+                        <input type="password" id="registerPassword" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Επιβεβαίωση Κωδικού:</label>
+                        <input type="password" id="confirmPassword" class="form-input" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="registerPassword">Κωδικός:</label>
-                    <input type="password" id="registerPassword" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Εγγραφή</button>
                 </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Επιβεβαίωση Κωδικού:</label>
-                    <input type="password" id="confirmPassword" required>
-                </div>
-                <button type="submit" class="btn">Εγγραφή</button>
             </form>
         </div>
     </div>
 
-    <!-- Main App - ΟΛΑ από το αρχικό αρχείο -->
+    <!-- Main Application -->
     <div id="app" class="hidden">
-        <div class="container">
-            <!-- Header -->
-            <div class="header">
-                <div class="header-content">
-                    <div class="logo">
-                        <i class="fas fa-chart-line"></i>
-                        WealthTracker Pro
-                    </div>
-                    <div class="user-info">
-                        <img id="userAvatar" class="user-avatar" src="/api/placeholder/40/40" alt="User">
-                        <span id="userName">User</span>
-                        <button id="logoutBtn" class="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Αποσύνδεση
-                        </button>
-                    </div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    WealthTracker Pro
                 </div>
             </div>
 
-            <!-- Summary Dashboard -->
-            <div class="dashboard">
-                <div class="card summary-card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-dashboard"></i>
-                            Συνολική Εικόνα
-                        </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <h4 id="userName">User</h4>
+                        <p id="userEmail">user@example.com</p>
                     </div>
-                    <div class="summary-grid">
-                        <div class="summary-item">
-                            <div class="summary-value" id="totalInvestments">€0</div>
-                            <div class="summary-label">Συνολικές Επενδύσεις</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Αποσύνδεση
+                </button>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-section="investments">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Επενδύσεις</span>
+                </div>
+                <div class="nav-item" data-section="real-estate">
+                    <i class="fas fa-building"></i>
+                    <span>Ακίνητα</span>
+                </div>
+                <div class="nav-item" data-section="deposits">
+                    <i class="fas fa-piggy-bank"></i>
+                    <span>Καταθέσεις</span>
+                </div>
+                <div class="nav-item" data-section="loans">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Δάνεια</span>
+                </div>
+                <div class="nav-item" data-section="income">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Εισοδήματα</span>
+                </div>
+                <div class="nav-item" data-section="transactions">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Συναλλαγές</span>
+                </div>
+                <div class="nav-item" data-section="expenses">
+                    <i class="fas fa-receipt"></i>
+                    <span>Έξοδα</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-header">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Επισκόπηση των οικονομικών σας</p>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content" class="content-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Συνολικές Επενδύσεις</h3>
+                                    <div class="stat-value" id="totalInvestments">€0</div>
+                                </div>
+                                <div class="stat-icon investments">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change positive" id="investmentsChange">+0%</div>
                         </div>
-                        <div class="summary-item">
-                            <div class="summary-value" id="totalRealEstate">€0</div>
-                            <div class="summary-label">Ακίνητα</div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Ακίνητα</h3>
+                                    <div class="stat-value" id="totalRealEstate">€0</div>
+                                </div>
+                                <div class="stat-icon real-estate">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change positive" id="realEstateChange">+0%</div>
                         </div>
-                        <div class="summary-item">
-                            <div class="summary-value" id="totalDeposits">€0</div>
-                            <div class="summary-label">Καταθέσεις</div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Καταθέσεις</h3>
+                                    <div class="stat-value" id="totalDeposits">€0</div>
+                                </div>
+                                <div class="stat-icon deposits">
+                                    <i class="fas fa-piggy-bank"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change positive" id="depositsChange">+0%</div>
                         </div>
-                        <div class="summary-item">
-                            <div class="summary-value" id="totalLoans">€0</div>
-                            <div class="summary-label">Δάνεια</div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Δάνεια</h3>
+                                    <div class="stat-value negative" id="totalLoans">€0</div>
+                                </div>
+                                <div class="stat-icon loans">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change negative" id="loansChange">€0</div>
                         </div>
-                        <div class="summary-item">
-                            <div class="summary-value" id="monthlyIncome">€0</div>
-                            <div class="summary-label">Μηνιαίο Εισόδημα</div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Μηνιαίο Εισόδημα</h3>
+                                    <div class="stat-value" id="monthlyIncome">€0</div>
+                                </div>
+                                <div class="stat-icon income">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change positive" id="incomeChange">+0%</div>
                         </div>
-                        <div class="summary-item">
-                            <div class="summary-value" id="netWorth">€0</div>
-                            <div class="summary-label">Καθαρή Περιουσία</div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3>Καθαρή Περιουσία</h3>
+                                    <div class="stat-value" id="netWorth">€0</div>
+                                </div>
+                                <div class="stat-icon net-worth">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change" id="netWorthChange">€0</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Investments -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-chart-pie"></i>
-                            Επενδύσεις
+                <!-- Investments Content -->
+                <div id="investments-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Επενδύσεις
+                            </div>
+                            <button class="add-button" onclick="openModal('investmentModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Επένδυσης
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('investmentModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="investmentsList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="investmentsList"></div>
                 </div>
 
-                <!-- Real Estate -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-home"></i>
-                            Ακίνητα
+                <!-- Real Estate Content -->
+                <div id="real-estate-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-building"></i>
+                                Ακίνητα
+                            </div>
+                            <button class="add-button" onclick="openModal('realEstateModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Ακινήτου
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('realEstateModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="realEstateList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="realEstateList"></div>
                 </div>
 
-                <!-- Deposits -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-piggy-bank"></i>
-                            Καταθέσεις
+                <!-- Deposits Content -->
+                <div id="deposits-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-piggy-bank"></i>
+                                Καταθέσεις
+                            </div>
+                            <button class="add-button" onclick="openModal('depositModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Κατάθεσης
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('depositModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="depositsList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="depositsList"></div>
                 </div>
 
-                <!-- Loans -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            Δάνεια
+                <!-- Loans Content -->
+                <div id="loans-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                Δάνεια
+                            </div>
+                            <button class="add-button" onclick="openModal('loanModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Δανείου
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('loanModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="loansList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="loansList"></div>
                 </div>
 
-                <!-- Income -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-money-bill-wave"></i>
-                            Εισοδήματα
+                <!-- Income Content -->
+                <div id="income-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Εισοδήματα
+                            </div>
+                            <button class="add-button" onclick="openModal('incomeModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Εισοδήματος
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('incomeModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="incomeList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="incomeList"></div>
                 </div>
 
-                <!-- Transactions -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-exchange-alt"></i>
-                            Συναλλαγές
+                <!-- Transactions Content -->
+                <div id="transactions-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-exchange-alt"></i>
+                                Συναλλαγές
+                            </div>
+                            <button class="add-button" onclick="openModal('transactionModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Συναλλαγής
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('transactionModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="transactionsList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="transactionsList"></div>
                 </div>
 
-                <!-- Expenses -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-shopping-cart"></i>
-                            Έξοδα
+                <!-- Expenses Content -->
+                <div id="expenses-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-receipt"></i>
+                                Έξοδα
+                            </div>
+                            <button class="add-button" onclick="openModal('expenseModal')">
+                                <i class="fas fa-plus"></i>
+                                Προσθήκη Εξόδου
+                            </button>
                         </div>
-                        <button class="add-btn" onclick="openModal('expenseModal')">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="section-content">
+                            <div id="expensesList" class="items-list"></div>
+                        </div>
                     </div>
-                    <div id="expensesList"></div>
                 </div>
             </div>
         </div>
@@ -726,46 +1073,51 @@
     <div id="investmentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Επένδυσης</h3>
-                <span class="close" onclick="closeModal('investmentModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Επένδυσης</h2>
+                <button class="close-btn" onclick="closeModal('investmentModal')">&times;</button>
             </div>
             <form id="investmentForm">
-                <div class="form-group">
-                    <label for="investmentName">Όνομα Επένδυσης:</label>
-                    <input type="text" id="investmentName" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Όνομα Επένδυσης:</label>
+                        <input type="text" id="investmentName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τύπος:</label>
+                        <select id="investmentType" class="form-input" required>
+                            <option value="">Επιλέξτε τύπο</option>
+                            <option value="Μετοχές">Μετοχές</option>
+                            <option value="ETF">ETF</option>
+                            <option value="Κρύπτο">Κρύπτο</option>
+                            <option value="Ομόλογα">Ομόλογα</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ποσότητα:</label>
+                        <input type="number" id="investmentQuantity" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τιμή Αγοράς (€):</label>
+                        <input type="number" id="investmentPurchasePrice" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τρέχουσα Τιμή (€):</label>
+                        <input type="number" id="investmentCurrentPrice" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τρέχουσα Αξία (€):</label>
+                        <input type="number" id="investmentCurrentValue" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Μηνιαία Επένδυση (€):</label>
+                        <input type="number" id="investmentMonthlyInvestment" class="form-input" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="investmentType">Τύπος:</label>
-                    <select id="investmentType" required>
-                        <option value="">Επιλέξτε τύπο</option>
-                        <option value="Μετοχές">Μετοχές</option>
-                        <option value="ETF">ETF</option>
-                        <option value="Κρύπτο">Κρύπτο</option>
-                        <option value="Ομόλογα">Ομόλογα</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('investmentModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="investmentQuantity">Ποσότητα:</label>
-                    <input type="number" id="investmentQuantity" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="investmentPurchasePrice">Τιμή Αγοράς (€):</label>
-                    <input type="number" id="investmentPurchasePrice" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="investmentCurrentPrice">Τρέχουσα Τιμή (€):</label>
-                    <input type="number" id="investmentCurrentPrice" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="investmentCurrentValue">Τρέχουσα Αξία (€):</label>
-                    <input type="number" id="investmentCurrentValue" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="investmentMonthlyInvestment">Μηνιαία Επένδυση (€):</label>
-                    <input type="number" id="investmentMonthlyInvestment" step="0.01">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -774,43 +1126,48 @@
     <div id="realEstateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Ακινήτου</h3>
-                <span class="close" onclick="closeModal('realEstateModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Ακινήτου</h2>
+                <button class="close-btn" onclick="closeModal('realEstateModal')">&times;</button>
             </div>
             <form id="realEstateForm">
-                <div class="form-group">
-                    <label for="realEstateName">Όνομα Ακινήτου:</label>
-                    <input type="text" id="realEstateName" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Όνομα Ακινήτου:</label>
+                        <input type="text" id="realEstateName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τύπος:</label>
+                        <select id="realEstateType" class="form-input" required>
+                            <option value="">Επιλέξτε τύπο</option>
+                            <option value="Κατοικία">Κατοικία</option>
+                            <option value="Διαμέρισμα">Διαμέρισμα</option>
+                            <option value="Γραφείο">Γραφείο</option>
+                            <option value="Κατάστημα">Κατάστημα</option>
+                            <option value="Γη">Γη</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τοποθεσία:</label>
+                        <input type="text" id="realEstateLocation" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τιμή Αγοράς (€):</label>
+                        <input type="number" id="realEstatePurchasePrice" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τρέχουσα Αξία (€):</label>
+                        <input type="number" id="realEstateCurrentValue" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Μηνιαίο Ενοίκιο (€):</label>
+                        <input type="number" id="realEstateMonthlyRent" class="form-input" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="realEstateType">Τύπος:</label>
-                    <select id="realEstateType" required>
-                        <option value="">Επιλέξτε τύπο</option>
-                        <option value="Κατοικία">Κατοικία</option>
-                        <option value="Διαμέρισμα">Διαμέρισμα</option>
-                        <option value="Γραφείο">Γραφείο</option>
-                        <option value="Κατάστημα">Κατάστημα</option>
-                        <option value="Γη">Γη</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('realEstateModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="realEstateLocation">Τοποθεσία:</label>
-                    <input type="text" id="realEstateLocation" required>
-                </div>
-                <div class="form-group">
-                    <label for="realEstatePurchasePrice">Τιμή Αγοράς (€):</label>
-                    <input type="number" id="realEstatePurchasePrice" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="realEstateCurrentValue">Τρέχουσα Αξία (€):</label>
-                    <input type="number" id="realEstateCurrentValue" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="realEstateMonthlyRent">Μηνιαίο Ενοίκιο (€):</label>
-                    <input type="number" id="realEstateMonthlyRent" step="0.01">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -819,37 +1176,42 @@
     <div id="depositModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Κατάθεσης</h3>
-                <span class="close" onclick="closeModal('depositModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Κατάθεσης</h2>
+                <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
             </div>
             <form id="depositForm">
-                <div class="form-group">
-                    <label for="depositBank">Τράπεζα:</label>
-                    <input type="text" id="depositBank" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Τράπεζα:</label>
+                        <input type="text" id="depositBank" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τύπος:</label>
+                        <select id="depositType" class="form-input" required>
+                            <option value="">Επιλέξτε τύπο</option>
+                            <option value="Όψεως">Όψεως</option>
+                            <option value="Ταμιευτήριο">Ταμιευτήριο</option>
+                            <option value="Προθεσμίας">Προθεσμίας</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Υπόλοιπο (€):</label>
+                        <input type="number" id="depositBalance" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Επιτόκιο (%):</label>
+                        <input type="number" id="depositInterestRate" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Περίοδος Δέσμευσης (μήνες):</label>
+                        <input type="number" id="depositLockupPeriod" class="form-input">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="depositType">Τύπος:</label>
-                    <select id="depositType" required>
-                        <option value="">Επιλέξτε τύπο</option>
-                        <option value="Όψεως">Όψεως</option>
-                        <option value="Ταμιευτήριο">Ταμιευτήριο</option>
-                        <option value="Προθεσμίας">Προθεσμίας</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('depositModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="depositBalance">Υπόλοιπο (€):</label>
-                    <input type="number" id="depositBalance" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="depositInterestRate">Επιτόκιο (%):</label>
-                    <input type="number" id="depositInterestRate" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="depositLockupPeriod">Περίοδος Δέσμευσης (μήνες):</label>
-                    <input type="number" id="depositLockupPeriod">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -858,38 +1220,43 @@
     <div id="loanModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Δανείου</h3>
-                <span class="close" onclick="closeModal('loanModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Δανείου</h2>
+                <button class="close-btn" onclick="closeModal('loanModal')">&times;</button>
             </div>
             <form id="loanForm">
-                <div class="form-group">
-                    <label for="loanBank">Τράπεζα:</label>
-                    <input type="text" id="loanBank" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Τράπεζα:</label>
+                        <input type="text" id="loanBank" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τύπος:</label>
+                        <select id="loanType" class="form-input" required>
+                            <option value="">Επιλέξτε τύπο</option>
+                            <option value="Στεγαστικό">Στεγαστικό</option>
+                            <option value="Καταναλωτικό">Καταναλωτικό</option>
+                            <option value="Αυτοκινήτου">Αυτοκινήτου</option>
+                            <option value="Επιχειρηματικό">Επιχειρηματικό</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Υπόλοιπο (€):</label>
+                        <input type="number" id="loanBalance" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Επιτόκιο (%):</label>
+                        <input type="number" id="loanInterestRate" class="form-input" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Μηνιαία Δόση (€):</label>
+                        <input type="number" id="loanMonthlyPayment" class="form-input" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="loanType">Τύπος:</label>
-                    <select id="loanType" required>
-                        <option value="">Επιλέξτε τύπο</option>
-                        <option value="Στεγαστικό">Στεγαστικό</option>
-                        <option value="Καταναλωτικό">Καταναλωτικό</option>
-                        <option value="Αυτοκινήτου">Αυτοκινήτου</option>
-                        <option value="Επιχειρηματικό">Επιχειρηματικό</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('loanModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="loanBalance">Υπόλοιπο (€):</label>
-                    <input type="number" id="loanBalance" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="loanInterestRate">Επιτόκιο (%):</label>
-                    <input type="number" id="loanInterestRate" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="loanMonthlyPayment">Μηνιαία Δόση (€):</label>
-                    <input type="number" id="loanMonthlyPayment" step="0.01">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -898,35 +1265,40 @@
     <div id="incomeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Εισοδήματος</h3>
-                <span class="close" onclick="closeModal('incomeModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Εισοδήματος</h2>
+                <button class="close-btn" onclick="closeModal('incomeModal')">&times;</button>
             </div>
             <form id="incomeForm">
-                <div class="form-group">
-                    <label for="incomeSource">Πηγή Εισοδήματος:</label>
-                    <input type="text" id="incomeSource" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Πηγή Εισοδήματος:</label>
+                        <input type="text" id="incomeSource" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Τύπος:</label>
+                        <select id="incomeType" class="form-input" required>
+                            <option value="">Επιλέξτε τύπο</option>
+                            <option value="Μισθός">Μισθός</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Ενοίκια">Ενοίκια</option>
+                            <option value="Επιχείρηση">Επιχείρηση</option>
+                            <option value="Συντάξεις">Συντάξεις</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Μηνιαίο Μικτό (€):</label>
+                        <input type="number" id="incomeMonthlyGross" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Φοροεπιβάρυνση (%):</label>
+                        <input type="number" id="incomeTaxRate" class="form-input" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="incomeType">Τύπος:</label>
-                    <select id="incomeType" required>
-                        <option value="">Επιλέξτε τύπο</option>
-                        <option value="Μισθός">Μισθός</option>
-                        <option value="Freelance">Freelance</option>
-                        <option value="Ενοίκια">Ενοίκια</option>
-                        <option value="Επιχείρηση">Επιχείρηση</option>
-                        <option value="Συντάξεις">Συντάξεις</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('incomeModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="incomeMonthlyGross">Μηνιαίο Μικτό (€):</label>
-                    <input type="number" id="incomeMonthlyGross" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="incomeTaxRate">Φοροεπιβάρυνση (%):</label>
-                    <input type="number" id="incomeTaxRate" step="0.01">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -935,35 +1307,40 @@
     <div id="transactionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Συναλλαγής</h3>
-                <span class="close" onclick="closeModal('transactionModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Συναλλαγής</h2>
+                <button class="close-btn" onclick="closeModal('transactionModal')">&times;</button>
             </div>
             <form id="transactionForm">
-                <div class="form-group">
-                    <label for="transactionDescription">Περιγραφή:</label>
-                    <input type="text" id="transactionDescription" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Περιγραφή:</label>
+                        <input type="text" id="transactionDescription" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Κατηγορία:</label>
+                        <select id="transactionCategory" class="form-input" required>
+                            <option value="">Επιλέξτε κατηγορία</option>
+                            <option value="Εισόδημα">Εισόδημα</option>
+                            <option value="Επένδυση">Επένδυση</option>
+                            <option value="Αγορά">Αγορά</option>
+                            <option value="Πώληση">Πώληση</option>
+                            <option value="Μεταφορά">Μεταφορά</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ημερομηνία:</label>
+                        <input type="date" id="transactionDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ποσό (€):</label>
+                        <input type="number" id="transactionAmount" class="form-input" step="0.01" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="transactionCategory">Κατηγορία:</label>
-                    <select id="transactionCategory" required>
-                        <option value="">Επιλέξτε κατηγορία</option>
-                        <option value="Εισόδημα">Εισόδημα</option>
-                        <option value="Επένδυση">Επένδυση</option>
-                        <option value="Αγορά">Αγορά</option>
-                        <option value="Πώληση">Πώληση</option>
-                        <option value="Μεταφορά">Μεταφορά</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('transactionModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="transactionDate">Ημερομηνία:</label>
-                    <input type="date" id="transactionDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="transactionAmount">Ποσό (€):</label>
-                    <input type="number" id="transactionAmount" step="0.01" required>
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
@@ -972,59 +1349,53 @@
     <div id="expenseModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Προσθήκη Εξόδου</h3>
-                <span class="close" onclick="closeModal('expenseModal')">&times;</span>
+                <h2 class="modal-title">Προσθήκη Εξόδου</h2>
+                <button class="close-btn" onclick="closeModal('expenseModal')">&times;</button>
             </div>
             <form id="expenseForm">
-                <div class="form-group">
-                    <label for="expenseCategory">Κατηγορία:</label>
-                    <select id="expenseCategory" required>
-                        <option value="">Επιλέξτε κατηγορία</option>
-                        <option value="Σπίτι">Σπίτι</option>
-                        <option value="Μεταφορά">Μεταφορά</option>
-                        <option value="Φαγητό">Φαγητό</option>
-                        <option value="Υγεία">Υγεία</option>
-                        <option value="Εκπαίδευση">Εκπαίδευση</option>
-                        <option value="Ψυχαγωγία">Ψυχαγωγία</option>
-                        <option value="Ρουχισμός">Ρουχισμός</option>
-                        <option value="Άλλο">Άλλο</option>
-                    </select>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Κατηγορία:</label>
+                        <select id="expenseCategory" class="form-input" required>
+                            <option value="">Επιλέξτε κατηγορία</option>
+                            <option value="Σπίτι">Σπίτι</option>
+                            <option value="Μεταφορά">Μεταφορά</option>
+                            <option value="Φαγητό">Φαγητό</option>
+                            <option value="Υγεία">Υγεία</option>
+                            <option value="Εκπαίδευση">Εκπαίδευση</option>
+                            <option value="Ψυχαγωγία">Ψυχαγωγία</option>
+                            <option value="Ρουχισμός">Ρουχισμός</option>
+                            <option value="Άλλο">Άλλο</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Περιγραφή:</label>
+                        <input type="text" id="expenseDescription" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ποσό (€):</label>
+                        <input type="number" id="expenseAmount" class="form-input" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ξοδεμένο (€):</label>
+                        <input type="number" id="expenseSpent" class="form-input" step="0.01">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="expenseDescription">Περιγραφή:</label>
-                    <input type="text" id="expenseDescription" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
                 </div>
-                <div class="form-group">
-                    <label for="expenseAmount">Ποσό (€):</label>
-                    <input type="number" id="expenseAmount" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="expenseSpent">Ξοδεμένο (€):</label>
-                    <input type="number" id="expenseSpent" step="0.01">
-                </div>
-                <button type="submit" class="btn">Προσθήκη</button>
             </form>
         </div>
     </div>
 
     <script>
-        console.log('🚀 WealthTracker Pro starting...');
-
-        // Initialize Icons
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                console.log('✅ Lucide icons loaded');
-                lucide.createIcons();
-            } else {
-                console.log('⚠️ Lucide not available, using fallback icons');
-            }
-        });
-
         let currentUser = null;
         let editingId = null;
         let editingType = null;
+        let currentSection = 'dashboard';
 
-        // Authentication Functions από το GitHub αρχείο
+        // Authentication Functions
         async function initializeAuth() {
             console.log('🔐 Initializing authentication...');
             
@@ -1036,7 +1407,7 @@
                     updateUserInfo();
                     loadAllData();
                 } else {
-                    console.log('🔐 No user authenticated - showing login modal');
+                    console.log('🔐 No user authenticated');
                     currentUser = null;
                     showLogin();
                 }
@@ -1044,19 +1415,17 @@
         }
 
         function showApp() {
-            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginModal').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
         }
 
         function showLogin() {
             document.getElementById('app').classList.add('hidden');
-            document.getElementById('loginModal').style.display = 'block';
-            console.log('✅ Login modal shown');
+            document.getElementById('loginModal').classList.remove('hidden');
         }
 
         async function signInWithGoogle() {
             try {
-                console.log('🔄 Attempting Google sign-in...');
                 const result = await window.signInWithPopup(window.auth, window.provider);
                 console.log('✅ Google sign-in successful:', result.user.email);
             } catch (error) {
@@ -1070,9 +1439,7 @@
             const password = document.getElementById('loginPassword').value;
             
             try {
-                console.log('🔄 Attempting email sign-in...');
                 await window.signInWithEmailAndPassword(window.auth, email, password);
-                console.log('✅ Email sign-in successful');
                 closeModal('emailLoginModal');
             } catch (error) {
                 console.error('❌ Email sign-in error:', error);
@@ -1091,9 +1458,7 @@
             }
             
             try {
-                console.log('🔄 Attempting email registration...');
                 await window.createUserWithEmailAndPassword(window.auth, email, password);
-                console.log('✅ Email registration successful');
                 closeModal('registerModal');
             } catch (error) {
                 console.error('❌ Email registration error:', error);
@@ -1104,7 +1469,6 @@
         async function logout() {
             try {
                 await window.signOut(window.auth);
-                console.log('✅ User logged out');
             } catch (error) {
                 console.error('❌ Logout error:', error);
             }
@@ -1112,22 +1476,66 @@
 
         function updateUserInfo() {
             if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
-                if (currentUser.photoURL) {
-                    document.getElementById('userAvatar').src = currentUser.photoURL;
-                }
+                const displayName = currentUser.displayName || currentUser.email.split('@')[0];
+                document.getElementById('userName').textContent = displayName;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                // Set user avatar
+                const initials = displayName.substring(0, 2).toUpperCase();
+                document.getElementById('userAvatar').textContent = initials;
             }
         }
 
-        // Όλες οι υπόλοιπες λειτουργίες από το αρχικό αρχείο
-        
+        // Navigation
+        function switchSection(sectionName) {
+            currentSection = sectionName;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`${sectionName}-content`).classList.remove('hidden');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'investments': 'Επενδύσεις',
+                'real-estate': 'Ακίνητα',
+                'deposits': 'Καταθέσεις',
+                'loans': 'Δάνεια',
+                'income': 'Εισοδήματα',
+                'transactions': 'Συναλλαγές',
+                'expenses': 'Έξοδα'
+            };
+            
+            const subtitles = {
+                'dashboard': 'Επισκόπηση των οικονομικών σας',
+                'investments': 'Διαχείριση επενδυτικού χαρτοφυλακίου',
+                'real-estate': 'Διαχείριση ακίνητης περιουσίας',
+                'deposits': 'Τραπεζικές καταθέσεις και αποταμιεύσεις',
+                'loans': 'Υποχρεώσεις και δάνεια',
+                'income': 'Πηγές εισοδήματος',
+                'transactions': 'Ιστορικό συναλλαγών',
+                'expenses': 'Παρακολούθηση εξόδων'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName];
+            document.getElementById('pageSubtitle').textContent = subtitles[sectionName];
+        }
+
         // Modal Functions
         function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+            document.getElementById(modalId).classList.remove('hidden');
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            document.getElementById(modalId).classList.add('hidden');
             clearForms();
             editingId = null;
             editingType = null;
@@ -1138,13 +1546,12 @@
             forms.forEach(form => form.reset());
         }
 
-        // Data Functions με Firebase integration
+        // Data Functions
         async function addData(collection, data) {
             try {
                 data.userId = currentUser.uid;
                 data.createdAt = new Date();
                 const docRef = await window.addDoc(window.collection(window.db, collection), data);
-                console.log('✅ Data added to', collection, ':', docRef.id);
                 return docRef.id;
             } catch (error) {
                 console.error('❌ Error adding data:', error);
@@ -1174,7 +1581,6 @@
         async function deleteData(collection, id) {
             try {
                 await window.deleteDoc(window.doc(window.db, collection, id));
-                console.log('✅ Data deleted from', collection, ':', id);
             } catch (error) {
                 console.error('❌ Error deleting data:', error);
                 throw error;
@@ -1184,14 +1590,13 @@
         async function updateData(collection, id, data) {
             try {
                 await window.updateDoc(window.doc(window.db, collection, id), data);
-                console.log('✅ Data updated in', collection, ':', id);
             } catch (error) {
                 console.error('❌ Error updating data:', error);
                 throw error;
             }
         }
 
-        // Load and Display Functions
+        // Load All Data
         async function loadAllData() {
             try {
                 await Promise.all([
@@ -1209,12 +1614,19 @@
             }
         }
 
+        // Load Functions
         async function loadInvestments() {
             const investments = await loadData('investments');
             const container = document.getElementById('investmentsList');
             
             if (investments.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν επενδύσεις</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>Δεν υπάρχουν επενδύσεις</h3>
+                        <p>Προσθέστε την πρώτη σας επένδυση για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1224,24 +1636,23 @@
                 const profitClass = profit >= 0 ? 'positive' : 'negative';
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.name}</div>
+                        <div>
+                            <div class="item-title">${item.name}</div>
+                            <div class="item-subtitle">${item.type}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('investments', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('investments', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('investments', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('investments', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Τύπος</div>
-                            <div class="detail-value">${item.type}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Ποσότητα</div>
                             <div class="detail-value">${item.quantity}</div>
@@ -1275,7 +1686,13 @@
             const container = document.getElementById('realEstateList');
             
             if (realEstate.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν ακίνητα</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-building"></i>
+                        <h3>Δεν υπάρχουν ακίνητα</h3>
+                        <p>Προσθέστε το πρώτο σας ακίνητο για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1285,28 +1702,23 @@
                 const profitClass = profit >= 0 ? 'positive' : 'negative';
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.name}</div>
+                        <div>
+                            <div class="item-title">${item.name}</div>
+                            <div class="item-subtitle">${item.type} - ${item.location}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('realEstate', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('realEstate', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('realEstate', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('realEstate', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Τύπος</div>
-                            <div class="detail-value">${item.type}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Τοποθεσία</div>
-                            <div class="detail-value">${item.location}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Τιμή Αγοράς</div>
                             <div class="detail-value">€${parseFloat(item.purchasePrice || 0).toFixed(2)}</div>
@@ -1322,7 +1734,7 @@
                         ${item.monthlyRent ? `
                         <div class="detail-item">
                             <div class="detail-label">Μηνιαίο Ενοίκιο</div>
-                            <div class="detail-value">€${parseFloat(item.monthlyRent).toFixed(2)}</div>
+                            <div class="detail-value positive">€${parseFloat(item.monthlyRent).toFixed(2)}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -1336,31 +1748,36 @@
             const container = document.getElementById('depositsList');
             
             if (deposits.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν καταθέσεις</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-piggy-bank"></i>
+                        <h3>Δεν υπάρχουν καταθέσεις</h3>
+                        <p>Προσθέστε την πρώτη σας κατάθεση για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
             container.innerHTML = '';
             deposits.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.bank}</div>
+                        <div>
+                            <div class="item-title">${item.bank}</div>
+                            <div class="item-subtitle">${item.type}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('deposits', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('deposits', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('deposits', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('deposits', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Τύπος</div>
-                            <div class="detail-value">${item.type}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Υπόλοιπο</div>
                             <div class="detail-value">€${parseFloat(item.balance || 0).toFixed(2)}</div>
@@ -1388,31 +1805,36 @@
             const container = document.getElementById('loansList');
             
             if (loans.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν δάνεια</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <h3>Δεν υπάρχουν δάνεια</h3>
+                        <p>Προσθέστε το πρώτο σας δάνειο για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
             container.innerHTML = '';
             loans.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.bank}</div>
+                        <div>
+                            <div class="item-title">${item.bank}</div>
+                            <div class="item-subtitle">${item.type}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('loans', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('loans', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('loans', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('loans', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Τύπος</div>
-                            <div class="detail-value">${item.type}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Υπόλοιπο</div>
                             <div class="detail-value negative">€${parseFloat(item.balance || 0).toFixed(2)}</div>
@@ -1440,7 +1862,13 @@
             const container = document.getElementById('incomeList');
             
             if (income.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν εισοδήματα</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Δεν υπάρχουν εισοδήματα</h3>
+                        <p>Προσθέστε το πρώτο σας εισόδημα για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1449,24 +1877,23 @@
                 const netIncome = item.monthlyGross * (1 - (item.taxRate || 0) / 100);
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.source}</div>
+                        <div>
+                            <div class="item-title">${item.source}</div>
+                            <div class="item-subtitle">${item.type}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('income', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('income', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('income', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('income', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Τύπος</div>
-                            <div class="detail-value">${item.type}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Μικτό</div>
                             <div class="detail-value">€${parseFloat(item.monthlyGross || 0).toFixed(2)}</div>
@@ -1492,7 +1919,13 @@
             const container = document.getElementById('transactionsList');
             
             if (transactions.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν συναλλαγές</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h3>Δεν υπάρχουν συναλλαγές</h3>
+                        <p>Προσθέστε την πρώτη σας συναλλαγή για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1501,24 +1934,23 @@
                 const amountClass = item.amount >= 0 ? 'positive' : 'negative';
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.description}</div>
+                        <div>
+                            <div class="item-title">${item.description}</div>
+                            <div class="item-subtitle">${item.category}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('transactions', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('transactions', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('transactions', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('transactions', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Κατηγορία</div>
-                            <div class="detail-value">${item.category}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Ημερομηνία</div>
                             <div class="detail-value">${new Date(item.date).toLocaleDateString('el-GR')}</div>
@@ -1538,7 +1970,13 @@
             const container = document.getElementById('expensesList');
             
             if (expenses.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Δεν υπάρχουν έξοδα</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>Δεν υπάρχουν έξοδα</h3>
+                        <p>Προσθέστε το πρώτο σας έξοδο για να ξεκινήσετε</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1550,24 +1988,23 @@
                 const remainingClass = remaining >= 0 ? 'positive' : 'negative';
                 
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'item';
+                itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
-                        <div class="item-title">${item.description}</div>
+                        <div>
+                            <div class="item-title">${item.description}</div>
+                            <div class="item-subtitle">${item.category}</div>
+                        </div>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editItem('expenses', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('expenses', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="delete-btn" onclick="deleteItem('expenses', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('expenses', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
-                        <div class="detail-item">
-                            <div class="detail-label">Κατηγορία</div>
-                            <div class="detail-value">${item.category}</div>
-                        </div>
                         <div class="detail-item">
                             <div class="detail-label">Προϋπολογισμός</div>
                             <div class="detail-value">€${amount.toFixed(2)}</div>
@@ -1596,7 +2033,6 @@
                     loadData('income')
                 ]);
 
-                // Calculate totals
                 const totalInvestments = investments.reduce((sum, item) => sum + parseFloat(item.currentValue || 0), 0);
                 const totalRealEstate = realEstate.reduce((sum, item) => sum + parseFloat(item.currentValue || 0), 0);
                 const totalDeposits = deposits.reduce((sum, item) => sum + parseFloat(item.balance || 0), 0);
@@ -1606,17 +2042,15 @@
                 }, 0);
                 const netWorth = totalInvestments + totalRealEstate + totalDeposits - totalLoans;
 
-                // Update display
-                document.getElementById('totalInvestments').textContent = `€${totalInvestments.toFixed(0)}`;
-                document.getElementById('totalRealEstate').textContent = `€${totalRealEstate.toFixed(0)}`;
-                document.getElementById('totalDeposits').textContent = `€${totalDeposits.toFixed(0)}`;
-                document.getElementById('totalLoans').textContent = `€${totalLoans.toFixed(0)}`;
-                document.getElementById('monthlyIncome').textContent = `€${monthlyIncome.toFixed(0)}`;
-                document.getElementById('netWorth').textContent = `€${netWorth.toFixed(0)}`;
+                document.getElementById('totalInvestments').textContent = `€${totalInvestments.toLocaleString()}`;
+                document.getElementById('totalRealEstate').textContent = `€${totalRealEstate.toLocaleString()}`;
+                document.getElementById('totalDeposits').textContent = `€${totalDeposits.toLocaleString()}`;
+                document.getElementById('totalLoans').textContent = `€${totalLoans.toLocaleString()}`;
+                document.getElementById('monthlyIncome').textContent = `€${monthlyIncome.toLocaleString()}`;
+                document.getElementById('netWorth').textContent = `€${netWorth.toLocaleString()}`;
 
-                // Color coding for net worth
                 const netWorthElement = document.getElementById('netWorth');
-                netWorthElement.className = 'summary-value ' + (netWorth >= 0 ? 'positive' : 'negative');
+                netWorthElement.className = 'stat-value ' + (netWorth >= 0 ? 'positive' : 'negative');
 
             } catch (error) {
                 console.error('❌ Error updating summary:', error);
@@ -1633,7 +2067,6 @@
                 editingId = id;
                 editingType = type;
 
-                // Populate form based on type
                 switch(type) {
                     case 'investments':
                         document.getElementById('investmentName').value = item.name || '';
@@ -1709,9 +2142,22 @@
             }
         }
 
-        // Form Handlers
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            // Auth forms
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    switchSection(item.dataset.section);
+                });
+            });
+
+            // Auth events
+            document.getElementById('googleSignIn').onclick = signInWithGoogle;
+            document.getElementById('emailSignIn').onclick = () => openModal('emailLoginModal');
+            document.getElementById('registerBtn').onclick = () => openModal('registerModal');
+            document.getElementById('logoutBtn').onclick = logout;
+
+            // Form submissions
             document.getElementById('emailLoginForm').onsubmit = async (e) => {
                 e.preventDefault();
                 await signInWithEmail();
@@ -1721,17 +2167,6 @@
                 e.preventDefault();
                 await registerWithEmail();
             };
-
-            document.getElementById('logoutBtn').onclick = logout;
-
-            // Close modals
-            document.getElementById('closeEmailLogin').onclick = () => closeModal('emailLoginModal');
-            document.getElementById('closeRegister').onclick = () => closeModal('registerModal');
-
-            // Auth buttons
-            document.getElementById('googleSignIn').onclick = signInWithGoogle;
-            document.getElementById('emailSignIn').onclick = () => openModal('emailLoginModal');
-            document.getElementById('registerBtn').onclick = () => openModal('registerModal');
 
             // Investment Form
             document.getElementById('investmentForm').onsubmit = async (e) => {
@@ -1901,22 +2336,19 @@
                 }
             };
 
-            // Initialize the app
-            initializeAuth();
-        });
-
-        // Close modal when clicking outside
-        window.onclick = (event) => {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
+            // Modal close events
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.add('hidden');
                     clearForms();
                     editingId = null;
                     editingType = null;
                 }
             });
-        };
+
+            // Initialize the app
+            initializeAuth();
+        });
 
         // Global functions for onclick handlers
         window.editItem = editItem;
@@ -1926,3 +2358,4 @@
     </script>
 </body>
 </html>
+                    
