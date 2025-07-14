@@ -134,6 +134,12 @@
         .risk-low { color: #10B981; }
         .risk-medium { color: #F59E0B; }
         .risk-high { color: #EF4444; }
+
+        /* Authentication specific styles */
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -164,8 +170,98 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
+        <div class="bg-white rounded-2xl w-full max-w-md">
+            <div class="p-8 text-center">
+                <div class="mb-6">
+                    <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-8 h-8 text-blue-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">WealthTracker Pro</h2>
+                    <p class="text-gray-600" data-translate="login_subtitle">Secure access to your financial data</p>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginForm" class="space-y-4">
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your.email@example.com">
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    
+                    <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">
+                        <span data-translate="sign_in">Sign In</span>
+                    </button>
+                    
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500" data-translate="or">or</span>
+                        </div>
+                    </div>
+                    
+                    <button id="googleSignInBtn" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span data-translate="sign_in_google">Continue with Google</span>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button id="showRegisterBtn" class="text-sm text-blue-600 hover:text-blue-800" data-translate="create_account">Don't have an account? Create one</button>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div id="registerForm" class="space-y-4 hidden">
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="registerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe">
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your.email@example.com">
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    
+                    <button id="registerBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors">
+                        <span data-translate="create_account">Create Account</span>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button id="showLoginBtn" class="text-sm text-blue-600 hover:text-blue-800" data-translate="back_to_login">Already have an account? Sign in</button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="authLoading" class="hidden">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="loading-spinner border-4 border-blue-200 border-t-blue-600 rounded-full w-8 h-8"></div>
+                        <span class="ml-3 text-gray-600" data-translate="authenticating">Authenticating...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl sidebar-transition" id="sidebar">
+    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl sidebar-transition" id="sidebar" style="display: none;">
         <div class="flex h-full flex-col">
             <!-- Logo -->
             <div class="flex h-16 items-center justify-center px-6 gradient-bg">
@@ -269,7 +365,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="ml-64 min-h-screen">
+    <div class="ml-64 min-h-screen" id="mainContent" style="display: none;">
         <!-- Header -->
         <header class="bg-white shadow-sm border-b sticky top-0 z-40">
             <div class="px-6 py-4">
@@ -674,96 +770,6 @@
         </main>
     </div>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl w-full max-w-md">
-            <div class="p-8 text-center">
-                <div class="mb-6">
-                    <div class="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i data-lucide="shield-check" class="w-8 h-8 text-blue-600"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">WealthTracker Pro</h2>
-                    <p class="text-gray-600" data-translate="login_subtitle">Secure access to your financial data</p>
-                </div>
-
-                <!-- Login Form -->
-                <div id="loginForm" class="space-y-4">
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="loginEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your.email@example.com">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="loginPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
-                    </div>
-                    
-                    <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors">
-                        <span data-translate="sign_in">Sign In</span>
-                    </button>
-                    
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500" data-translate="or">or</span>
-                        </div>
-                    </div>
-                    
-                    <button id="googleSignInBtn" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center">
-                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        <span data-translate="sign_in_google">Continue with Google</span>
-                    </button>
-                    
-                    <div class="text-center mt-4">
-                        <button id="showRegisterBtn" class="text-sm text-blue-600 hover:text-blue-800" data-translate="create_account">Don't have an account? Create one</button>
-                    </div>
-                </div>
-
-                <!-- Register Form -->
-                <div id="registerForm" class="space-y-4 hidden">
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" id="registerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your.email@example.com">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
-                    </div>
-                    <div class="text-left">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                        <input type="password" id="registerConfirmPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
-                    </div>
-                    
-                    <button id="registerBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 rounded-lg transition-colors">
-                        <span data-translate="create_account">Create Account</span>
-                    </button>
-                    
-                    <div class="text-center mt-4">
-                        <button id="showLoginBtn" class="text-sm text-blue-600 hover:text-blue-800" data-translate="back_to_login">Already have an account? Sign in</button>
-                    </div>
-                </div>
-
-                <!-- Loading State -->
-                <div id="authLoading" class="hidden">
-                    <div class="flex items-center justify-center py-8">
-                        <div class="loading-spinner border-4 border-blue-200 border-t-blue-600 rounded-full w-8 h-8"></div>
-                        <span class="ml-3 text-gray-600" data-translate="authenticating">Authenticating...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Universal Add Modal -->
     <div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -790,7 +796,7 @@
     </div>
 
     <script>
-        // 🔥 FIREBASE CONFIGURATION - KEEP YOUR EXISTING CONFIG
+        // 🔥 FIREBASE CONFIGURATION - ΔΙΑΤΗΡΟΥΜΕ ΤΟ ΔΙΚΟ ΣΑΣ CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
             authDomain: "wealth-tracker-app-4209f.firebaseapp.com",
@@ -812,11 +818,10 @@
         let currentModalType = '';
         let editingId = null;
         let isOnline = navigator.onLine;
-        let syncInProgress = false;
         let currentUser = null;
 
-        // 📊 DATA ARRAYS (Now will sync with Firebase)
-        let capitalMarkets = []; // Renamed from investments
+        // 📊 DATA ARRAYS
+        let capitalMarkets = [];
         let properties = [];
         let accounts = [];
         let liabilities = [];
@@ -828,41 +833,57 @@
         // 🔐 AUTHENTICATION SERVICE
         class AuthService {
             static async initialize() {
-                // Listen for auth state changes
-                auth.onAuthStateChanged(async (user) => {
-                    currentUser = user;
-                    if (user) {
-                        // User is signed in
-                        this.showApp();
-                        this.updateUserInfo(user);
-                        await FirebaseService.initializeData();
-                        renderTabContent();
-                        updateLastUpdated();
-                    } else {
-                        // User is signed out
-                        this.showLogin();
-                        this.clearUserData();
-                    }
+                console.log('🔐 Initializing AuthService...');
+                
+                return new Promise((resolve) => {
+                    auth.onAuthStateChanged(async (user) => {
+                        console.log('🔐 Auth state changed:', user ? user.email : 'No user');
+                        currentUser = user;
+                        
+                        if (user) {
+                            console.log('✅ User authenticated:', user.uid);
+                            this.showApp();
+                            this.updateUserInfo(user);
+                            
+                            try {
+                                await FirebaseService.initializeData();
+                                renderTabContent();
+                                updateLastUpdated();
+                                FirebaseService.updateSyncStatus('success');
+                            } catch (error) {
+                                console.error('❌ Data loading error:', error);
+                                FirebaseService.updateSyncStatus('error');
+                            }
+                        } else {
+                            console.log('❌ User not authenticated - showing login');
+                            this.showLogin();
+                            this.clearUserData();
+                            FirebaseService.updateSyncStatus('offline');
+                        }
+                        resolve();
+                    });
                 });
             }
 
             static async signInWithEmail(email, password) {
                 try {
+                    FirebaseService.updateSyncStatus('syncing');
                     const result = await auth.signInWithEmailAndPassword(email, password);
                     showToast(translate('login_success'));
                     return result;
                 } catch (error) {
-                    console.error('Login error:', error);
-                    showToast(translate('login_error'), 'error');
+                    console.error('❌ Login error:', error);
+                    FirebaseService.updateSyncStatus('error');
+                    showToast(this.getAuthErrorMessage(error), 'error');
                     throw error;
                 }
             }
 
             static async signUpWithEmail(email, password, displayName) {
                 try {
+                    FirebaseService.updateSyncStatus('syncing');
                     const result = await auth.createUserWithEmailAndPassword(email, password);
                     
-                    // Update user profile with display name
                     if (displayName) {
                         await result.user.updateProfile({
                             displayName: displayName
@@ -872,14 +893,16 @@
                     showToast(translate('register_success'));
                     return result;
                 } catch (error) {
-                    console.error('Register error:', error);
-                    showToast(translate('register_error'), 'error');
+                    console.error('❌ Register error:', error);
+                    FirebaseService.updateSyncStatus('error');
+                    showToast(this.getAuthErrorMessage(error), 'error');
                     throw error;
                 }
             }
 
             static async signInWithGoogle() {
                 try {
+                    FirebaseService.updateSyncStatus('syncing');
                     const provider = new firebase.auth.GoogleAuthProvider();
                     provider.addScope('email');
                     provider.addScope('profile');
@@ -888,8 +911,9 @@
                     showToast(translate('login_success'));
                     return result;
                 } catch (error) {
-                    console.error('Google sign-in error:', error);
-                    showToast(translate('login_error'), 'error');
+                    console.error('❌ Google sign-in error:', error);
+                    FirebaseService.updateSyncStatus('error');
+                    showToast(this.getAuthErrorMessage(error), 'error');
                     throw error;
                 }
             }
@@ -899,21 +923,747 @@
                     await auth.signOut();
                     showToast(translate('logout_success'));
                 } catch (error) {
-                    console.error('Logout error:', error);
-                    showToast('Logout failed', 'error');
+                    console.error('❌ Logout error:', error);
+                    showToast('Item added successfully!');
+                }
+
+                closeModal();
+                renderTabContent();
+                updateLastUpdated();
+
+            } catch (error) {
+                console.error('Error saving item:', error);
+                showToast('Error saving item. Please try again.', 'error');
+            }
+        }
+
+        async function deleteItem(type, id) {
+            if (!confirm('Are you sure you want to delete this item?')) {
+                return;
+            }
+            
+            try {
+                let collection = '';
+                let array;
+                
+                switch (type) {
+                    case 'capital_market':
+                        collection = 'capitalMarkets';
+                        array = capitalMarkets;
+                        break;
+                    case 'property':
+                        collection = 'properties';
+                        array = properties;
+                        break;
+                    case 'account':
+                        collection = 'accounts';
+                        array = accounts;
+                        break;
+                    case 'liability':
+                        collection = 'liabilities';
+                        array = liabilities;
+                        break;
+                    case 'income':
+                        collection = 'incomes';
+                        array = incomes;
+                        break;
+                    case 'expense':
+                        collection = 'expenses';
+                        array = expenses;
+                        break;
+                    case 'budget':
+                        collection = 'budgets';
+                        array = budgets;
+                        break;
+                }
+
+                await FirebaseService.deleteData(collection, id);
+                
+                const index = array.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    array.splice(index, 1);
+                }
+                
+                renderTabContent();
+                updateLastUpdated();
+                showToast('Item deleted successfully!');
+                
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                showToast('Error deleting item. Please try again.', 'error');
+            }
+        }
+
+        // EXPORT FUNCTIONALITY
+        function exportToExcel() {
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // Create summary sheet
+                const summaryData = [
+                    ['WealthTracker Pro - Financial Summary'],
+                    ['Generated on:', new Date().toLocaleDateString()],
+                    ['User:', currentUser.email],
+                    [''],
+                    ['Net Worth Summary'],
+                    ['Total Assets', calculateTotalAssets()],
+                    ['Total Liabilities', calculateTotalLiabilities()],
+                    ['Net Worth', calculateNetWorth()],
+                    ['Invested Capital', calculateInvestedCapital()],
+                    [''],
+                    ['Monthly Cash Flow'],
+                    ['Monthly Income', calculateMonthlyIncome()],
+                    ['Monthly Expenses', calculateMonthlyExpenses()],
+                    ['Net Monthly Cash Flow', calculateMonthlyIncome() - calculateMonthlyExpenses()]
+                ];
+                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
+
+                // Capital Markets sheet
+                if (capitalMarkets.length > 0) {
+                    const capitalMarketsData = [
+                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price/Value', 'Total Value', 'Monthly Investment', 'Risk Level', 'Gain/Loss', 'Currency'],
+                        ...capitalMarkets.map(inv => {
+                            let totalValue, gainLoss;
+                            if (inv.type === 'life_insurance') {
+                                totalValue = inv.currentValue || inv.purchasePrice;
+                                gainLoss = totalValue - inv.purchasePrice;
+                            } else {
+                                totalValue = inv.quantity * inv.currentPrice;
+                                gainLoss = totalValue - (inv.quantity * inv.purchasePrice);
+                            }
+                            
+                            return [
+                                inv.name,
+                                inv.type,
+                                inv.quantity,
+                                inv.purchasePrice,
+                                inv.type === 'life_insurance' ? inv.currentValue : inv.currentPrice,
+                                totalValue,
+                                inv.monthlyInvestment || 0,
+                                inv.riskLevel,
+                                gainLoss,
+                                inv.currency
+                            ];
+                        })
+                    ];
+                    const capitalMarketsSheet = XLSX.utils.aoa_to_sheet(capitalMarketsData);
+                    XLSX.utils.book_append_sheet(wb, capitalMarketsSheet, 'Capital Markets');
+                }
+
+                // Properties sheet
+                if (properties.length > 0) {
+                    const propertyData = [
+                        ['Property', 'Address', 'Type', 'Purchase Price', 'Current Value', 'Appreciation', 'Monthly Rent', 'Currency'],
+                        ...properties.map(prop => [
+                            prop.name,
+                            prop.address,
+                            prop.type,
+                            prop.purchasePrice,
+                            prop.currentValue,
+                            prop.currentValue - prop.purchasePrice,
+                            prop.monthlyRent || 0,
+                            prop.currency
+                        ])
+                    ];
+                    const propertySheet = XLSX.utils.aoa_to_sheet(propertyData);
+                    XLSX.utils.book_append_sheet(wb, propertySheet, 'Real Estate');
+                }
+
+                // Accounts sheet
+                if (accounts.length > 0) {
+                    const accountData = [
+                        ['Account Name', 'Bank', 'Type', 'Balance', 'Interest Rate', 'Lockup Period', 'Terms', 'Currency'],
+                        ...accounts.map(acc => [
+                            acc.name,
+                            acc.bank,
+                            acc.type,
+                            acc.balance,
+                            acc.interestRate || 0,
+                            acc.lockupPeriod || 0,
+                            acc.terms || '',
+                            acc.currency
+                        ])
+                    ];
+                    const accountSheet = XLSX.utils.aoa_to_sheet(accountData);
+                    XLSX.utils.book_append_sheet(wb, accountSheet, 'Accounts');
+                }
+
+                if (liabilities.length > 0) {
+                    const liabilityData = [
+                        ['Liability', 'Type', 'Balance', 'Interest Rate', 'Monthly Payment', 'Currency'],
+                        ...liabilities.map(lib => [
+                            lib.name,
+                            lib.type,
+                            lib.balance,
+                            lib.interestRate,
+                            lib.monthlyPayment,
+                            lib.currency
+                        ])
+                    ];
+                    const liabilitySheet = XLSX.utils.aoa_to_sheet(liabilityData);
+                    XLSX.utils.book_append_sheet(wb, liabilitySheet, 'Liabilities');
+                }
+
+                if (incomes.length > 0) {
+                    const incomeData = [
+                        ['Income Source', 'Type', 'Employer', 'Monthly Gross', 'Tax Rate', 'Monthly Net', 'Annual Net', 'Currency'],
+                        ...incomes.map(inc => [
+                            inc.name,
+                            inc.type,
+                            inc.employer,
+                            inc.monthlyGross,
+                            inc.taxRate,
+                            inc.monthlyGross * (1 - inc.taxRate / 100),
+                            inc.monthlyGross * 12 * (1 - inc.taxRate / 100),
+                            inc.currency
+                        ])
+                    ];
+                    const incomeSheet = XLSX.utils.aoa_to_sheet(incomeData);
+                    XLSX.utils.book_append_sheet(wb, incomeSheet, 'Income');
+                }
+
+                if (expenses.length > 0) {
+                    const expenseData = [
+                        ['Date', 'Description', 'Category', 'Amount', 'Currency'],
+                        ...expenses.map(exp => [
+                            exp.date,
+                            exp.description,
+                            exp.category,
+                            exp.amount,
+                            exp.currency
+                        ])
+                    ];
+                    const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
+                    XLSX.utils.book_append_sheet(wb, expenseSheet, 'Expenses');
+                }
+
+                if (budgets.length > 0) {
+                    const budgetData = [
+                        ['Category', 'Budget Amount', 'Spent Amount', 'Remaining', 'Percentage Used', 'Currency'],
+                        ...budgets.map(bud => [
+                            bud.category,
+                            bud.amount,
+                            bud.spent,
+                            bud.amount - bud.spent,
+                            ((bud.spent / bud.amount) * 100).toFixed(2) + '%',
+                            bud.currency
+                        ])
+                    ];
+                    const budgetSheet = XLSX.utils.aoa_to_sheet(budgetData);
+                    XLSX.utils.book_append_sheet(wb, budgetSheet, 'Budgets');
+                }
+
+                const fileName = `WealthTracker_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                showToast('Export completed successfully!');
+            } catch (error) {
+                console.error('Export failed:', error);
+                showToast('Export failed. Please try again.', 'error');
+            }
+        }
+
+        // AUTHENTICATION FUNCTIONS
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!AuthService.validateEmail(email)) {
+                showToast(translate('invalid_email'), 'error');
+                return;
+            }
+            
+            if (!AuthService.validatePassword(password)) {
+                showToast(translate('weak_password'), 'error');
+                return;
+            }
+
+            showAuthLoading(true);
+            
+            try {
+                await AuthService.signInWithEmail(email, password);
+            } catch (error) {
+                // Error handling is done in AuthService
+            } finally {
+                showAuthLoading(false);
+            }
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (!name) {
+                showToast('Please enter your full name', 'error');
+                return;
+            }
+            
+            if (!AuthService.validateEmail(email)) {
+                showToast(translate('invalid_email'), 'error');
+                return;
+            }
+            
+            if (!AuthService.validatePassword(password)) {
+                showToast(translate('weak_password'), 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showToast(translate('password_mismatch'), 'error');
+                return;
+            }
+
+            showAuthLoading(true);
+            
+            try {
+                await AuthService.signUpWithEmail(email, password, name);
+            } catch (error) {
+                // Error handling is done in AuthService
+            } finally {
+                showAuthLoading(false);
+            }
+        }
+
+        async function handleGoogleSignIn() {
+            showAuthLoading(true);
+            
+            try {
+                await AuthService.signInWithGoogle();
+            } catch (error) {
+                // Error handling is done in AuthService
+            } finally {
+                showAuthLoading(false);
+            }
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showAuthLoading(show) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const authLoading = document.getElementById('authLoading');
+            
+            if (show) {
+                loginForm.classList.add('hidden');
+                registerForm.classList.add('hidden');
+                authLoading.classList.remove('hidden');
+            } else {
+                authLoading.classList.add('hidden');
+                if (registerForm.classList.contains('hidden')) {
+                    loginForm.classList.remove('hidden');
+                } else {
+                    registerForm.classList.remove('hidden');
+                }
+            }
+        }
+
+        // GLOBAL FUNCTIONS FOR ONCLICK HANDLERS
+        window.editItem = function(type, id) {
+            openModal(type, id);
+        };
+
+        window.deleteItem = deleteItem;
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 WealthTracker Pro starting...');
+            
+            try {
+                // Initialize PWA
+                PWAService.init();
+                
+                // Initialize UI
+                createIcons();
+                updateLanguage();
+
+                // Initialize Authentication - this will show login modal if not authenticated
+                await AuthService.initialize();
+                
+                // Setup Event Listeners
+                setupEventListeners();
+
+                // Hide loading overlay
+                setTimeout(() => {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
+                }, 1000);
+
+                console.log('✅ WealthTracker Pro initialized successfully');
+
+            } catch (error) {
+                console.error('❌ Error initializing app:', error);
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-red-600 text-xl mb-4">⚠️</div>
+                            <p class="text-gray-600">Error loading app. Please refresh the page.</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        function setupEventListeners() {
+            // Authentication Event Listeners
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const showRegisterBtn = document.getElementById('showRegisterBtn');
+            const showLoginBtn = document.getElementById('showLoginBtn');
+
+            if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+            if (registerBtn) registerBtn.addEventListener('click', handleRegister);
+            if (googleSignInBtn) googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+            if (logoutBtn) logoutBtn.addEventListener('click', AuthService.signOut);
+            if (showRegisterBtn) showRegisterBtn.addEventListener('click', showRegisterForm);
+            if (showLoginBtn) showLoginBtn.addEventListener('click', showLoginForm);
+
+            // Language switcher
+            const languageSelect = document.getElementById('languageSelect');
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    updateLanguage();
+                    if (currentUser) renderTabContent();
+                });
+            }
+
+            // Currency switcher
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.addEventListener('change', function() {
+                    currentCurrency = this.value;
+                    if (currentUser) renderTabContent();
+                });
+            }
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            // Modal controls
+            const closeModal = document.getElementById('closeModal');
+            const cancelModal = document.getElementById('cancelModal');
+            const saveModal = document.getElementById('saveModal');
+
+            if (closeModal) closeModal.addEventListener('click', closeModal);
+            if (cancelModal) cancelModal.addEventListener('click', closeModal);
+            if (saveModal) saveModal.addEventListener('click', saveItem);
+
+            // Add Item button logic
+            const addItemBtn = document.getElementById('addItemBtn');
+            if (addItemBtn) {
+                addItemBtn.addEventListener('click', () => {
+                    if (!currentUser) {
+                        showToast('Please login first', 'error');
+                        return;
+                    }
+                    
+                    switch (activeTab) {
+                        case 'capital-markets':
+                            openModal('capital_market');
+                            break;
+                        case 'real-estate':
+                            openModal('property');
+                            break;
+                        case 'accounts':
+                            openModal('account');
+                            break;
+                        case 'liabilities':
+                            openModal('liability');
+                            break;
+                        case 'income':
+                            openModal('income');
+                            break;
+                        case 'expenses':
+                            openModal('expense');
+                            break;
+                        case 'budgets':
+                            openModal('budget');
+                            break;
+                        default:
+                            showToast('Please navigate to a specific section to add items', 'error');
+                    }
+                });
+            }
+
+            // Specific add buttons
+            const addButtons = [
+                { id: 'addCapitalMarketBtn', type: 'capital_market' },
+                { id: 'addPropertyBtn', type: 'property' },
+                { id: 'addAccountBtn', type: 'account' },
+                { id: 'addLiabilityBtn', type: 'liability' },
+                { id: 'addIncomeBtn', type: 'income' },
+                { id: 'addExpenseBtn', type: 'expense' },
+                { id: 'addBudgetBtn', type: 'budget' }
+            ];
+
+            addButtons.forEach(btn => {
+                const element = document.getElementById(btn.id);
+                if (element) {
+                    element.addEventListener('click', () => {
+                        if (!currentUser) {
+                            showToast('Please login first', 'error');
+                            return;
+                        }
+                        openModal(btn.type);
+                    });
+                }
+            });
+
+            // Export functionality
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportToExcel);
+            }
+
+            // Dynamic form field handlers
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'propertyType') {
+                    const rentalSection = document.getElementById('rentalSection');
+                    if (rentalSection) {
+                        rentalSection.style.display = e.target.value === 'rental' ? 'block' : 'none';
+                    }
+                }
+                
+                if (e.target.id === 'capitalMarketType') {
+                    const quantityPriceSection = document.getElementById('quantityPriceSection');
+                    const currentPriceSection = document.getElementById('currentPriceSection');
+                    const lifeInsuranceSection = document.getElementById('lifeInsuranceSection');
+                    
+                    if (e.target.value === 'life_insurance') {
+                        if (quantityPriceSection) quantityPriceSection.style.display = 'none';
+                        if (currentPriceSection) currentPriceSection.style.display = 'none';
+                        if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'block';
+                    } else {
+                        if (quantityPriceSection) quantityPriceSection.style.display = 'grid';
+                        if (currentPriceSection) currentPriceSection.style.display = 'block';
+                        if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'none';
+                    }
+                }
+                
+                if (e.target.id === 'accountType') {
+                    const interestSection = document.getElementById('interestSection');
+                    const lockupSection = document.getElementById('lockupSection');
+                    
+                    if (e.target.value === 'savings' || e.target.value === 'term_deposit') {
+                        if (interestSection) interestSection.style.display = 'grid';
+                    } else {
+                        if (interestSection) interestSection.style.display = 'none';
+                    }
+                    
+                    if (e.target.value === 'term_deposit') {
+                        if (lockupSection) lockupSection.style.display = 'block';
+                    } else {
+                        if (lockupSection) lockupSection.style.display = 'none';
+                    }
+                }
+            });
+
+            // Close modal on background click
+            const addModal = document.getElementById('addModal');
+            if (addModal) {
+                addModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // Handle Enter key in login forms
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const loginForm = document.getElementById('loginForm');
+                    const registerForm = document.getElementById('registerForm');
+                    
+                    if (loginForm && !loginForm.classList.contains('hidden')) {
+                        handleLogin();
+                    } else if (registerForm && !registerForm.classList.contains('hidden')) {
+                        handleRegister();
+                    }
+                }
+            });
+        }
+
+        // Initialize chart cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            Object.values(chartInstances).forEach(chart => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
+            });
+        });
+
+        // Force login modal on auth failure
+        setTimeout(() => {
+            if (!currentUser) {
+                console.log('🔐 No user authenticated after initialization - ensuring login modal is visible');
+                const loginModal = document.getElementById('loginModal');
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                
+                if (loginModal) {
+                    loginModal.classList.remove('hidden');
+                }
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+                
+                document.getElementById('sidebar').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+            }
+        }, 3000);
+
+    </script>
+
+    <!-- 🔥 FIREBASE SECURITY RULES SETUP INSTRUCTIONS -->
+    <!--
+    
+    Για να λειτουργήσει σωστά το Firebase Authentication, ακολουθήστε αυτά τα βήματα:
+
+    1. FIREBASE CONSOLE SETUP:
+    ===========================
+    
+    A. Authentication Setup:
+    - Firebase Console → Authentication → Sign-in method
+    - Enable "Email/Password" ✅
+    - Enable "Google" (προαιρετικά) ✅
+    - Προσθέστε το Netlify domain στα "Authorized domains": bright-yeot-c7342e.netlify.app
+    
+    B. Firestore Security Rules:
+    - Firebase Console → Firestore Database → Rules
+    - Αντικαταστήστε τα rules με ένα από τα παρακάτω:
+
+    ΕΠΙΛΟΓΗ 1: Απλή λύση (για single user):
+    ========================================
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /{document=**} {
+          allow read, write: if request.auth != null;
+        }
+      }
+    }
+
+    ΕΠΙΛΟΓΗ 2: Multi-user με ασφάλεια (προτεινόμενη):
+    ===============================================
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /{collection}/{document} {
+          allow read, write: if request.auth != null && 
+            (resource == null || request.auth.uid == resource.data.userId) &&
+            request.auth.uid == request.resource.data.userId;
+        }
+      }
+    }
+
+    ΕΠΙΛΟΓΗ 3: Maximum Security:
+    ============================
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /capitalMarkets/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /properties/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /accounts/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /liabilities/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /incomes/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /expenses/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /budgets/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+        match /otherAssets/{docId} {
+          allow read, write: if request.auth != null && 
+            request.auth.uid == resource.data.userId;
+        }
+      }
+    }
+
+    2. NETLIFY SETUP:
+    ================
+    
+    Δημιουργήστε αρχείο _redirects στο root directory:
+    
+    /*    /index.html   200
+
+    3. DEPLOY FILES:
+    ===============
+    
+    Αρχεία για deploy:
+    - index.html (αυτό το αρχείο)
+    - _redirects
+    
+    🎉 ΤΟ WEALTHTRACKER ΕΙΝΑΙ ΕΤΟΙΜΟ!
+    
+    Χαρακτηριστικά:
+    ✅ Πλήρης Firebase Authentication (Email/Password + Google)
+    ✅ User-specific data isolation
+    ✅ Capital Markets με Life Insurance support
+    ✅ Enhanced Bank Accounts με interest rates
+    ✅ Monthly Investment tracking
+    ✅ Risk Level indicators
+    ✅ Invested Capital calculation
+    ✅ Multi-language support (EN/EL)
+    ✅ Export to Excel
+    ✅ PWA support
+    ✅ Offline capabilities
+    ✅ Responsive design
+    
+    -->Logout failed', 'error');
                 }
             }
 
             static showLogin() {
+                console.log('🔐 Showing login modal');
                 document.getElementById('loginModal').classList.remove('hidden');
                 document.getElementById('sidebar').style.display = 'none';
-                document.querySelector('.ml-64').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
             }
 
             static showApp() {
+                console.log('✅ Showing app interface');
                 document.getElementById('loginModal').classList.add('hidden');
                 document.getElementById('sidebar').style.display = 'flex';
-                document.querySelector('.ml-64').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'block';
             }
 
             static updateUserInfo(user) {
@@ -929,11 +1679,9 @@
                     userName.textContent = displayName;
                     userEmail.textContent = user.email;
                     
-                    // Set avatar with initials
                     const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
                     userAvatar.textContent = initials.substring(0, 2);
                     
-                    // Use profile photo if available
                     if (user.photoURL) {
                         userAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile" class="w-10 h-10 rounded-full object-cover">`;
                     }
@@ -941,7 +1689,6 @@
             }
 
             static clearUserData() {
-                // Clear all local data arrays
                 capitalMarkets = [];
                 properties = [];
                 accounts = [];
@@ -951,7 +1698,6 @@
                 budgets = [];
                 otherAssets = [];
 
-                // Hide user info
                 const userInfo = document.getElementById('userInfo');
                 if (userInfo) {
                     userInfo.classList.add('hidden');
@@ -966,9 +1712,26 @@
             static validatePassword(password) {
                 return password && password.length >= 6;
             }
+
+            static getAuthErrorMessage(error) {
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        return 'No account found with this email';
+                    case 'auth/wrong-password':
+                        return 'Incorrect password';
+                    case 'auth/email-already-in-use':
+                        return 'An account with this email already exists';
+                    case 'auth/weak-password':
+                        return 'Password should be at least 6 characters';
+                    case 'auth/invalid-email':
+                        return 'Invalid email address';
+                    default:
+                        return 'Authentication failed. Please try again.';
+                }
+            }
         }
 
-        // 🔄 FIREBASE FUNCTIONS
+        // 🔄 FIREBASE SERVICE
         class FirebaseService {
             static async saveData(collection, data) {
                 try {
@@ -976,21 +1739,20 @@
                         throw new Error('User not authenticated');
                     }
 
-                    // Add user ID to the data
+                    console.log(`💾 Saving data to ${collection}:`, data.name || data.description || 'item');
                     data.userId = currentUser.uid;
                     
                     if (data.id && typeof data.id === 'string') {
-                        // Update existing document
                         await db.collection(collection).doc(data.id).set(data);
                     } else {
-                        // Create new document
                         const docRef = await db.collection(collection).add(data);
                         data.id = docRef.id;
                     }
+                    
                     this.updateSyncStatus('success');
                     return data;
                 } catch (error) {
-                    console.error('Error saving to Firebase:', error);
+                    console.error(`❌ Error saving to ${collection}:`, error);
                     this.updateSyncStatus('error');
                     throw error;
                 }
@@ -999,11 +1761,13 @@
             static async loadData(collection) {
                 try {
                     if (!currentUser) {
+                        console.log(`⚠️ No user authenticated for loading ${collection}`);
                         return [];
                     }
 
+                    console.log(`📥 Loading ${collection} for user:`, currentUser.uid);
                     this.updateSyncStatus('syncing');
-                    // Query only current user's data
+                    
                     const snapshot = await db.collection(collection)
                         .where('userId', '==', currentUser.uid)
                         .get();
@@ -1012,10 +1776,12 @@
                     snapshot.forEach(doc => {
                         data.push({ id: doc.id, ...doc.data() });
                     });
+                    
+                    console.log(`✅ Loaded ${data.length} items from ${collection}`);
                     this.updateSyncStatus('success');
                     return data;
                 } catch (error) {
-                    console.error('Error loading from Firebase:', error);
+                    console.error(`❌ Error loading ${collection}:`, error);
                     this.updateSyncStatus('error');
                     return [];
                 }
@@ -1027,10 +1793,11 @@
                         throw new Error('User not authenticated');
                     }
 
+                    console.log(`🗑️ Deleting from ${collection}:`, id);
                     await db.collection(collection).doc(id).delete();
                     this.updateSyncStatus('success');
                 } catch (error) {
-                    console.error('Error deleting from Firebase:', error);
+                    console.error(`❌ Error deleting from ${collection}:`, error);
                     this.updateSyncStatus('error');
                     throw error;
                 }
@@ -1065,10 +1832,12 @@
             static async initializeData() {
                 try {
                     if (!currentUser) {
+                        console.log('⚠️ No user for data initialization');
                         return;
                     }
 
-                    // Load all data from Firebase (using new collection names)
+                    console.log('📊 Initializing user data...');
+
                     const [
                         capitalMarketsData,
                         propertiesData,
@@ -1079,7 +1848,7 @@
                         budgetsData,
                         otherAssetsData
                     ] = await Promise.all([
-                        this.loadData('capitalMarkets'), // Changed from 'investments'
+                        this.loadData('capitalMarkets'),
                         this.loadData('properties'),
                         this.loadData('accounts'),
                         this.loadData('liabilities'),
@@ -1089,7 +1858,6 @@
                         this.loadData('otherAssets')
                     ]);
 
-                    // Update global arrays
                     capitalMarkets = capitalMarketsData;
                     properties = propertiesData;
                     accounts = accountsData;
@@ -1099,20 +1867,21 @@
                     budgets = budgetsData;
                     otherAssets = otherAssetsData;
 
-                    // If no data exists for new user, populate with sample data
+                    // Create sample data for new users
                     if (capitalMarkets.length === 0 && properties.length === 0 && accounts.length === 0) {
+                        console.log('📝 Creating sample data for new user');
                         await this.createSampleData();
                     }
 
+                    console.log('✅ Data initialization complete');
+
                 } catch (error) {
-                    console.error('Error initializing data:', error);
-                    // Load sample data offline
-                    this.loadSampleData();
+                    console.error('❌ Error initializing data:', error);
+                    this.loadSampleDataOffline();
                 }
             }
 
             static async createSampleData() {
-                // Sample capital markets investments
                 const sampleCapitalMarkets = [
                     { 
                         name: 'Apple Inc. (AAPL)', 
@@ -1160,13 +1929,28 @@
                     }
                 ];
 
-                // Sample properties
                 const sampleProperties = [
-                    { name: 'Main Residence', address: '123 Main St, Athens', purchasePrice: 300000, currentValue: 375000, type: 'residential', currency: 'EUR', userId: currentUser.uid },
-                    { name: 'Rental Property', address: '456 Oak Ave, Thessaloniki', purchasePrice: 150000, currentValue: 180000, type: 'rental', monthlyRent: 800, currency: 'EUR', userId: currentUser.uid }
+                    { 
+                        name: 'Main Residence', 
+                        address: '123 Main St, Athens', 
+                        purchasePrice: 300000, 
+                        currentValue: 375000, 
+                        type: 'residential', 
+                        currency: 'EUR', 
+                        userId: currentUser.uid 
+                    },
+                    { 
+                        name: 'Rental Property', 
+                        address: '456 Oak Ave, Thessaloniki', 
+                        purchasePrice: 150000, 
+                        currentValue: 180000, 
+                        type: 'rental', 
+                        monthlyRent: 800, 
+                        currency: 'EUR', 
+                        userId: currentUser.uid 
+                    }
                 ];
 
-                // Sample accounts with enhanced features
                 const sampleAccounts = [
                     { 
                         name: 'Alpha Bank Checking', 
@@ -1203,7 +1987,6 @@
                     }
                 ];
 
-                // Rest of sample data with userId
                 const sampleLiabilities = [
                     { name: 'Home Mortgage', type: 'mortgage', balance: 195000, interestRate: 2.5, monthlyPayment: 950, currency: 'EUR', userId: currentUser.uid },
                     { name: 'Car Loan', type: 'car_loan', balance: 15000, interestRate: 4.2, monthlyPayment: 320, currency: 'EUR', userId: currentUser.uid }
@@ -1233,53 +2016,34 @@
                 ];
                 
                 try {
-                    for (const investment of sampleCapitalMarkets) {
-                        await this.saveData('capitalMarkets', investment);
-                        capitalMarkets.push(investment);
+                    const collections = [
+                        { name: 'capitalMarkets', data: sampleCapitalMarkets, array: capitalMarkets },
+                        { name: 'properties', data: sampleProperties, array: properties },
+                        { name: 'accounts', data: sampleAccounts, array: accounts },
+                        { name: 'liabilities', data: sampleLiabilities, array: liabilities },
+                        { name: 'incomes', data: sampleIncomes, array: incomes },
+                        { name: 'expenses', data: sampleExpenses, array: expenses },
+                        { name: 'budgets', data: sampleBudgets, array: budgets },
+                        { name: 'otherAssets', data: sampleOtherAssets, array: otherAssets }
+                    ];
+
+                    for (const collection of collections) {
+                        for (const item of collection.data) {
+                            const savedItem = await this.saveData(collection.name, item);
+                            collection.array.push(savedItem);
+                        }
                     }
 
-                    for (const property of sampleProperties) {
-                        await this.saveData('properties', property);
-                        properties.push(property);
-                    }
-
-                    for (const account of sampleAccounts) {
-                        await this.saveData('accounts', account);
-                        accounts.push(account);
-                    }
-
-                    for (const liability of sampleLiabilities) {
-                        await this.saveData('liabilities', liability);
-                        liabilities.push(liability);
-                    }
-
-                    for (const income of sampleIncomes) {
-                        await this.saveData('incomes', income);
-                        incomes.push(income);
-                    }
-
-                    for (const expense of sampleExpenses) {
-                        await this.saveData('expenses', expense);
-                        expenses.push(expense);
-                    }
-
-                    for (const budget of sampleBudgets) {
-                        await this.saveData('budgets', budget);
-                        budgets.push(budget);
-                    }
-
-                    for (const asset of sampleOtherAssets) {
-                        await this.saveData('otherAssets', asset);
-                        otherAssets.push(asset);
-                    }
+                    console.log('✅ Sample data created successfully');
 
                 } catch (error) {
-                    console.error('Error creating sample data:', error);
+                    console.error('❌ Error creating sample data:', error);
+                    this.loadSampleDataOffline();
                 }
             }
 
-            static loadSampleData() {
-                // Fallback sample data for offline use
+            static loadSampleDataOffline() {
+                console.log('📱 Loading offline sample data');
                 capitalMarkets = [
                     { id: 'sample1', name: 'Apple Inc. (AAPL)', type: 'stocks', quantity: 50, purchasePrice: 127.50, currentPrice: 157.50, monthlyInvestment: 500, riskLevel: 'medium', currency: 'USD' },
                     { id: 'sample2', name: 'Bitcoin', type: 'cryptocurrency', quantity: 0.5, purchasePrice: 45000, currentPrice: 52000, monthlyInvestment: 300, riskLevel: 'high', currency: 'USD' }
@@ -1315,24 +2079,16 @@
             }
         }
 
-        // 🔄 PWA FUNCTIONS
+        // PWA SERVICE
         class PWAService {
             static init() {
-                // Register service worker
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.register('/service-worker.js')
-                        .then(registration => {
-                            console.log('Service Worker registered:', registration);
-                        })
-                        .catch(error => {
-                            console.log('Service Worker registration failed:', error);
-                        });
+                        .then(registration => console.log('Service Worker registered:', registration))
+                        .catch(error => console.log('Service Worker registration failed:', error));
                 }
 
-                // Handle app install
                 this.handleInstallPrompt();
-
-                // Handle online/offline status
                 this.handleConnectionStatus();
             }
 
@@ -1384,13 +2140,11 @@
 
                 window.addEventListener('online', updateOnlineStatus);
                 window.addEventListener('offline', updateOnlineStatus);
-                
-                // Initial check
                 updateOnlineStatus();
             }
         }
 
-        // Enhanced Translation object with new terms
+        // TRANSLATIONS
         const translations = {
             en: {
                 dashboard: 'Dashboard',
@@ -1482,163 +2236,6 @@
                 debt_to_asset_ratio: 'Debt-to-Asset Ratio',
                 debt_to_income_ratio: 'Debt-to-Income Ratio',
                 savings_rate: 'Savings Rate',
-                emergency_fund: 'Emergency Fund',
-                months_of_expenses: 'Months of Expenses Covered',
-                // Authentication
-                login_subtitle: 'Secure access to your financial data',
-                sign_in: 'Sign In',
-                or: 'or',
-                sign_in_google: 'Continue with Google',
-                create_account: "Don't have an account? Create one",
-                back_to_login: 'Already have an account? Sign in',
-                authenticating: 'Authenticating...',
-                welcome_back: 'Welcome back',
-                login_success: 'Login successful!',
-                login_error: 'Login failed. Please try again.',
-                register_success: 'Account created successfully!',
-                register_error: 'Registration failed. Please try again.',
-                logout_success: 'Logged out successfully',
-                password_mismatch: 'Passwords do not match',
-                invalid_email: 'Please enter a valid email address',
-                weak_password: 'Password must be at least 6 characters',
-                // Asset Types
-                stocks: 'Stocks',
-                bonds: 'Bonds',
-                etf: 'ETF',
-                mutual_fund: 'Mutual Fund',
-                cryptocurrency: 'Cryptocurrency',
-                index_fund: 'Index Fund',
-                life_insurance: 'Life Insurance',
-                vehicle: 'Vehicle',
-                jewelry: 'Jewelry',
-                // Risk Levels
-                low: 'Low',
-                medium: 'Medium',
-                high: 'High',
-                // Property Types
-                residential: 'Residential',
-                rental: 'Rental',
-                commercial: 'Commercial',
-                // Account Types
-                checking: 'Checking',
-                savings: 'Savings',
-                term_deposit: 'Term Deposit',
-                // Liability Types
-                mortgage: 'Mortgage',
-                car_loan: 'Car Loan',
-                personal_loan: 'Personal Loan',
-                credit_card: 'Credit Card',
-                student_loan: 'Student Loan',
-                // Income Types
-                salary: 'Salary',
-                freelance: 'Freelance',
-                business: 'Business',
-                rental: 'Rental',
-                dividends: 'Dividends',
-                pension: 'Pension',
-                // Expense Categories
-                groceries: 'Groceries',
-                transportation: 'Transportation',
-                dining: 'Dining',
-                utilities: 'Utilities',
-                entertainment: 'Entertainment',
-                health: 'Health',
-                shopping: 'Shopping',
-                travel: 'Travel',
-                education: 'Education',
-                insurance: 'Insurance',
-                other: 'Other'
-            },
-            el: {
-                dashboard: 'Πίνακας Ελέγχου',
-                assets: 'Περιουσιακά Στοιχεία',
-                capital_markets: 'Κεφαλαιαγορά',
-                real_estate: 'Ακίνητα',
-                accounts: 'Λογαριασμοί',
-                liabilities: 'Υποχρεώσεις',
-                income: 'Εισόδημα',
-                expenses: 'Έξοδα',
-                budgets: 'Προϋπολογισμοί',
-                analytics: 'Αναλυτικά',
-                export: 'Εξαγωγή',
-                welcome_message: 'Καλώς ήρθατε στην οικονομική σας επισκόπηση',
-                add_item: 'Προσθήκη Στοιχείου',
-                last_updated: 'Τελευταία Ενημέρωση',
-                net_worth: 'Καθαρή Αξία',
-                total_wealth: 'Συνολικός Πλούτος',
-                total_assets: 'Συνολικά Περιουσιακά',
-                all_holdings: 'Όλες οι Συμμετοχές',
-                invested_capital: 'Επενδυμένο Κεφάλαιο',
-                growing_assets: 'Αυξανόμενα Περιουσιακά',
-                monthly_income: 'Μηνιαίο Εισόδημα',
-                after_taxes: 'Μετά από Φόρους',
-                monthly_expenses: 'Μηνιαία Έξοδα',
-                this_month: 'Τον Μήνα',
-                asset_allocation: 'Κατανομή Περιουσίας',
-                net_worth_trend: 'Τάση Καθαρής Αξίας',
-                recent_transactions: 'Πρόσφατες Συναλλαγές',
-                budget_overview: 'Επισκόπηση Προϋπολογισμού',
-                asset_breakdown: 'Ανάλυση Περιουσίας',
-                asset_summary: 'Περίληψη Περιουσίας',
-                capital_markets_portfolio: 'Χαρτοφυλάκιο Κεφαλαιαγοράς',
-                add_investment: 'Προσθήκη Επένδυσης',
-                investment: 'Επένδυση',
-                type: 'Τύπος',
-                quantity: 'Ποσότητα',
-                purchase_price: 'Τιμή Αγοράς',
-                current_price: 'Τρέχουσα Τιμή',
-                current_value: 'Τρέχουσα Αξία',
-                total_value: 'Συνολική Αξία',
-                gain_loss: 'Κέρδος/Ζημία',
-                monthly_investment: 'Μηνιαία Επένδυση',
-                risk_level: 'Επίπεδο Ρίσκου',
-                investment_risk_overview: 'Επισκόπηση Ρίσκου Επενδύσεων',
-                actions: 'Ενέργειες',
-                real_estate_portfolio: 'Χαρτοφυλάκιο Ακινήτων',
-                add_property: 'Προσθήκη Ακινήτου',
-                bank_accounts: 'Τραπεζικοί Λογαριασμοί',
-                add_account: 'Προσθήκη Λογαριασμού',
-                account_terms: 'Όροι Λογαριασμού',
-                interest_rate: 'Επιτόκιο',
-                lockup_period: 'Περίοδος Δέσμευσης (μήνες)',
-                liabilities_debts: 'Υποχρεώσεις & Χρέη',
-                add_liability: 'Προσθήκη Υποχρέωσης',
-                liability: 'Υποχρέωση',
-                balance: 'Υπόλοιπο',
-                monthly_payment: 'Μηνιαία Δόση',
-                income_sources: 'Πηγές Εισοδήματος',
-                add_income: 'Προσθήκη Εισοδήματος',
-                source: 'Πηγή',
-                monthly_gross: 'Μηνιαίο Μικτό',
-                monthly_net: 'Μηνιαίο Καθαρό',
-                annual_net: 'Ετήσιο Καθαρό',
-                expense_tracking: 'Παρακολούθηση Εξόδων',
-                add_expense: 'Προσθήκη Εξόδου',
-                date: 'Ημερομηνία',
-                description: 'Περιγραφή',
-                category: 'Κατηγορία',
-                amount: 'Ποσό',
-                monthly_budgets: 'Μηνιαίοι Προϋπολογισμοί',
-                add_budget: 'Προσθήκη Προϋπολογισμού',
-                expense_breakdown: 'Ανάλυση Εξόδων',
-                income_vs_expenses: 'Εισόδημα vs Έξοδα',
-                financial_health: 'Οικονομική Υγεία',
-                cancel: 'Ακύρωση',
-                save: 'Αποθήκευση',
-                name: 'Όνομα',
-                address: 'Διεύθυνση',
-                bank: 'Τράπεζα',
-                employer: 'Εργοδότης',
-                tax_rate: 'Φορολογικό Ποσοστό (%)',
-                monthly_rent: 'Μηνιαίο Ενοίκιο',
-                purchase_date: 'Ημερομηνία Αγοράς',
-                budget_limit: 'Όριο Προϋπολογισμού',
-                spent_amount: 'Ποσό που Ξοδεύτηκε',
-                remaining: 'Υπόλοιπο',
-                over_budget: 'Υπέρβαση Προϋπολογισμού',
-                debt_to_asset_ratio: 'Αναλογία Χρέους προς Περιουσία',
-                debt_to_income_ratio: 'Αναλογία Χρέους προς Εισόδημα',
-                savings_rate: 'Ποσοστό Αποταμίευσης',
                 emergency_fund: 'Ταμείο Έκτακτης Ανάγκης',
                 months_of_expenses: 'Μήνες Εξόδων που Καλύπτονται',
                 // Authentication
@@ -1711,7 +2308,7 @@
         // Chart instances
         let chartInstances = {};
 
-        // Utility functions
+        // UTILITY FUNCTIONS
         function formatCurrency(amount, currency = currentCurrency) {
             return new Intl.NumberFormat('en-EU', {
                 style: 'currency',
@@ -1731,7 +2328,10 @@
 
         function updateLastUpdated() {
             const now = new Date();
-            document.getElementById('lastUpdated').textContent = now.toLocaleString();
+            const element = document.getElementById('lastUpdated');
+            if (element) {
+                element.textContent = now.toLocaleString();
+            }
         }
 
         function updateLanguage() {
@@ -1739,18 +2339,20 @@
                 const key = element.getAttribute('data-translate');
                 element.textContent = translate(key);
             });
+            createIcons();
         }
 
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
-            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-medium ${
+            toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-medium transition-opacity ${
                 type === 'success' ? 'bg-green-500' : 'bg-red-500'
             }`;
             toast.textContent = message;
             document.body.appendChild(toast);
             
             setTimeout(() => {
-                toast.remove();
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
@@ -1769,73 +2371,7 @@
             return `<span class="risk-indicator ${riskColors[riskLevel]}">${riskIcons[riskLevel]} ${translate(riskLevel)}</span>`;
         }
 
-        // Navigation functions
-        function switchTab(tabName) {
-            activeTab = tabName;
-            
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.add('text-gray-600');
-            });
-            
-            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
-            activeBtn.classList.add('active');
-            activeBtn.classList.remove('text-gray-600');
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            const activeContent = document.getElementById(`${tabName}-content`);
-            if (activeContent) {
-                activeContent.classList.remove('hidden');
-            }
-            
-            // Update page title
-            document.getElementById('pageTitle').textContent = translate(tabName.replace('-', '_'));
-            
-            // Render content
-            renderTabContent();
-        }
-
-        function renderTabContent() {
-            switch (activeTab) {
-                case 'dashboard':
-                    renderDashboard();
-                    break;
-                case 'assets':
-                    renderAssets();
-                    break;
-                case 'capital-markets':
-                    renderCapitalMarkets();
-                    break;
-                case 'real-estate':
-                    renderRealEstate();
-                    break;
-                case 'accounts':
-                    renderAccounts();
-                    break;
-                case 'liabilities':
-                    renderLiabilities();
-                    break;
-                case 'income':
-                    renderIncome();
-                    break;
-                case 'expenses':
-                    renderExpenses();
-                    break;
-                case 'budgets':
-                    renderBudgets();
-                    break;
-                case 'analytics':
-                    renderAnalytics();
-                    break;
-            }
-        }
-
-        // Enhanced calculation functions
+        // CALCULATION FUNCTIONS
         function calculateTotalAssets() {
             const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
                 if (inv.type === 'life_insurance') {
@@ -1850,7 +2386,6 @@
         }
 
         function calculateInvestedCapital() {
-            // Capital markets investments
             const capitalMarketsValue = capitalMarkets.reduce((sum, inv) => {
                 if (inv.type === 'life_insurance') {
                     return sum + (inv.currentValue || inv.purchasePrice);
@@ -1858,10 +2393,8 @@
                 return sum + (inv.quantity * inv.currentPrice);
             }, 0);
             
-            // Real estate
             const propertyValue = properties.reduce((sum, prop) => sum + prop.currentValue, 0);
             
-            // Interest-bearing accounts
             const interestBearingAccounts = accounts
                 .filter(acc => acc.interestRate && acc.interestRate > 0)
                 .reduce((sum, acc) => sum + acc.balance, 0);
@@ -1921,7 +2454,76 @@
             };
         }
 
-        // Enhanced render functions
+        // NAVIGATION FUNCTIONS
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-gray-600');
+            }
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            const activeContent = document.getElementById(`${tabName}-content`);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+            
+            const pageTitle = document.getElementById('pageTitle');
+            if (pageTitle) {
+                pageTitle.textContent = translate(tabName.replace('-', '_'));
+            }
+            
+            renderTabContent();
+        }
+
+        function renderTabContent() {
+            if (!currentUser) return;
+            
+            switch (activeTab) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'assets':
+                    renderAssets();
+                    break;
+                case 'capital-markets':
+                    renderCapitalMarkets();
+                    break;
+                case 'real-estate':
+                    renderRealEstate();
+                    break;
+                case 'accounts':
+                    renderAccounts();
+                    break;
+                case 'liabilities':
+                    renderLiabilities();
+                    break;
+                case 'income':
+                    renderIncome();
+                    break;
+                case 'expenses':
+                    renderExpenses();
+                    break;
+                case 'budgets':
+                    renderBudgets();
+                    break;
+                case 'analytics':
+                    renderAnalytics();
+                    break;
+            }
+        }
+
+        // RENDER FUNCTIONS
         function renderDashboard() {
             const totalAssets = calculateTotalAssets();
             const totalLiabilities = calculateTotalLiabilities();
@@ -1930,18 +2532,14 @@
             const monthlyIncome = calculateMonthlyIncome();
             const monthlyExpenses = calculateMonthlyExpenses();
 
-            // Update dashboard stats
             document.getElementById('netWorthValue').textContent = formatCurrency(netWorth);
             document.getElementById('totalAssetsValue').textContent = formatCurrency(totalAssets);
             document.getElementById('investedCapitalValue').textContent = formatCurrency(investedCapital);
             document.getElementById('monthlyIncomeValue').textContent = formatCurrency(monthlyIncome);
             document.getElementById('monthlyExpensesValue').textContent = formatCurrency(monthlyExpenses);
 
-            // Render charts
             renderChart('assetAllocationChart', 'doughnut', getAssetAllocationData());
             renderChart('netWorthChart', 'line', getNetWorthTrendData());
-            
-            // Render recent transactions
             renderRecentTransactions();
             renderBudgetOverview();
         }
@@ -2437,14 +3035,13 @@
             `;
         }
 
-        // Chart functions
+        // CHART FUNCTIONS
         function renderChart(canvasId, type, data) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
             
             const ctx = canvas.getContext('2d');
             
-            // Destroy existing chart if it exists
             if (chartInstances[canvasId]) {
                 chartInstances[canvasId].destroy();
             }
@@ -2583,7 +3180,6 @@
         }
 
         function getNetWorthTrendData() {
-            // Sample data for the trend - in a real app, this would come from historical data
             return {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                 datasets: [{
@@ -2632,8 +3228,13 @@
             };
         }
 
-        // Modal functions
+        // MODAL FUNCTIONS
         function openModal(type, id = null) {
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
             currentModalType = type;
             editingId = id;
             
@@ -2641,16 +3242,13 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalForm = document.getElementById('modalForm');
             
-            // Set modal title
             if (id) {
                 modalTitle.textContent = `Edit ${translate(type)}`;
             } else {
                 modalTitle.textContent = `${translate('add_item')} - ${translate(type)}`;
             }
             
-            // Generate form based on type
             modalForm.innerHTML = generateForm(type, id);
-            
             modal.classList.remove('hidden');
             createIcons();
         }
@@ -2998,75 +3596,6 @@
             }
         }
 
-        async function saveItem() {
-            const formData = collectFormData(currentModalType);
-            
-            if (!validateFormData(formData, currentModalType)) {
-                return;
-            }
-
-            try {
-                let collection = '';
-                let array;
-                
-                switch (currentModalType) {
-                    case 'capital_market':
-                        collection = 'capitalMarkets';
-                        array = capitalMarkets;
-                        break;
-                    case 'property':
-                        collection = 'properties';
-                        array = properties;
-                        break;
-                    case 'account':
-                        collection = 'accounts';
-                        array = accounts;
-                        break;
-                    case 'liability':
-                        collection = 'liabilities';
-                        array = liabilities;
-                        break;
-                    case 'income':
-                        collection = 'incomes';
-                        array = incomes;
-                        break;
-                    case 'expense':
-                        collection = 'expenses';
-                        array = expenses;
-                        break;
-                    case 'budget':
-                        collection = 'budgets';
-                        array = budgets;
-                        break;
-                }
-
-                if (editingId) {
-                    // Update existing item
-                    formData.id = editingId;
-                    await FirebaseService.saveData(collection, formData);
-                    
-                    const index = array.findIndex(item => item.id === editingId);
-                    if (index !== -1) {
-                        array[index] = formData;
-                    }
-                    showToast('Item updated successfully!');
-                } else {
-                    // Create new item
-                    const savedItem = await FirebaseService.saveData(collection, formData);
-                    array.push(savedItem);
-                    showToast('Item added successfully!');
-                }
-
-                closeModal();
-                renderTabContent();
-                updateLastUpdated();
-
-            } catch (error) {
-                console.error('Error saving item:', error);
-                showToast('Error saving item. Please try again.', 'error');
-            }
-        }
-
         function collectFormData(type) {
             const data = {};
             
@@ -3082,7 +3611,7 @@
                         data.quantity = 1;
                         data.purchasePrice = parseFloat(document.getElementById('capitalMarketPurchasePrice')?.value || 0);
                         data.currentValue = parseFloat(document.getElementById('capitalMarketCurrentValue')?.value || 0);
-                        data.currentPrice = data.currentValue; // For compatibility
+                        data.currentPrice = data.currentValue;
                     } else {
                         data.quantity = parseFloat(document.getElementById('capitalMarketQuantity')?.value || 0);
                         data.purchasePrice = parseFloat(document.getElementById('capitalMarketPurchasePrice')?.value || 0);
@@ -3156,9 +3685,8 @@
         }
 
         function validateFormData(data, type) {
-            // Basic validation - extend as needed
             for (const key in data) {
-                if (['monthlyRent', 'terms', 'interestRate', 'lockupPeriod', 'currentValue'].includes(key)) continue; // Optional fields
+                if (['monthlyRent', 'terms', 'interestRate', 'lockupPeriod', 'currentValue', 'monthlyInvestment'].includes(key)) continue;
                 if (data[key] === undefined || data[key] === '' || (typeof data[key] === 'number' && isNaN(data[key]))) {
                     showToast(`Please fill in all required fields`, 'error');
                     return false;
@@ -3167,16 +3695,18 @@
             return true;
         }
 
-        async function deleteItem(type, id) {
-            if (!confirm('Are you sure you want to delete this item?')) {
+        async function saveItem() {
+            const formData = collectFormData(currentModalType);
+            
+            if (!validateFormData(formData, currentModalType)) {
                 return;
             }
-            
+
             try {
                 let collection = '';
                 let array;
                 
-                switch (type) {
+                switch (currentModalType) {
                     case 'capital_market':
                         collection = 'capitalMarkets';
                         array = capitalMarkets;
@@ -3207,615 +3737,173 @@
                         break;
                 }
 
-                await FirebaseService.deleteData(collection, id);
-                
-                // Remove from local array
-                const index = array.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    array.splice(index, 1);
-                }
-                
-                renderTabContent();
-                updateLastUpdated();
-                showToast('Item deleted successfully!');
-                
-            } catch (error) {
-                console.error('Error deleting item:', error);
-                showToast('Error deleting item. Please try again.', 'error');
-            }
-        }
-
-        // Export functionality
-        function exportToExcel() {
-            try {
-                const wb = XLSX.utils.book_new();
-                
-                // Create summary sheet
-                const summaryData = [
-                    ['WealthTracker Pro - Financial Summary'],
-                    ['Generated on:', new Date().toLocaleDateString()],
-                    [''],
-                    ['Net Worth Summary'],
-                    ['Total Assets', calculateTotalAssets()],
-                    ['Total Liabilities', calculateTotalLiabilities()],
-                    ['Net Worth', calculateNetWorth()],
-                    ['Invested Capital', calculateInvestedCapital()],
-                    [''],
-                    ['Monthly Cash Flow'],
-                    ['Monthly Income', calculateMonthlyIncome()],
-                    ['Monthly Expenses', calculateMonthlyExpenses()],
-                    ['Net Monthly Cash Flow', calculateMonthlyIncome() - calculateMonthlyExpenses()]
-                ];
-                const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-                XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
-
-                // Capital Markets sheet
-                if (capitalMarkets.length > 0) {
-                    const capitalMarketsData = [
-                        ['Investment', 'Type', 'Quantity', 'Purchase Price', 'Current Price/Value', 'Total Value', 'Monthly Investment', 'Risk Level', 'Gain/Loss', 'Currency'],
-                        ...capitalMarkets.map(inv => {
-                            let totalValue, gainLoss;
-                            if (inv.type === 'life_insurance') {
-                                totalValue = inv.currentValue || inv.purchasePrice;
-                                gainLoss = totalValue - inv.purchasePrice;
-                            } else {
-                                totalValue = inv.quantity * inv.currentPrice;
-                                gainLoss = totalValue - (inv.quantity * inv.purchasePrice);
-                            }
-                            
-                            return [
-                                inv.name,
-                                inv.type,
-                                inv.quantity,
-                                inv.purchasePrice,
-                                inv.type === 'life_insurance' ? inv.currentValue : inv.currentPrice,
-                                totalValue,
-                                inv.monthlyInvestment || 0,
-                                inv.riskLevel,
-                                gainLoss,
-                                inv.currency
-                            ];
-                        })
-                    ];
-                    const capitalMarketsSheet = XLSX.utils.aoa_to_sheet(capitalMarketsData);
-                    XLSX.utils.book_append_sheet(wb, capitalMarketsSheet, 'Capital Markets');
-                }
-
-                // Properties sheet (unchanged)
-                if (properties.length > 0) {
-                    const propertyData = [
-                        ['Property', 'Address', 'Type', 'Purchase Price', 'Current Value', 'Appreciation', 'Monthly Rent', 'Currency'],
-                        ...properties.map(prop => [
-                            prop.name,
-                            prop.address,
-                            prop.type,
-                            prop.purchasePrice,
-                            prop.currentValue,
-                            prop.currentValue - prop.purchasePrice,
-                            prop.monthlyRent || 0,
-                            prop.currency
-                        ])
-                    ];
-                    const propertySheet = XLSX.utils.aoa_to_sheet(propertyData);
-                    XLSX.utils.book_append_sheet(wb, propertySheet, 'Real Estate');
-                }
-
-                // Enhanced Accounts sheet
-                if (accounts.length > 0) {
-                    const accountData = [
-                        ['Account Name', 'Bank', 'Type', 'Balance', 'Interest Rate', 'Lockup Period', 'Terms', 'Currency'],
-                        ...accounts.map(acc => [
-                            acc.name,
-                            acc.bank,
-                            acc.type,
-                            acc.balance,
-                            acc.interestRate || 0,
-                            acc.lockupPeriod || 0,
-                            acc.terms || '',
-                            acc.currency
-                        ])
-                    ];
-                    const accountSheet = XLSX.utils.aoa_to_sheet(accountData);
-                    XLSX.utils.book_append_sheet(wb, accountSheet, 'Accounts');
-                }
-
-                // Continue with other sheets as before...
-                if (liabilities.length > 0) {
-                    const liabilityData = [
-                        ['Liability', 'Type', 'Balance', 'Interest Rate', 'Monthly Payment', 'Currency'],
-                        ...liabilities.map(lib => [
-                            lib.name,
-                            lib.type,
-                            lib.balance,
-                            lib.interestRate,
-                            lib.monthlyPayment,
-                            lib.currency
-                        ])
-                    ];
-                    const liabilitySheet = XLSX.utils.aoa_to_sheet(liabilityData);
-                    XLSX.utils.book_append_sheet(wb, liabilitySheet, 'Liabilities');
-                }
-
-                if (incomes.length > 0) {
-                    const incomeData = [
-                        ['Income Source', 'Type', 'Employer', 'Monthly Gross', 'Tax Rate', 'Monthly Net', 'Annual Net', 'Currency'],
-                        ...incomes.map(inc => [
-                            inc.name,
-                            inc.type,
-                            inc.employer,
-                            inc.monthlyGross,
-                            inc.taxRate,
-                            inc.monthlyGross * (1 - inc.taxRate / 100),
-                            inc.monthlyGross * 12 * (1 - inc.taxRate / 100),
-                            inc.currency
-                        ])
-                    ];
-                    const incomeSheet = XLSX.utils.aoa_to_sheet(incomeData);
-                    XLSX.utils.book_append_sheet(wb, incomeSheet, 'Income');
-                }
-
-                if (expenses.length > 0) {
-                    const expenseData = [
-                        ['Date', 'Description', 'Category', 'Amount', 'Currency'],
-                        ...expenses.map(exp => [
-                            exp.date,
-                            exp.description,
-                            exp.category,
-                            exp.amount,
-                            exp.currency
-                        ])
-                    ];
-                    const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
-                    XLSX.utils.book_append_sheet(wb, expenseSheet, 'Expenses');
-                }
-
-                if (budgets.length > 0) {
-                    const budgetData = [
-                        ['Category', 'Budget Amount', 'Spent Amount', 'Remaining', 'Percentage Used', 'Currency'],
-                        ...budgets.map(bud => [
-                            bud.category,
-                            bud.amount,
-                            bud.spent,
-                            bud.amount - bud.spent,
-                            ((bud.spent / bud.amount) * 100).toFixed(2) + '%',
-                            bud.currency
-                        ])
-                    ];
-                    const budgetSheet = XLSX.utils.aoa_to_sheet(budgetData);
-                    XLSX.utils.book_append_sheet(wb, budgetSheet, 'Budgets');
-                }
-
-                // Save the file
-                const fileName = `WealthTracker_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                
-                showToast('Export completed successfully!');
-            } catch (error) {
-                console.error('Export failed:', error);
-                showToast('Export failed. Please try again.', 'error');
-            }
-        }
-
-        // Global functions for onclick handlers
-        window.editItem = editItem;
-        window.deleteItem = deleteItem;
-
-        async function editItem(type, id) {
-            openModal(type, id);
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Show loading overlay
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            try {
-                // Initialize PWA
-                PWAService.init();
-                
-                // Initialize Authentication
-                await AuthService.initialize();
-                
-                // Initialize UI
-                createIcons();
-                updateLanguage();
-                updateLastUpdated();
-
-                // Authentication Event Listeners
-                document.getElementById('loginBtn').addEventListener('click', handleLogin);
-                document.getElementById('registerBtn').addEventListener('click', handleRegister);
-                document.getElementById('googleSignInBtn').addEventListener('click', handleGoogleSignIn);
-                document.getElementById('logoutBtn').addEventListener('click', AuthService.signOut);
-                
-                // Form toggle listeners
-                document.getElementById('showRegisterBtn').addEventListener('click', showRegisterForm);
-                document.getElementById('showLoginBtn').addEventListener('click', showLoginForm);
-
-                // Hide loading overlay after a delay
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 1000);
-// 🔐 FORCE LOGIN MODAL - TEMPORARY FIX
-setTimeout(() => {
-    console.log('🔍 Checking authentication status...');
-    
-    // Force show login if no user authenticated
-    if (!currentUser) {
-        console.log('🔐 No user found - showing login modal');
-        document.getElementById('loginModal').classList.remove('hidden');
-        document.getElementById('sidebar').style.display = 'none';
-        document.querySelector('.ml-64').style.display = 'none';
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
-}, 2000);
-                // Language switcher
-                document.getElementById('languageSelect').addEventListener('change', function() {
-                    currentLanguage = this.value;
-                    updateLanguage();
-                    renderTabContent();
-                });
-
-                // Currency switcher
-                document.getElementById('currencySelect').addEventListener('change', function() {
-                    currentCurrency = this.value;
-                    renderTabContent();
-                });
-
-                // Navigation
-                document.querySelectorAll('.nav-item').forEach(btn => {
-                    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-                });
-
-                // Modal controls
-                document.getElementById('closeModal').addEventListener('click', closeModal);
-                document.getElementById('cancelModal').addEventListener('click', closeModal);
-                document.getElementById('saveModal').addEventListener('click', saveItem);
-
-                // Updated Add Item button logic
-                document.getElementById('addItemBtn').addEventListener('click', () => {
-                    switch (activeTab) {
-                        case 'capital-markets':
-                            openModal('capital_market');
-                            break;
-                        case 'real-estate':
-                            openModal('property');
-                            break;
-                        case 'accounts':
-                            openModal('account');
-                            break;
-                        case 'liabilities':
-                            openModal('liability');
-                            break;
-                        case 'income':
-                            openModal('income');
-                            break;
-                        case 'expenses':
-                            openModal('expense');
-                            break;
-                        case 'budgets':
-                            openModal('budget');
-                            break;
-                        default:
-                            showToast('Please navigate to a specific section to add items', 'error');
-                    }
-                });
-
-                // Updated specific add buttons
-                const addButtons = [
-                    { id: 'addCapitalMarketBtn', type: 'capital_market' },
-                    { id: 'addPropertyBtn', type: 'property' },
-                    { id: 'addAccountBtn', type: 'account' },
-                    { id: 'addLiabilityBtn', type: 'liability' },
-                    { id: 'addIncomeBtn', type: 'income' },
-                    { id: 'addExpenseBtn', type: 'expense' },
-                    { id: 'addBudgetBtn', type: 'budget' }
-                ];
-
-                addButtons.forEach(btn => {
-                    const element = document.getElementById(btn.id);
-                    if (element) {
-                        element.addEventListener('click', () => openModal(btn.type));
-                    }
-                });
-
-                // Export functionality
-                document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-
-                // Dynamic form field handlers
-                document.addEventListener('change', function(e) {
-                    // Property type change handler
-                    if (e.target.id === 'propertyType') {
-                        const rentalSection = document.getElementById('rentalSection');
-                        if (rentalSection) {
-                            rentalSection.style.display = e.target.value === 'rental' ? 'block' : 'none';
-                        }
-                    }
+                if (editingId) {
+                    formData.id = editingId;
+                    await FirebaseService.saveData(collection, formData);
                     
-                    // Capital market type change handler
-                    if (e.target.id === 'capitalMarketType') {
-                        const quantityPriceSection = document.getElementById('quantityPriceSection');
-                        const currentPriceSection = document.getElementById('currentPriceSection');
-                        const lifeInsuranceSection = document.getElementById('lifeInsuranceSection');
-                        
-                        if (e.target.value === 'life_insurance') {
-                            if (quantityPriceSection) quantityPriceSection.style.display = 'none';
-                            if (currentPriceSection) currentPriceSection.style.display = 'none';
-                            if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'block';
-                        } else {
-                            if (quantityPriceSection) quantityPriceSection.style.display = 'grid';
-                            if (currentPriceSection) currentPriceSection.style.display = 'block';
-                            if (lifeInsuranceSection) lifeInsuranceSection.style.display = 'none';
-                        }
+                    const index = array.findIndex(item => item.id === editingId);
+                    if (index !== -1) {
+                        array[index] = formData;
                     }
-                    
-                    // Account type change handler
-                    if (e.target.id === 'accountType') {
-                        const interestSection = document.getElementById('interestSection');
-                        const lockupSection = document.getElementById('lockupSection');
-                        
-                        if (e.target.value === 'savings' || e.target.value === 'term_deposit') {
-                            if (interestSection) interestSection.style.display = 'grid';
-                        } else {
-                            if (interestSection) interestSection.style.display = 'none';
-                        }
-                        
-                        if (e.target.value === 'term_deposit') {
-                            if (lockupSection) lockupSection.style.display = 'block';
-                        } else {
-                            if (lockupSection) lockupSection.style.display = 'none';
-                        }
-                    }
-                });
-
-                // Close modal on background click
-                document.getElementById('addModal').addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closeModal();
-                    }
-                });
-
-                // Handle Enter key in login forms
-                document.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        const loginForm = document.getElementById('loginForm');
-                        const registerForm = document.getElementById('registerForm');
-                        
-                        if (!loginForm.classList.contains('hidden')) {
-                            handleLogin();
-                        } else if (!registerForm.classList.contains('hidden')) {
-                            handleRegister();
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error initializing app:', error);
-                loadingOverlay.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-red-600 text-xl mb-4">⚠️</div>
-                        <p class="text-gray-600">Error loading app. Please refresh the page.</p>
-                    </div>
-                `;
-            }
-        });
-
-        // Authentication functions
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!AuthService.validateEmail(email)) {
-                showToast(translate('invalid_email'), 'error');
-                return;
-            }
-            
-            if (!AuthService.validatePassword(password)) {
-                showToast(translate('weak_password'), 'error');
-                return;
-            }
-
-            showAuthLoading(true);
-            
-            try {
-                await AuthService.signInWithEmail(email, password);
-            } catch (error) {
-                // Error handling is done in AuthService
-            } finally {
-                showAuthLoading(false);
-            }
-        }
-
-        async function handleRegister() {
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
-            if (!name) {
-                showToast('Please enter your full name', 'error');
-                return;
-            }
-            
-            if (!AuthService.validateEmail(email)) {
-                showToast(translate('invalid_email'), 'error');
-                return;
-            }
-            
-            if (!AuthService.validatePassword(password)) {
-                showToast(translate('weak_password'), 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showToast(translate('password_mismatch'), 'error');
-                return;
-            }
-
-            showAuthLoading(true);
-            
-            try {
-                await AuthService.signUpWithEmail(email, password, name);
-            } catch (error) {
-                // Error handling is done in AuthService
-            } finally {
-                showAuthLoading(false);
-            }
-        }
-
-        async function handleGoogleSignIn() {
-            showAuthLoading(true);
-            
-            try {
-                await AuthService.signInWithGoogle();
-            } catch (error) {
-                // Error handling is done in AuthService
-            } finally {
-                showAuthLoading(false);
-            }
-        }
-
-        function showLoginForm() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-        }
-
-        function showRegisterForm() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.remove('hidden');
-        }
-
-        function showAuthLoading(show) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const authLoading = document.getElementById('authLoading');
-            
-            if (show) {
-                loginForm.classList.add('hidden');
-                registerForm.classList.add('hidden');
-                authLoading.classList.remove('hidden');
-            } else {
-                authLoading.classList.add('hidden');
-                if (registerForm.classList.contains('hidden')) {
-                    loginForm.classList.remove('hidden');
+                    showToast('Item updated successfully!');
                 } else {
-                    registerForm.classList.remove('hidden');
-                }
-            }
-        }
-
-        // Initialize chart cleanup on page unload
-        window.addEventListener('beforeunload', function() {
-            Object.values(chartInstances).forEach(chart => {
-                if (chart && typeof chart.destroy === 'function') {
-                    chart.destroy();
-                }
-            });
-        });
-
-        // 🔐 FIREBASE SECURITY RULES INSTRUCTIONS
-        /*
-        To secure your Firebase data, update your Firestore Security Rules:
-
-        Option 1: Single User Access (Simple)
-        =====================================
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-            match /{document=**} {
-              allow read, write: if request.auth != null && request.auth.uid == "YOUR_USER_ID";
-            }
-          }
-        }
-
-        Option 2: Multi-User Access (Recommended)
-        ========================================
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-            match /{collection}/{document} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId;
-            }
-          }
-        }
-
-        Option 3: Enhanced Security with Validation
-        ==========================================
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-            match /capitalMarkets/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /properties/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /accounts/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /liabilities/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /incomes/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /expenses/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /budgets/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-            match /otherAssets/{docId} {
-              allow read, write: if request.auth != null && 
-                request.auth.uid == resource.data.userId &&
-                request.auth.uid == request.resource.data.userId;
-            }
-          }
-        }
-
-        SETUP INSTRUCTIONS:
-        ==================
-        1. Go to Firebase Console → Your Project → Firestore Database
-        2. Click "Rules" tab
-        3. Replace the existing rules with one of the options above
-        4. Click "Publish"
-
-        For Option 1: Replace "YOUR_USER_ID" with your actual Firebase Auth UID
-        You can find your UID by logging in and checking the browser console.
-
-        🔥 AUTHENTICATION SETUP IN FIREBASE CONSOLE:
-        ============================================
-        1. Go to Firebase Console → Authentication → Sign-in method
-        2. Enable "Email/Password" 
-        3. Enable "Google" (optional but recommended)
-        4. For Google: Add your domain to authorized domains
-        5. Save changes
-
-        This WealthTracker now includes:
-        ✅ Secure user authentication
-        ✅ User-specific data isolation  
-        ✅ Google Sign-In support
-        ✅ Persistent login sessions
-        ✅ Secure Firebase integration
-        */
-    </script>
-</body>
-</html>">
-                                <span class="text-sm text-gray-500">${translate('purchase_price')}:</span>
-                                <span class="text-sm font-medium">${formatCurrency(property.purchasePrice, property.currency)}</span>
-                            </div>
-                            <div class="flex justify-between
+                    const savedItem = await FirebaseService.saveData(collection, formData);
+                    array.push(savedItem);
+                    showToast('Emergency Fund',
+                months_of_expenses: 'Months of Expenses Covered',
+                // Authentication
+                login_subtitle: 'Secure access to your financial data',
+                sign_in: 'Sign In',
+                or: 'or',
+                sign_in_google: 'Continue with Google',
+                create_account: "Don't have an account? Create one",
+                back_to_login: 'Already have an account? Sign in',
+                authenticating: 'Authenticating...',
+                welcome_back: 'Welcome back',
+                login_success: 'Login successful!',
+                login_error: 'Login failed. Please try again.',
+                register_success: 'Account created successfully!',
+                register_error: 'Registration failed. Please try again.',
+                logout_success: 'Logged out successfully',
+                password_mismatch: 'Passwords do not match',
+                invalid_email: 'Please enter a valid email address',
+                weak_password: 'Password must be at least 6 characters',
+                // Asset Types
+                stocks: 'Stocks',
+                bonds: 'Bonds',
+                etf: 'ETF',
+                mutual_fund: 'Mutual Fund',
+                cryptocurrency: 'Cryptocurrency',
+                index_fund: 'Index Fund',
+                life_insurance: 'Life Insurance',
+                vehicle: 'Vehicle',
+                jewelry: 'Jewelry',
+                // Risk Levels
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
+                // Property Types
+                residential: 'Residential',
+                rental: 'Rental',
+                commercial: 'Commercial',
+                // Account Types
+                checking: 'Checking',
+                savings: 'Savings',
+                term_deposit: 'Term Deposit',
+                // Liability Types
+                mortgage: 'Mortgage',
+                car_loan: 'Car Loan',
+                personal_loan: 'Personal Loan',
+                credit_card: 'Credit Card',
+                student_loan: 'Student Loan',
+                // Income Types
+                salary: 'Salary',
+                freelance: 'Freelance',
+                business: 'Business',
+                rental: 'Rental',
+                dividends: 'Dividends',
+                pension: 'Pension',
+                // Expense Categories
+                groceries: 'Groceries',
+                transportation: 'Transportation',
+                dining: 'Dining',
+                utilities: 'Utilities',
+                entertainment: 'Entertainment',
+                health: 'Health',
+                shopping: 'Shopping',
+                travel: 'Travel',
+                education: 'Education',
+                insurance: 'Insurance',
+                other: 'Other'
+            },
+            el: {
+                dashboard: 'Πίνακας Ελέγχου',
+                assets: 'Περιουσιακά Στοιχεία',
+                capital_markets: 'Κεφαλαιαγορά',
+                real_estate: 'Ακίνητα',
+                accounts: 'Λογαριασμοί',
+                liabilities: 'Υποχρεώσεις',
+                income: 'Εισόδημα',
+                expenses: 'Έξοδα',
+                budgets: 'Προϋπολογισμοί',
+                analytics: 'Αναλυτικά',
+                export: 'Εξαγωγή',
+                welcome_message: 'Καλώς ήρθατε στην οικονομική σας επισκόπηση',
+                add_item: 'Προσθήκη Στοιχείου',
+                last_updated: 'Τελευταία Ενημέρωση',
+                net_worth: 'Καθαρή Αξία',
+                total_wealth: 'Συνολικός Πλούτος',
+                total_assets: 'Συνολικά Περιουσιακά',
+                all_holdings: 'Όλες οι Συμμετοχές',
+                invested_capital: 'Επενδυμένο Κεφάλαιο',
+                growing_assets: 'Αυξανόμενα Περιουσιακά',
+                monthly_income: 'Μηνιαίο Εισόδημα',
+                after_taxes: 'Μετά από Φόρους',
+                monthly_expenses: 'Μηνιαία Έξοδα',
+                this_month: 'Τον Μήνα',
+                asset_allocation: 'Κατανομή Περιουσίας',
+                net_worth_trend: 'Τάση Καθαρής Αξίας',
+                recent_transactions: 'Πρόσφατες Συναλλαγές',
+                budget_overview: 'Επισκόπηση Προϋπολογισμού',
+                asset_breakdown: 'Ανάλυση Περιουσίας',
+                asset_summary: 'Περίληψη Περιουσίας',
+                capital_markets_portfolio: 'Χαρτοφυλάκιο Κεφαλαιαγοράς',
+                add_investment: 'Προσθήκη Επένδυσης',
+                investment: 'Επένδυση',
+                type: 'Τύπος',
+                quantity: 'Ποσότητα',
+                purchase_price: 'Τιμή Αγοράς',
+                current_price: 'Τρέχουσα Τιμή',
+                current_value: 'Τρέχουσα Αξία',
+                total_value: 'Συνολική Αξία',
+                gain_loss: 'Κέρδος/Ζημία',
+                monthly_investment: 'Μηνιαία Επένδυση',
+                risk_level: 'Επίπεδο Ρίσκου',
+                investment_risk_overview: 'Επισκόπηση Ρίσκου Επενδύσεων',
+                actions: 'Ενέργειες',
+                real_estate_portfolio: 'Χαρτοφυλάκιο Ακινήτων',
+                add_property: 'Προσθήκη Ακινήτου',
+                bank_accounts: 'Τραπεζικοί Λογαριασμοί',
+                add_account: 'Προσθήκη Λογαριασμού',
+                account_terms: 'Όροι Λογαριασμού',
+                interest_rate: 'Επιτόκιο',
+                lockup_period: 'Περίοδος Δέσμευσης (μήνες)',
+                liabilities_debts: 'Υποχρεώσεις & Χρέη',
+                add_liability: 'Προσθήκη Υποχρέωσης',
+                liability: 'Υποχρέωση',
+                balance: 'Υπόλοιπο',
+                monthly_payment: 'Μηνιαία Δόση',
+                income_sources: 'Πηγές Εισοδήματος',
+                add_income: 'Προσθήκη Εισοδήματος',
+                source: 'Πηγή',
+                monthly_gross: 'Μηνιαίο Μικτό',
+                monthly_net: 'Μηνιαίο Καθαρό',
+                annual_net: 'Ετήσιο Καθαρό',
+                expense_tracking: 'Παρακολούθηση Εξόδων',
+                add_expense: 'Προσθήκη Εξόδου',
+                date: 'Ημερομηνία',
+                description: 'Περιγραφή',
+                category: 'Κατηγορία',
+                amount: 'Ποσό',
+                monthly_budgets: 'Μηνιαίοι Προϋπολογισμοί',
+                add_budget: 'Προσθήκη Προϋπολογισμού',
+                expense_breakdown: 'Ανάλυση Εξόδων',
+                income_vs_expenses: 'Εισόδημα vs Έξοδα',
+                financial_health: 'Οικονομική Υγεία',
+                cancel: 'Ακύρωση',
+                save: 'Αποθήκευση',
+                name: 'Όνομα',
+                address: 'Διεύθυνση',
+                bank: 'Τράπεζα',
+                employer: 'Εργοδότης',
+                tax_rate: 'Φορολογικό Ποσοστό (%)',
+                monthly_rent: 'Μηνιαίο Ενοίκιο',
+                purchase_date: 'Ημερομηνία Αγοράς',
+                budget_limit: 'Όριο Προϋπολογισμού',
+                spent_amount: 'Ποσό που Ξοδεύτηκε',
+                remaining: 'Υπόλοιπο',
+                over_budget: 'Υπέρβαση Προϋπολογισμού',
+                debt_to_asset_ratio: 'Αναλογία Χρέους προς Περιουσία',
+                debt_to_income_ratio: 'Αναλογία Χρέους προς Εισόδημα',
+                savings_rate: 'Ποσοστό Αποταμίευσης',
+                emergency_fund: '
