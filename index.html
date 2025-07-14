@@ -32,6 +32,81 @@
             height: 300px;
             padding: 10px;
         }
+
+        // 🔄 PWA SERVICE
+        class PWAService {
+            static init() {
+                // Register service worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(registration => {
+                            console.log('Service Worker registered:', registration);
+                        })
+                        .catch(error => {
+                            console.log('Service Worker registration failed:', error);
+                        });
+                }
+
+                // Handle app install
+                this.handleInstallPrompt();
+
+                // Handle online/offline status
+                this.handleConnectionStatus();
+            }
+
+            static handleInstallPrompt() {
+                let deferredPrompt;
+                const installPrompt = document.getElementById('installPrompt');
+                const installAccept = document.getElementById('installAccept');
+                const installCancel = document.getElementById('installCancel');
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    if (installPrompt) installPrompt.classList.remove('hidden');
+                });
+
+                if (installAccept) {
+                    installAccept.addEventListener('click', async () => {
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            const { outcome } = await deferredPrompt.userChoice;
+                            console.log(`User response to install prompt: ${outcome}`);
+                            deferredPrompt = null;
+                        }
+                        if (installPrompt) installPrompt.classList.add('hidden');
+                    });
+                }
+
+                if (installCancel) {
+                    installCancel.addEventListener('click', () => {
+                        if (installPrompt) installPrompt.classList.add('hidden');
+                    });
+                }
+            }
+
+            static handleConnectionStatus() {
+                const offlineBanner = document.getElementById('offlineBanner');
+
+                function updateOnlineStatus() {
+                    isOnline = navigator.onLine;
+                    
+                    if (isOnline) {
+                        if (offlineBanner) offlineBanner.classList.remove('show');
+                        FirebaseService.updateSyncStatus('success');
+                    } else {
+                        if (offlineBanner) offlineBanner.classList.add('show');
+                        FirebaseService.updateSyncStatus('offline');
+                    }
+                }
+
+                window.addEventListener('online', updateOnlineStatus);
+                window.addEventListener('offline', updateOnlineStatus);
+                
+                // Initial check
+                updateOnlineStatus();
+            }
+        }
         
         .chart-container canvas {
             max-height: 280px !important;
@@ -1171,8 +1246,11 @@
 
         // AUTHENTICATION FUNCTIONS
         async function handleLogin() {
+            console.log('🔐 Login button clicked');
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            
+            console.log('📧 Email:', email);
             
             if (!AuthService.validateEmail(email)) {
                 showToast(translate('invalid_email'), 'error');
@@ -1189,7 +1267,7 @@
             try {
                 await AuthService.signInWithEmail(email, password);
             } catch (error) {
-                // Error handling is done in AuthService
+                console.error('❌ Login failed:', error);
             } finally {
                 showAuthLoading(false);
             }
@@ -1285,8 +1363,12 @@
             console.log('🚀 WealthTracker Pro starting...');
             
             try {
-                // Initialize PWA
-                PWAService.init();
+                // Initialize PWA (with error handling)
+                if (typeof PWAService !== 'undefined') {
+                    PWAService.init();
+                } else {
+                    console.log('⚠️ PWAService not available, skipping PWA initialization');
+                }
                 
                 // Initialize UI
                 createIcons();
@@ -1323,6 +1405,8 @@
         });
 
         function setupEventListeners() {
+            console.log('🔧 Setting up event listeners...');
+            
             // Authentication Event Listeners
             const loginBtn = document.getElementById('loginBtn');
             const registerBtn = document.getElementById('registerBtn');
@@ -1331,9 +1415,25 @@
             const showRegisterBtn = document.getElementById('showRegisterBtn');
             const showLoginBtn = document.getElementById('showLoginBtn');
 
-            if (loginBtn) loginBtn.addEventListener('click', handleLogin);
-            if (registerBtn) registerBtn.addEventListener('click', handleRegister);
-            if (googleSignInBtn) googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+            console.log('🔐 Auth buttons found:', {
+                loginBtn: !!loginBtn,
+                registerBtn: !!registerBtn,
+                googleSignInBtn: !!googleSignInBtn,
+                logoutBtn: !!logoutBtn
+            });
+
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+                console.log('✅ Login button event attached');
+            }
+            if (registerBtn) {
+                registerBtn.addEventListener('click', handleRegister);
+                console.log('✅ Register button event attached');
+            }
+            if (googleSignInBtn) {
+                googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+                console.log('✅ Google sign-in button event attached');
+            }
             if (logoutBtn) logoutBtn.addEventListener('click', AuthService.signOut);
             if (showRegisterBtn) showRegisterBtn.addEventListener('click', showRegisterForm);
             if (showLoginBtn) showLoginBtn.addEventListener('click', showLoginForm);
@@ -1363,11 +1463,11 @@
             });
 
             // Modal controls
-            const closeModal = document.getElementById('closeModal');
+            const closeModalBtn = document.getElementById('closeModal');
             const cancelModal = document.getElementById('cancelModal');
             const saveModal = document.getElementById('saveModal');
 
-            if (closeModal) closeModal.addEventListener('click', closeModal);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
             if (cancelModal) cancelModal.addEventListener('click', closeModal);
             if (saveModal) saveModal.addEventListener('click', saveItem);
 
@@ -1515,7 +1615,7 @@
             });
         });
 
-        // Force login modal on auth failure
+        // Force login modal on auth failure and ensure event listeners
         setTimeout(() => {
             if (!currentUser) {
                 console.log('🔐 No user authenticated after initialization - ensuring login modal is visible');
@@ -1524,6 +1624,7 @@
                 
                 if (loginModal) {
                     loginModal.classList.remove('hidden');
+                    console.log('✅ Login modal shown');
                 }
                 if (loadingOverlay) {
                     loadingOverlay.style.display = 'none';
@@ -1531,6 +1632,24 @@
                 
                 document.getElementById('sidebar').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'none';
+                
+                // Ensure auth event listeners are attached
+                const loginBtn = document.getElementById('loginBtn');
+                const registerBtn = document.getElementById('registerBtn');
+                const googleSignInBtn = document.getElementById('googleSignInBtn');
+                
+                if (loginBtn && !loginBtn.onclick) {
+                    console.log('🔧 Re-attaching login button event');
+                    loginBtn.addEventListener('click', handleLogin);
+                }
+                if (registerBtn && !registerBtn.onclick) {
+                    console.log('🔧 Re-attaching register button event');
+                    registerBtn.addEventListener('click', handleRegister);
+                }
+                if (googleSignInBtn && !googleSignInBtn.onclick) {
+                    console.log('🔧 Re-attaching Google sign-in button event');
+                    googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+                }
             }
         }, 3000);
 
@@ -1554,8 +1673,8 @@
     - Firebase Console → Firestore Database → Rules
     - Αντικαταστήστε τα rules με ένα από τα παρακάτω:
 
-    ΕΠΙΛΟΓΗ 1: Απλή λύση (για single user):
-    ========================================
+    ΕΠΙΛΟΓΗ 1: Testing Rules (ξεκινήστε με αυτό):
+    ============================================
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
@@ -1565,8 +1684,8 @@
       }
     }
 
-    ΕΠΙΛΟΓΗ 2: Multi-user με ασφάλεια (προτεινόμενη):
-    ===============================================
+    ΕΠΙΛΟΓΗ 2: Production Rules (μετά το testing):
+    =============================================
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
@@ -3254,7 +3373,10 @@
         }
 
         function closeModal() {
-            document.getElementById('addModal').classList.add('hidden');
+            const modal = document.getElementById('addModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
             currentModalType = '';
             editingId = null;
         }
@@ -3579,7 +3701,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">${translate('spent_amount')}</label>
-                            <input type="number" id="budgetSpent" value="${item?.spent || 0}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="budgetSpent" value="${(item && item.spent) ? item.spent : 0}" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
