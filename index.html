@@ -25,16 +25,17 @@
             position: fixed;
             left: 0;
             top: 0;
-            width: 260px;
+            width: 280px;
             height: 100vh;
-            background: #1e293b;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             z-index: 1000;
             transition: all 0.3s ease;
             overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.15);
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 24px;
             border-bottom: 1px solid #334155;
         }
 
@@ -43,17 +44,58 @@
             align-items: center;
             gap: 12px;
             color: white;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .logo i {
             color: #3b82f6;
-            font-size: 24px;
+            font-size: 28px;
+        }
+
+        .language-currency-section {
+            padding: 16px 24px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .control-group {
+            flex: 1;
+        }
+
+        .control-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .control-select {
+            width: 100%;
+            background: #334155;
+            border: 1px solid #475569;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .control-select:focus {
+            outline: none;
+            border-color: #3b82f6;
         }
 
         .user-section {
-            padding: 20px;
+            padding: 20px 24px;
             border-bottom: 1px solid #334155;
         }
 
@@ -61,25 +103,27 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
             font-size: 14px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .user-details h4 {
             color: white;
             font-size: 14px;
+            font-weight: 600;
             margin-bottom: 2px;
         }
 
@@ -92,15 +136,20 @@
             background: #ef4444;
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
+            font-weight: 500;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .logout-btn:hover {
             background: #dc2626;
+            transform: translateY(-1px);
         }
 
         .nav-menu {
@@ -110,23 +159,26 @@
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
+            gap: 14px;
+            padding: 14px 24px;
             color: #cbd5e1;
             cursor: pointer;
             transition: all 0.2s;
             border-left: 3px solid transparent;
+            font-weight: 500;
         }
 
         .nav-item:hover {
             background: #334155;
             color: white;
+            border-left-color: #64748b;
         }
 
         .nav-item.active {
-            background: #1e40af;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
             color: white;
-            border-left-color: #3b82f6;
+            border-left-color: #60a5fa;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
         .nav-item i {
@@ -137,7 +189,7 @@
 
         /* MAIN CONTENT */
         .main-content {
-            margin-left: 260px;
+            margin-left: 280px;
             min-height: 100vh;
             background: #f8fafc;
         }
@@ -145,20 +197,22 @@
         .top-bar {
             background: white;
             border-bottom: 1px solid #e2e8f0;
-            padding: 20px 30px;
+            padding: 24px 32px;
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .page-header h1 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
             color: #1e293b;
             margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
 
         .page-header p {
@@ -166,160 +220,209 @@
             font-size: 14px;
         }
 
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .invested-capital-indicator {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .invested-capital-indicator .label {
+            display: block;
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+
         .content-area {
-            padding: 30px;
+            padding: 32px;
         }
 
         /* DASHBOARD STATS */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 28px;
             border: 1px solid #e2e8f0;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
         }
 
         .stat-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
         }
 
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .stat-info h3 {
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: #64748b;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-value {
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             color: #1e293b;
+            letter-spacing: -1px;
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .stat-icon.investments { background: #dbeafe; color: #1d4ed8; }
-        .stat-icon.real-estate { background: #dcfce7; color: #16a34a; }
-        .stat-icon.deposits { background: #fef3c7; color: #d97706; }
-        .stat-icon.loans { background: #fee2e2; color: #dc2626; }
-        .stat-icon.income { background: #e0f2fe; color: #0284c7; }
-        .stat-icon.net-worth { background: #f3e8ff; color: #7c3aed; }
+        .stat-icon.capital-markets { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .stat-icon.real-estate { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .stat-icon.deposits { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .stat-icon.loans { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .stat-icon.income { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+        .stat-icon.invested { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+        .stat-icon.net-worth { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
 
         .stat-change {
-            font-size: 12px;
-            font-weight: 500;
-            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .positive { color: #16a34a; }
+        .positive { color: #059669; }
         .negative { color: #dc2626; }
 
         /* CARDS AND SECTIONS */
         .section-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid #e2e8f0;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .section-header {
-            padding: 20px 24px;
+            padding: 24px 28px;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
         }
 
         .section-title {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             color: #1e293b;
         }
 
         .section-title i {
             color: #3b82f6;
+            font-size: 22px;
         }
 
         .add-button {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .add-button:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
         .section-content {
-            padding: 24px;
+            padding: 28px;
         }
 
         /* ITEMS LIST */
         .items-list {
             display: grid;
-            gap: 16px;
+            gap: 20px;
         }
 
         .item-card {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
         }
 
         .item-card:hover {
             border-color: #3b82f6;
             background: white;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
         }
 
         .item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .item-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: #1e293b;
             margin-bottom: 4px;
         }
@@ -327,6 +430,7 @@
         .item-subtitle {
             font-size: 14px;
             color: #64748b;
+            font-weight: 500;
         }
 
         .item-actions {
@@ -337,11 +441,11 @@
         .action-btn {
             background: none;
             border: none;
-            padding: 6px;
-            border-radius: 6px;
+            padding: 8px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .edit-btn {
@@ -362,29 +466,64 @@
 
         .item-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
         }
 
         .detail-item {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .detail-label {
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .detail-value {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             color: #1e293b;
         }
+
+        .risk-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-low { background: #dcfce7; color: #166534; }
+        .risk-medium { background: #fef3c7; color: #92400e; }
+        .risk-high { background: #fee2e2; color: #991b1b; }
+
+        .investment-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-stocks { background: #dbeafe; color: #1e40af; }
+        .type-bonds { background: #f3e8ff; color: #7c3aed; }
+        .type-etf { background: #dcfce7; color: #166534; }
+        .type-crypto { background: #fef3c7; color: #92400e; }
+        .type-life-insurance { background: #fce7f3; color: #be185d; }
+        .type-other { background: #f1f5f9; color: #475569; }
 
         /* MODALS */
         .modal {
@@ -394,111 +533,132 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 2000;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
             position: relative;
             background: white;
-            max-width: 500px;
-            margin: 5% auto;
-            border-radius: 16px;
+            max-width: 600px;
+            margin: 3% auto;
+            border-radius: 20px;
             overflow: hidden;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
         }
 
         .modal-header {
-            padding: 24px;
+            padding: 28px;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
         }
 
         .modal-title {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             color: #1e293b;
         }
 
         .close-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             color: #64748b;
             cursor: pointer;
             transition: all 0.2s;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .close-btn:hover {
             color: #1e293b;
+            background: #f1f5f9;
         }
 
         .modal-body {
-            padding: 24px;
+            padding: 28px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-label {
             display: block;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: #374151;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             font-size: 14px;
             transition: all 0.2s;
+            background: #f9fafb;
         }
 
         .form-input:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
         .modal-footer {
-            padding: 24px;
+            padding: 28px;
             border-top: 1px solid #e2e8f0;
             display: flex;
             gap: 12px;
             justify-content: flex-end;
+            background: #f8fafc;
         }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             border: none;
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
             background: #f1f5f9;
             color: #475569;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #e2e8f0;
         }
 
         .btn-secondary:hover {
@@ -521,47 +681,50 @@
 
         .login-card {
             background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 400px;
+            border-radius: 20px;
+            padding: 48px;
+            max-width: 420px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
         }
 
         .login-header {
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
         .login-logo {
-            width: 60px;
-            height: 60px;
-            background: #3b82f6;
-            border-radius: 16px;
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
             color: white;
-            font-size: 24px;
+            font-size: 32px;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
         }
 
         .login-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             color: #1e293b;
             margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .login-subtitle {
             color: #64748b;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .auth-buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
 
         .auth-btn {
@@ -569,40 +732,49 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 16px 24px;
+            border-radius: 12px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             border: none;
         }
 
         .google-btn {
             background: #ea4335;
             color: white;
+            box-shadow: 0 4px 12px rgba(234, 67, 53, 0.3);
         }
 
         .google-btn:hover {
             background: #d33b2c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 67, 53, 0.4);
         }
 
         .email-btn {
             background: #3b82f6;
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .email-btn:hover {
             background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
         .register-btn {
             background: #059669;
             color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
         }
 
         .register-btn:hover {
             background: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
         }
 
         .hidden {
@@ -611,31 +783,43 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             color: #64748b;
         }
 
         .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 64px;
+            margin-bottom: 20px;
             color: #cbd5e1;
         }
 
         .empty-state h3 {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 8px;
             color: #475569;
         }
 
         .empty-state p {
             font-size: 14px;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
         /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 260px;
+            }
+            .main-content {
+                margin-left: 260px;
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 280px;
             }
 
             .sidebar.open {
@@ -652,6 +836,30 @@
 
             .item-details {
                 grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                padding: 16px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .section-header {
+                padding: 20px;
+            }
+
+            .section-content {
+                padding: 20px;
+            }
+
+            .invested-capital-indicator {
+                display: none;
             }
         }
     </style>
@@ -705,20 +913,20 @@
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <h1 class="login-title">WealthTracker Pro</h1>
-                <p class="login-subtitle">Διαχειριστείτε τα επενδυτικά σας χαρτοφυλάκια με ασφάλεια</p>
+                <p class="login-subtitle" data-translate="login_subtitle">Διαχειριστείτε τα επενδυτικά σας χαρτοφυλάκια με ασφάλεια</p>
             </div>
             <div class="auth-buttons">
                 <button id="googleSignIn" class="auth-btn google-btn">
                     <i class="fab fa-google"></i>
-                    Σύνδεση με Google
+                    <span data-translate="google_signin">Σύνδεση με Google</span>
                 </button>
                 <button id="emailSignIn" class="auth-btn email-btn">
                     <i class="fas fa-envelope"></i>
-                    Σύνδεση με Email
+                    <span data-translate="email_signin">Σύνδεση με Email</span>
                 </button>
                 <button id="registerBtn" class="auth-btn register-btn">
                     <i class="fas fa-user-plus"></i>
-                    Εγγραφή νέου λογαριασμού
+                    <span data-translate="register">Εγγραφή νέου λογαριασμού</span>
                 </button>
             </div>
         </div>
@@ -728,7 +936,7 @@
     <div id="emailLoginModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Σύνδεση με Email</h2>
+                <h2 class="modal-title" data-translate="email_login">Σύνδεση με Email</h2>
                 <button class="close-btn" onclick="closeModal('emailLoginModal')">&times;</button>
             </div>
             <form id="emailLoginForm">
@@ -738,13 +946,13 @@
                         <input type="email" id="loginEmail" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Κωδικός:</label>
+                        <label class="form-label" data-translate="password">Κωδικός:</label>
                         <input type="password" id="loginPassword" class="form-input" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('emailLoginModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Σύνδεση</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('emailLoginModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="signin">Σύνδεση</button>
                 </div>
             </form>
         </div>
@@ -754,7 +962,7 @@
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Εγγραφή νέου λογαριασμού</h2>
+                <h2 class="modal-title" data-translate="register">Εγγραφή νέου λογαριασμού</h2>
                 <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
             </div>
             <form id="registerForm">
@@ -764,17 +972,17 @@
                         <input type="email" id="registerEmail" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Κωδικός:</label>
+                        <label class="form-label" data-translate="password">Κωδικός:</label>
                         <input type="password" id="registerPassword" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Επιβεβαίωση Κωδικού:</label>
+                        <label class="form-label" data-translate="confirm_password">Επιβεβαίωση Κωδικού:</label>
                         <input type="password" id="confirmPassword" class="form-input" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Εγγραφή</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('registerModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="register">Εγγραφή</button>
                 </div>
             </form>
         </div>
@@ -791,6 +999,26 @@
                 </div>
             </div>
 
+            <div class="language-currency-section">
+                <div class="controls-row">
+                    <div class="control-group">
+                        <div class="control-label" data-translate="language">Γλώσσα</div>
+                        <select id="languageSelect" class="control-select">
+                            <option value="el">Ελληνικά</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label" data-translate="currency">Νόμισμα</div>
+                        <select id="currencySelect" class="control-select">
+                            <option value="EUR">EUR (€)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div class="user-section">
                 <div class="user-info">
                     <div class="user-avatar" id="userAvatar">U</div>
@@ -800,42 +1028,47 @@
                     </div>
                 </div>
                 <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Αποσύνδεση
+                    <i class="fas fa-sign-out-alt"></i> 
+                    <span data-translate="logout">Αποσύνδεση</span>
                 </button>
             </div>
 
             <nav class="nav-menu">
                 <div class="nav-item active" data-section="dashboard">
                     <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+                    <span data-translate="dashboard">Dashboard</span>
                 </div>
-                <div class="nav-item" data-section="investments">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Επενδύσεις</span>
+                <div class="nav-item" data-section="capital-markets">
+                    <i class="fas fa-chart-line"></i>
+                    <span data-translate="capital_markets">Κεφαλαιαγορά</span>
                 </div>
                 <div class="nav-item" data-section="real-estate">
                     <i class="fas fa-building"></i>
-                    <span>Ακίνητα</span>
+                    <span data-translate="real_estate">Ακίνητα</span>
                 </div>
                 <div class="nav-item" data-section="deposits">
                     <i class="fas fa-piggy-bank"></i>
-                    <span>Καταθέσεις</span>
+                    <span data-translate="deposits">Καταθέσεις</span>
                 </div>
                 <div class="nav-item" data-section="loans">
                     <i class="fas fa-hand-holding-usd"></i>
-                    <span>Δάνεια</span>
+                    <span data-translate="loans">Δάνεια</span>
                 </div>
                 <div class="nav-item" data-section="income">
                     <i class="fas fa-money-bill-wave"></i>
-                    <span>Εισοδήματα</span>
+                    <span data-translate="income">Εισοδήματα</span>
                 </div>
                 <div class="nav-item" data-section="transactions">
                     <i class="fas fa-exchange-alt"></i>
-                    <span>Συναλλαγές</span>
+                    <span data-translate="transactions">Συναλλαγές</span>
                 </div>
                 <div class="nav-item" data-section="expenses">
                     <i class="fas fa-receipt"></i>
-                    <span>Έξοδα</span>
+                    <span data-translate="expenses">Έξοδα</span>
+                </div>
+                <div class="nav-item" data-section="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span data-translate="analytics">Αναλυτικά</span>
                 </div>
             </nav>
         </div>
@@ -845,7 +1078,13 @@
             <div class="top-bar">
                 <div class="page-header">
                     <h1 id="pageTitle">Dashboard</h1>
-                    <p id="pageSubtitle">Επισκόπηση των οικονομικών σας</p>
+                    <p id="pageSubtitle" data-translate="dashboard_subtitle">Επισκόπηση των οικονομικών σας</p>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="invested-capital-indicator">
+                        <span class="label" data-translate="invested_capital">Επενδυμένο Κεφάλαιο</span>
+                        <div id="investedCapitalAmount">€0</div>
+                    </div>
                 </div>
             </div>
 
@@ -856,20 +1095,20 @@
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Συνολικές Επενδύσεις</h3>
-                                    <div class="stat-value" id="totalInvestments">€0</div>
+                                    <h3 data-translate="capital_markets">Κεφαλαιαγορά</h3>
+                                    <div class="stat-value" id="totalCapitalMarkets">€0</div>
                                 </div>
-                                <div class="stat-icon investments">
-                                    <i class="fas fa-chart-pie"></i>
+                                <div class="stat-icon capital-markets">
+                                    <i class="fas fa-chart-line"></i>
                                 </div>
                             </div>
-                            <div class="stat-change positive" id="investmentsChange">+0%</div>
+                            <div class="stat-change positive" id="capitalMarketsChange">+0%</div>
                         </div>
 
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Ακίνητα</h3>
+                                    <h3 data-translate="real_estate">Ακίνητα</h3>
                                     <div class="stat-value" id="totalRealEstate">€0</div>
                                 </div>
                                 <div class="stat-icon real-estate">
@@ -882,7 +1121,7 @@
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Καταθέσεις</h3>
+                                    <h3 data-translate="deposits">Καταθέσεις</h3>
                                     <div class="stat-value" id="totalDeposits">€0</div>
                                 </div>
                                 <div class="stat-icon deposits">
@@ -895,7 +1134,7 @@
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Δάνεια</h3>
+                                    <h3 data-translate="loans">Δάνεια</h3>
                                     <div class="stat-value negative" id="totalLoans">€0</div>
                                 </div>
                                 <div class="stat-icon loans">
@@ -908,7 +1147,20 @@
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Μηνιαίο Εισόδημα</h3>
+                                    <h3 data-translate="invested_capital">Επενδυμένο Κεφάλαιο</h3>
+                                    <div class="stat-value" id="totalInvestedCapital">€0</div>
+                                </div>
+                                <div class="stat-icon invested">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                            </div>
+                            <div class="stat-change positive" id="investedChange">+0%</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-info">
+                                    <h3 data-translate="monthly_income">Μηνιαίο Εισόδημα</h3>
                                     <div class="stat-value" id="monthlyIncome">€0</div>
                                 </div>
                                 <div class="stat-icon income">
@@ -921,7 +1173,7 @@
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-info">
-                                    <h3>Καθαρή Περιουσία</h3>
+                                    <h3 data-translate="net_worth">Καθαρή Περιουσία</h3>
                                     <div class="stat-value" id="netWorth">€0</div>
                                 </div>
                                 <div class="stat-icon net-worth">
@@ -933,21 +1185,21 @@
                     </div>
                 </div>
 
-                <!-- Investments Content -->
-                <div id="investments-content" class="content-section hidden">
+                <!-- Capital Markets Content -->
+                <div id="capital-markets-content" class="content-section hidden">
                     <div class="section-card">
                         <div class="section-header">
                             <div class="section-title">
-                                <i class="fas fa-chart-pie"></i>
-                                Επενδύσεις
+                                <i class="fas fa-chart-line"></i>
+                                <span data-translate="capital_markets">Κεφαλαιαγορά</span>
                             </div>
-                            <button class="add-button" onclick="openModal('investmentModal')">
+                            <button class="add-button" onclick="openModal('capitalMarketsModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Επένδυσης
+                                <span data-translate="add_investment">Προσθήκη Επένδυσης</span>
                             </button>
                         </div>
                         <div class="section-content">
-                            <div id="investmentsList" class="items-list"></div>
+                            <div id="capitalMarketsList" class="items-list"></div>
                         </div>
                     </div>
                 </div>
@@ -958,11 +1210,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-building"></i>
-                                Ακίνητα
+                                <span data-translate="real_estate">Ακίνητα</span>
                             </div>
                             <button class="add-button" onclick="openModal('realEstateModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Ακινήτου
+                                <span data-translate="add_property">Προσθήκη Ακινήτου</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -977,11 +1229,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-piggy-bank"></i>
-                                Καταθέσεις
+                                <span data-translate="deposits">Καταθέσεις</span>
                             </div>
                             <button class="add-button" onclick="openModal('depositModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Κατάθεσης
+                                <span data-translate="add_deposit">Προσθήκη Κατάθεσης</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -996,11 +1248,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-hand-holding-usd"></i>
-                                Δάνεια
+                                <span data-translate="loans">Δάνεια</span>
                             </div>
                             <button class="add-button" onclick="openModal('loanModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Δανείου
+                                <span data-translate="add_loan">Προσθήκη Δανείου</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -1015,11 +1267,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-money-bill-wave"></i>
-                                Εισοδήματα
+                                <span data-translate="income">Εισοδήματα</span>
                             </div>
                             <button class="add-button" onclick="openModal('incomeModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Εισοδήματος
+                                <span data-translate="add_income">Προσθήκη Εισοδήματος</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -1034,11 +1286,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-exchange-alt"></i>
-                                Συναλλαγές
+                                <span data-translate="transactions">Συναλλαγές</span>
                             </div>
                             <button class="add-button" onclick="openModal('transactionModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Συναλλαγής
+                                <span data-translate="add_transaction">Προσθήκη Συναλλαγής</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -1053,11 +1305,11 @@
                         <div class="section-header">
                             <div class="section-title">
                                 <i class="fas fa-receipt"></i>
-                                Έξοδα
+                                <span data-translate="expenses">Έξοδα</span>
                             </div>
                             <button class="add-button" onclick="openModal('expenseModal')">
                                 <i class="fas fa-plus"></i>
-                                Προσθήκη Εξόδου
+                                <span data-translate="add_expense">Προσθήκη Εξόδου</span>
                             </button>
                         </div>
                         <div class="section-content">
@@ -1065,58 +1317,121 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Analytics Content -->
+                <div id="analytics-content" class="content-section hidden">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-chart-bar"></i>
+                                <span data-translate="analytics">Αναλυτικά Επενδύσεων</span>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div id="analyticsContainer">
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-header">
+                                            <div class="stat-info">
+                                                <h3 data-translate="low_risk">Χαμηλό Ρίσκο</h3>
+                                                <div class="stat-value" id="lowRiskAmount">€0</div>
+                                            </div>
+                                            <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                                                <i class="fas fa-shield-alt"></i>
+                                            </div>
+                                        </div>
+                                        <div class="stat-change" id="lowRiskPercentage">0%</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-header">
+                                            <div class="stat-info">
+                                                <h3 data-translate="medium_risk">Μέτριο Ρίσκο</h3>
+                                                <div class="stat-value" id="mediumRiskAmount">€0</div>
+                                            </div>
+                                            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                                                <i class="fas fa-balance-scale"></i>
+                                            </div>
+                                        </div>
+                                        <div class="stat-change" id="mediumRiskPercentage">0%</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-header">
+                                            <div class="stat-info">
+                                                <h3 data-translate="high_risk">Υψηλό Ρίσκο</h3>
+                                                <div class="stat-value" id="highRiskAmount">€0</div>
+                                            </div>
+                                            <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                        </div>
+                                        <div class="stat-change" id="highRiskPercentage">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Investment Modal -->
-    <div id="investmentModal" class="modal">
+    <!-- Capital Markets Modal -->
+    <div id="capitalMarketsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Επένδυσης</h2>
-                <button class="close-btn" onclick="closeModal('investmentModal')">&times;</button>
+                <h2 class="modal-title" data-translate="add_investment">Προσθήκη Επένδυσης</h2>
+                <button class="close-btn" onclick="closeModal('capitalMarketsModal')">&times;</button>
             </div>
-            <form id="investmentForm">
+            <form id="capitalMarketsForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Όνομα Επένδυσης:</label>
-                        <input type="text" id="investmentName" class="form-input" required>
+                        <label class="form-label" data-translate="investment_name">Όνομα Επένδυσης:</label>
+                        <input type="text" id="capitalMarketsName" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Τύπος:</label>
-                        <select id="investmentType" class="form-input" required>
+                        <label class="form-label" data-translate="type">Τύπος:</label>
+                        <select id="capitalMarketsType" class="form-input" required>
                             <option value="">Επιλέξτε τύπο</option>
-                            <option value="Μετοχές">Μετοχές</option>
-                            <option value="ETF">ETF</option>
-                            <option value="Κρύπτο">Κρύπτο</option>
-                            <option value="Ομόλογα">Ομόλογα</option>
-                            <option value="Άλλο">Άλλο</option>
+                            <option value="stocks" data-translate="stocks">Μετοχές</option>
+                            <option value="bonds" data-translate="bonds">Ομόλογα</option>
+                            <option value="etf" data-translate="etf">ETF</option>
+                            <option value="crypto" data-translate="crypto">Κρύπτο</option>
+                            <option value="life-insurance" data-translate="life_insurance">Ασφάλεια Ζωής</option>
+                            <option value="other" data-translate="other">Άλλο</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Ποσότητα:</label>
-                        <input type="number" id="investmentQuantity" class="form-input" step="0.01" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="quantity">Ποσότητα:</label>
+                            <input type="number" id="capitalMarketsQuantity" class="form-input" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="purchase_price">Τιμή Αγοράς:</label>
+                            <input type="number" id="capitalMarketsPurchasePrice" class="form-input" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="current_price">Τρέχουσα Τιμή:</label>
+                            <input type="number" id="capitalMarketsCurrentPrice" class="form-input" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="monthly_investment">Μηνιαία Επένδυση (€):</label>
+                            <input type="number" id="capitalMarketsMonthlyInvestment" class="form-input" step="0.01">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Τιμή Αγοράς (€):</label>
-                        <input type="number" id="investmentPurchasePrice" class="form-input" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Τρέχουσα Τιμή (€):</label>
-                        <input type="number" id="investmentCurrentPrice" class="form-input" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Τρέχουσα Αξία (€):</label>
-                        <input type="number" id="investmentCurrentValue" class="form-input" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Μηνιαία Επένδυση (€):</label>
-                        <input type="number" id="investmentMonthlyInvestment" class="form-input" step="0.01">
+                        <label class="form-label" data-translate="risk_level">Επίπεδο Ρίσκου:</label>
+                        <select id="capitalMarketsRiskLevel" class="form-input" required>
+                            <option value="low" data-translate="low">Χαμηλό</option>
+                            <option value="medium" data-translate="medium">Μέτριο</option>
+                            <option value="high" data-translate="high">Υψηλό</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('investmentModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('capitalMarketsModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1126,47 +1441,51 @@
     <div id="realEstateModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Ακινήτου</h2>
+                <h2 class="modal-title" data-translate="add_property">Προσθήκη Ακινήτου</h2>
                 <button class="close-btn" onclick="closeModal('realEstateModal')">&times;</button>
             </div>
             <form id="realEstateForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Όνομα Ακινήτου:</label>
+                        <label class="form-label" data-translate="property_name">Όνομα Ακινήτου:</label>
                         <input type="text" id="realEstateName" class="form-input" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Τύπος:</label>
-                        <select id="realEstateType" class="form-input" required>
-                            <option value="">Επιλέξτε τύπο</option>
-                            <option value="Κατοικία">Κατοικία</option>
-                            <option value="Διαμέρισμα">Διαμέρισμα</option>
-                            <option value="Γραφείο">Γραφείο</option>
-                            <option value="Κατάστημα">Κατάστημα</option>
-                            <option value="Γη">Γη</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="type">Τύπος:</label>
+                            <select id="realEstateType" class="form-input" required>
+                                <option value="">Επιλέξτε τύπο</option>
+                                <option value="residence" data-translate="residence">Κατοικία</option>
+                                <option value="apartment" data-translate="apartment">Διαμέρισμα</option>
+                                <option value="office" data-translate="office">Γραφείο</option>
+                                <option value="shop" data-translate="shop">Κατάστημα</option>
+                                <option value="land" data-translate="land">Γη</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="location">Τοποθεσία:</label>
+                            <input type="text" id="realEstateLocation" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="purchase_price">Τιμή Αγοράς (€):</label>
+                            <input type="number" id="realEstatePurchasePrice" class="form-input" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="current_value">Τρέχουσα Αξία (€):</label>
+                            <input type="number" id="realEstateCurrentValue" class="form-input" step="0.01">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Τοποθεσία:</label>
-                        <input type="text" id="realEstateLocation" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Τιμή Αγοράς (€):</label>
-                        <input type="number" id="realEstatePurchasePrice" class="form-input" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Τρέχουσα Αξία (€):</label>
-                        <input type="number" id="realEstateCurrentValue" class="form-input" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Μηνιαίο Ενοίκιο (€):</label>
+                        <label class="form-label" data-translate="monthly_rent">Μηνιαίο Ενοίκιο (€):</label>
                         <input type="number" id="realEstateMonthlyRent" class="form-input" step="0.01">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('realEstateModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('realEstateModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1176,41 +1495,49 @@
     <div id="depositModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Κατάθεσης</h2>
+                <h2 class="modal-title" data-translate="add_deposit">Προσθήκη Κατάθεσης</h2>
                 <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
             </div>
             <form id="depositForm">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Τράπεζα:</label>
-                        <input type="text" id="depositBank" class="form-input" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="bank">Τράπεζα:</label>
+                            <input type="text" id="depositBank" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="type">Τύπος:</label>
+                            <select id="depositType" class="form-input" required>
+                                <option value="">Επιλέξτε τύπο</option>
+                                <option value="checking" data-translate="checking">Όψεως</option>
+                                <option value="savings" data-translate="savings">Ταμιευτήριο</option>
+                                <option value="term_deposit" data-translate="term_deposit">Προθεσμίας</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Τύπος:</label>
-                        <select id="depositType" class="form-input" required>
-                            <option value="">Επιλέξτε τύπο</option>
-                            <option value="Όψεως">Όψεως</option>
-                            <option value="Ταμιευτήριο">Ταμιευτήριο</option>
-                            <option value="Προθεσμίας">Προθεσμίας</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Υπόλοιπο (€):</label>
+                        <label class="form-label" data-translate="balance">Υπόλοιπο (€):</label>
                         <input type="number" id="depositBalance" class="form-input" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Επιτόκιο (%):</label>
-                        <input type="number" id="depositInterestRate" class="form-input" step="0.01">
+                        <label class="form-label" data-translate="account_terms">Βασικοί όροι λογαριασμού:</label>
+                        <textarea id="depositTerms" class="form-input" rows="3" placeholder="π.χ. Ελάχιστο υπόλοιπο €1000, δωρεάν συναλλαγές"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Περίοδος Δέσμευσης (μήνες):</label>
-                        <input type="number" id="depositLockupPeriod" class="form-input">
+                    <div class="form-row" id="depositAdvancedFields" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="interest_rate">Επιτόκιο (%):</label>
+                            <input type="number" id="depositInterestRate" class="form-input" step="0.01">
+                        </div>
+                        <div class="form-group" id="lockupGroup" style="display: none;">
+                            <label class="form-label" data-translate="lockup_period">Περίοδος Δέσμευσης (μήνες):</label>
+                            <input type="number" id="depositLockupPeriod" class="form-input">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('depositModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('depositModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1220,42 +1547,46 @@
     <div id="loanModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Δανείου</h2>
+                <h2 class="modal-title" data-translate="add_loan">Προσθήκη Δανείου</h2>
                 <button class="close-btn" onclick="closeModal('loanModal')">&times;</button>
             </div>
             <form id="loanForm">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Τράπεζα:</label>
-                        <input type="text" id="loanBank" class="form-input" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="bank">Τράπεζα:</label>
+                            <input type="text" id="loanBank" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="type">Τύπος:</label>
+                            <select id="loanType" class="form-input" required>
+                                <option value="">Επιλέξτε τύπο</option>
+                                <option value="mortgage" data-translate="mortgage">Στεγαστικό</option>
+                                <option value="consumer" data-translate="consumer">Καταναλωτικό</option>
+                                <option value="car" data-translate="car">Αυτοκινήτου</option>
+                                <option value="business" data-translate="business">Επιχειρηματικό</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="balance">Υπόλοιπο (€):</label>
+                            <input type="number" id="loanBalance" class="form-input" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="interest_rate">Επιτόκιο (%):</label>
+                            <input type="number" id="loanInterestRate" class="form-input" step="0.01">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Τύπος:</label>
-                        <select id="loanType" class="form-input" required>
-                            <option value="">Επιλέξτε τύπο</option>
-                            <option value="Στεγαστικό">Στεγαστικό</option>
-                            <option value="Καταναλωτικό">Καταναλωτικό</option>
-                            <option value="Αυτοκινήτου">Αυτοκινήτου</option>
-                            <option value="Επιχειρηματικό">Επιχειρηματικό</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Υπόλοιπο (€):</label>
-                        <input type="number" id="loanBalance" class="form-input" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Επιτόκιο (%):</label>
-                        <input type="number" id="loanInterestRate" class="form-input" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Μηνιαία Δόση (€):</label>
+                        <label class="form-label" data-translate="monthly_payment">Μηνιαία Δόση (€):</label>
                         <input type="number" id="loanMonthlyPayment" class="form-input" step="0.01">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('loanModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('loanModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1265,39 +1596,43 @@
     <div id="incomeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Εισοδήματος</h2>
+                <h2 class="modal-title" data-translate="add_income">Προσθήκη Εισοδήματος</h2>
                 <button class="close-btn" onclick="closeModal('incomeModal')">&times;</button>
             </div>
             <form id="incomeForm">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Πηγή Εισοδήματος:</label>
-                        <input type="text" id="incomeSource" class="form-input" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="income_source">Πηγή Εισοδήματος:</label>
+                            <input type="text" id="incomeSource" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="type">Τύπος:</label>
+                            <select id="incomeType" class="form-input" required>
+                                <option value="">Επιλέξτε τύπο</option>
+                                <option value="salary" data-translate="salary">Μισθός</option>
+                                <option value="freelance" data-translate="freelance">Freelance</option>
+                                <option value="rental" data-translate="rental">Ενοίκια</option>
+                                <option value="business" data-translate="business">Επιχείρηση</option>
+                                <option value="pension" data-translate="pension">Συντάξεις</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Τύπος:</label>
-                        <select id="incomeType" class="form-input" required>
-                            <option value="">Επιλέξτε τύπο</option>
-                            <option value="Μισθός">Μισθός</option>
-                            <option value="Freelance">Freelance</option>
-                            <option value="Ενοίκια">Ενοίκια</option>
-                            <option value="Επιχείρηση">Επιχείρηση</option>
-                            <option value="Συντάξεις">Συντάξεις</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Μηνιαίο Μικτό (€):</label>
-                        <input type="number" id="incomeMonthlyGross" class="form-input" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Φοροεπιβάρυνση (%):</label>
-                        <input type="number" id="incomeTaxRate" class="form-input" step="0.01">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="monthly_gross">Μηνιαίο Μικτό (€):</label>
+                            <input type="number" id="incomeMonthlyGross" class="form-input" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="tax_rate">Φοροεπιβάρυνση (%):</label>
+                            <input type="number" id="incomeTaxRate" class="form-input" step="0.01">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('incomeModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('incomeModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1307,39 +1642,41 @@
     <div id="transactionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Συναλλαγής</h2>
+                <h2 class="modal-title" data-translate="add_transaction">Προσθήκη Συναλλαγής</h2>
                 <button class="close-btn" onclick="closeModal('transactionModal')">&times;</button>
             </div>
             <form id="transactionForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Περιγραφή:</label>
+                        <label class="form-label" data-translate="description">Περιγραφή:</label>
                         <input type="text" id="transactionDescription" class="form-input" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Κατηγορία:</label>
-                        <select id="transactionCategory" class="form-input" required>
-                            <option value="">Επιλέξτε κατηγορία</option>
-                            <option value="Εισόδημα">Εισόδημα</option>
-                            <option value="Επένδυση">Επένδυση</option>
-                            <option value="Αγορά">Αγορά</option>
-                            <option value="Πώληση">Πώληση</option>
-                            <option value="Μεταφορά">Μεταφορά</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="category">Κατηγορία:</label>
+                            <select id="transactionCategory" class="form-input" required>
+                                <option value="">Επιλέξτε κατηγορία</option>
+                                <option value="income" data-translate="income">Εισόδημα</option>
+                                <option value="investment" data-translate="investment">Επένδυση</option>
+                                <option value="purchase" data-translate="purchase">Αγορά</option>
+                                <option value="sale" data-translate="sale">Πώληση</option>
+                                <option value="transfer" data-translate="transfer">Μεταφορά</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="date">Ημερομηνία:</label>
+                            <input type="date" id="transactionDate" class="form-input" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Ημερομηνία:</label>
-                        <input type="date" id="transactionDate" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Ποσό (€):</label>
+                        <label class="form-label" data-translate="amount">Ποσό (€):</label>
                         <input type="number" id="transactionAmount" class="form-input" step="0.01" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('transactionModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('transactionModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
@@ -1349,51 +1686,337 @@
     <div id="expenseModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Προσθήκη Εξόδου</h2>
+                <h2 class="modal-title" data-translate="add_expense">Προσθήκη Εξόδου</h2>
                 <button class="close-btn" onclick="closeModal('expenseModal')">&times;</button>
             </div>
             <form id="expenseForm">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Κατηγορία:</label>
-                        <select id="expenseCategory" class="form-input" required>
-                            <option value="">Επιλέξτε κατηγορία</option>
-                            <option value="Σπίτι">Σπίτι</option>
-                            <option value="Μεταφορά">Μεταφορά</option>
-                            <option value="Φαγητό">Φαγητό</option>
-                            <option value="Υγεία">Υγεία</option>
-                            <option value="Εκπαίδευση">Εκπαίδευση</option>
-                            <option value="Ψυχαγωγία">Ψυχαγωγία</option>
-                            <option value="Ρουχισμός">Ρουχισμός</option>
-                            <option value="Άλλο">Άλλο</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="category">Κατηγορία:</label>
+                            <select id="expenseCategory" class="form-input" required>
+                                <option value="">Επιλέξτε κατηγορία</option>
+                                <option value="housing" data-translate="housing">Σπίτι</option>
+                                <option value="transport" data-translate="transport">Μεταφορά</option>
+                                <option value="food" data-translate="food">Φαγητό</option>
+                                <option value="health" data-translate="health">Υγεία</option>
+                                <option value="education" data-translate="education">Εκπαίδευση</option>
+                                <option value="entertainment" data-translate="entertainment">Ψυχαγωγία</option>
+                                <option value="clothing" data-translate="clothing">Ρουχισμός</option>
+                                <option value="other" data-translate="other">Άλλο</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="description">Περιγραφή:</label>
+                            <input type="text" id="expenseDescription" class="form-input" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Περιγραφή:</label>
-                        <input type="text" id="expenseDescription" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Ποσό (€):</label>
-                        <input type="number" id="expenseAmount" class="form-input" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Ξοδεμένο (€):</label>
-                        <input type="number" id="expenseSpent" class="form-input" step="0.01">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-translate="amount">Ποσό (€):</label>
+                            <input type="number" id="expenseAmount" class="form-input" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-translate="spent">Ξοδεμένο (€):</label>
+                            <input type="number" id="expenseSpent" class="form-input" step="0.01">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')">Ακύρωση</button>
-                    <button type="submit" class="btn btn-primary">Προσθήκη</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')" data-translate="cancel">Ακύρωση</button>
+                    <button type="submit" class="btn btn-primary" data-translate="add">Προσθήκη</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        // Translation Object
+        const translations = {
+            el: {
+                login_subtitle: "Διαχειριστείτε τα επενδυτικά σας χαρτοφυλάκια με ασφάλεια",
+                google_signin: "Σύνδεση με Google",
+                email_signin: "Σύνδεση με Email",
+                register: "Εγγραφή νέου λογαριασμού",
+                email_login: "Σύνδεση με Email",
+                password: "Κωδικός",
+                confirm_password: "Επιβεβαίωση Κωδικού",
+                cancel: "Ακύρωση",
+                signin: "Σύνδεση",
+                add: "Προσθήκη",
+                language: "Γλώσσα",
+                currency: "Νόμισμα",
+                logout: "Αποσύνδεση",
+                dashboard: "Dashboard",
+                capital_markets: "Κεφαλαιαγορά",
+                real_estate: "Ακίνητα",
+                deposits: "Καταθέσεις",
+                loans: "Δάνεια",
+                income: "Εισοδήματα",
+                transactions: "Συναλλαγές",
+                expenses: "Έξοδα",
+                analytics: "Αναλυτικά",
+                dashboard_subtitle: "Επισκόπηση των οικονομικών σας",
+                invested_capital: "Επενδυμένο Κεφάλαιο",
+                monthly_income: "Μηνιαίο Εισόδημα",
+                net_worth: "Καθαρή Περιουσία",
+                low_risk: "Χαμηλό Ρίσκο",
+                medium_risk: "Μέτριο Ρίσκο",
+                high_risk: "Υψηλό Ρίσκο",
+                add_investment: "Προσθήκη Επένδυσης",
+                add_property: "Προσθήκη Ακινήτου",
+                add_deposit: "Προσθήκη Κατάθεσης",
+                add_loan: "Προσθήκη Δανείου",
+                add_income: "Προσθήκη Εισοδήματος",
+                add_transaction: "Προσθήκη Συναλλαγής",
+                add_expense: "Προσθήκη Εξόδου",
+                investment_name: "Όνομα Επένδυσης",
+                type: "Τύπος",
+                quantity: "Ποσότητα",
+                purchase_price: "Τιμή Αγοράς",
+                current_price: "Τρέχουσα Τιμή",
+                current_value: "Τρέχουσα Αξία",
+                monthly_investment: "Μηνιαία Επένδυση",
+                risk_level: "Επίπεδο Ρίσκου",
+                property_name: "Όνομα Ακινήτου",
+                location: "Τοποθεσία",
+                monthly_rent: "Μηνιαίο Ενοίκιο",
+                bank: "Τράπεζα",
+                balance: "Υπόλοιπο",
+                account_terms: "Βασικοί όροι λογαριασμού",
+                interest_rate: "Επιτόκιο",
+                lockup_period: "Περίοδος Δέσμευσης",
+                monthly_payment: "Μηνιαία Δόση",
+                income_source: "Πηγή Εισοδήματος",
+                monthly_gross: "Μηνιαίο Μικτό",
+                tax_rate: "Φοροεπιβάρυνση",
+                description: "Περιγραφή",
+                category: "Κατηγορία",
+                date: "Ημερομηνία",
+                amount: "Ποσό",
+                spent: "Ξοδεμένο",
+                // Asset types
+                stocks: "Μετοχές",
+                bonds: "Ομόλογα",
+                etf: "ETF",
+                crypto: "Κρύπτο",
+                life_insurance: "Ασφάλεια Ζωής",
+                other: "Άλλο",
+                // Property types
+                residence: "Κατοικία",
+                apartment: "Διαμέρισμα",
+                office: "Γραφείο",
+                shop: "Κατάστημα",
+                land: "Γη",
+                // Account types
+                checking: "Όψεως",
+                savings: "Ταμιευτήριο",
+                term_deposit: "Προθεσμίας",
+                // Loan types
+                mortgage: "Στεγαστικό",
+                consumer: "Καταναλωτικό",
+                car: "Αυτοκινήτου",
+                business: "Επιχειρηματικό",
+                // Income types
+                salary: "Μισθός",
+                freelance: "Freelance",
+                rental: "Ενοίκια",
+                pension: "Συντάξεις",
+                // Transaction types
+                investment: "Επένδυση",
+                purchase: "Αγορά",
+                sale: "Πώληση",
+                transfer: "Μεταφορά",
+                // Expense categories
+                housing: "Σπίτι",
+                transport: "Μεταφορά",
+                food: "Φαγητό",
+                health: "Υγεία",
+                education: "Εκπαίδευση",
+                entertainment: "Ψυχαγωγία",
+                clothing: "Ρουχισμός",
+                // Risk levels
+                low: "Χαμηλό",
+                medium: "Μέτριο",
+                high: "Υψηλό"
+            },
+            en: {
+                login_subtitle: "Securely manage your investment portfolios",
+                google_signin: "Sign in with Google",
+                email_signin: "Sign in with Email",
+                register: "Create new account",
+                email_login: "Email Login",
+                password: "Password",
+                confirm_password: "Confirm Password",
+                cancel: "Cancel",
+                signin: "Sign In",
+                add: "Add",
+                language: "Language",
+                currency: "Currency",
+                logout: "Logout",
+                dashboard: "Dashboard",
+                capital_markets: "Capital Markets",
+                real_estate: "Real Estate",
+                deposits: "Deposits",
+                loans: "Loans",
+                income: "Income",
+                transactions: "Transactions",
+                expenses: "Expenses",
+                analytics: "Analytics",
+                dashboard_subtitle: "Overview of your finances",
+                invested_capital: "Invested Capital",
+                monthly_income: "Monthly Income",
+                net_worth: "Net Worth",
+                low_risk: "Low Risk",
+                medium_risk: "Medium Risk",
+                high_risk: "High Risk",
+                add_investment: "Add Investment",
+                add_property: "Add Property",
+                add_deposit: "Add Deposit",
+                add_loan: "Add Loan",
+                add_income: "Add Income",
+                add_transaction: "Add Transaction",
+                add_expense: "Add Expense",
+                investment_name: "Investment Name",
+                type: "Type",
+                quantity: "Quantity",
+                purchase_price: "Purchase Price",
+                current_price: "Current Price",
+                current_value: "Current Value",
+                monthly_investment: "Monthly Investment",
+                risk_level: "Risk Level",
+                property_name: "Property Name",
+                location: "Location",
+                monthly_rent: "Monthly Rent",
+                bank: "Bank",
+                balance: "Balance",
+                account_terms: "Basic account terms",
+                interest_rate: "Interest Rate",
+                lockup_period: "Lockup Period",
+                monthly_payment: "Monthly Payment",
+                income_source: "Income Source",
+                monthly_gross: "Monthly Gross",
+                tax_rate: "Tax Rate",
+                description: "Description",
+                category: "Category",
+                date: "Date",
+                amount: "Amount",
+                spent: "Spent",
+                // Asset types
+                stocks: "Stocks",
+                bonds: "Bonds",
+                etf: "ETF",
+                crypto: "Cryptocurrency",
+                life_insurance: "Life Insurance",
+                other: "Other",
+                // Property types
+                residence: "Residence",
+                apartment: "Apartment",
+                office: "Office",
+                shop: "Shop",
+                land: "Land",
+                // Account types
+                checking: "Checking",
+                savings: "Savings",
+                term_deposit: "Term Deposit",
+                // Loan types
+                mortgage: "Mortgage",
+                consumer: "Consumer",
+                car: "Car Loan",
+                business: "Business",
+                // Income types
+                salary: "Salary",
+                freelance: "Freelance",
+                rental: "Rental",
+                pension: "Pension",
+                // Transaction types
+                investment: "Investment",
+                purchase: "Purchase",
+                sale: "Sale",
+                transfer: "Transfer",
+                // Expense categories
+                housing: "Housing",
+                transport: "Transport",
+                food: "Food",
+                health: "Health",
+                education: "Education",
+                entertainment: "Entertainment",
+                clothing: "Clothing",
+                // Risk levels
+                low: "Low",
+                medium: "Medium",
+                high: "High"
+            }
+        };
+
         let currentUser = null;
         let editingId = null;
         let editingType = null;
         let currentSection = 'dashboard';
+        let currentLanguage = 'el';
+        let currentCurrency = 'EUR';
+
+        // Translation function
+        function translate(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                const translation = translate(key);
+                
+                if (element.tagName === 'INPUT' && element.type === 'submit') {
+                    element.value = translation;
+                } else if (element.tagName === 'OPTION') {
+                    element.textContent = translation;
+                } else {
+                    element.textContent = translation;
+                }
+            });
+
+            // Update page title and subtitle based on current section
+            updatePageTitle();
+        }
+
+        function updatePageTitle() {
+            const titles = {
+                'dashboard': translate('dashboard'),
+                'capital-markets': translate('capital_markets'),
+                'real-estate': translate('real_estate'),
+                'deposits': translate('deposits'),
+                'loans': translate('loans'),
+                'income': translate('income'),
+                'transactions': translate('transactions'),
+                'expenses': translate('expenses'),
+                'analytics': translate('analytics')
+            };
+            
+            const subtitles = {
+                'dashboard': translate('dashboard_subtitle'),
+                'capital-markets': 'Διαχείριση επενδυτικού χαρτοφυλακίου',
+                'real-estate': 'Διαχείριση ακίνητης περιουσίας',
+                'deposits': 'Τραπεζικές καταθέσεις και αποταμιεύσεις',
+                'loans': 'Υποχρεώσεις και δάνεια',
+                'income': 'Πηγές εισοδήματος',
+                'transactions': 'Ιστορικό συναλλαγών',
+                'expenses': 'Παρακολούθηση εξόδων',
+                'analytics': 'Ανάλυση επενδυτικού ρίσκου'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[currentSection];
+            document.getElementById('pageSubtitle').textContent = subtitles[currentSection];
+        }
+
+        function formatCurrency(amount) {
+            const symbols = {
+                'EUR': '€',
+                'USD': '$',
+                'GBP': '£'
+            };
+            
+            return `${symbols[currentCurrency]}${amount.toLocaleString()}`;
+        }
 
         // Authentication Functions
         async function initializeAuth() {
@@ -1503,30 +2126,12 @@
             document.getElementById(`${sectionName}-content`).classList.remove('hidden');
             
             // Update page title
-            const titles = {
-                'dashboard': 'Dashboard',
-                'investments': 'Επενδύσεις',
-                'real-estate': 'Ακίνητα',
-                'deposits': 'Καταθέσεις',
-                'loans': 'Δάνεια',
-                'income': 'Εισοδήματα',
-                'transactions': 'Συναλλαγές',
-                'expenses': 'Έξοδα'
-            };
+            updatePageTitle();
             
-            const subtitles = {
-                'dashboard': 'Επισκόπηση των οικονομικών σας',
-                'investments': 'Διαχείριση επενδυτικού χαρτοφυλακίου',
-                'real-estate': 'Διαχείριση ακίνητης περιουσίας',
-                'deposits': 'Τραπεζικές καταθέσεις και αποταμιεύσεις',
-                'loans': 'Υποχρεώσεις και δάνεια',
-                'income': 'Πηγές εισοδήματος',
-                'transactions': 'Ιστορικό συναλλαγών',
-                'expenses': 'Παρακολούθηση εξόδων'
-            };
-            
-            document.getElementById('pageTitle').textContent = titles[sectionName];
-            document.getElementById('pageSubtitle').textContent = subtitles[sectionName];
+            // Load specific section data if needed
+            if (sectionName === 'analytics') {
+                updateAnalytics();
+            }
         }
 
         // Modal Functions
@@ -1600,7 +2205,7 @@
         async function loadAllData() {
             try {
                 await Promise.all([
-                    loadInvestments(),
+                    loadCapitalMarkets(),
                     loadRealEstate(),
                     loadDeposits(),
                     loadLoans(),
@@ -1614,26 +2219,60 @@
             }
         }
 
-        // Load Functions
-        async function loadInvestments() {
-            const investments = await loadData('investments');
-            const container = document.getElementById('investmentsList');
+        // Calculate invested capital
+        function calculateInvestedCapital(capitalMarkets, realEstate, deposits) {
+            let investedCapital = 0;
             
-            if (investments.length === 0) {
+            // All capital markets investments are considered invested
+            capitalMarkets.forEach(item => {
+                const currentValue = item.currentPrice ? 
+                    (item.quantity * item.currentPrice) : 
+                    (item.currentValue || item.quantity * item.purchasePrice);
+                investedCapital += currentValue;
+            });
+            
+            // All real estate is considered invested
+            realEstate.forEach(item => {
+                investedCapital += item.currentValue || item.purchasePrice;
+            });
+            
+            // Only deposits with interest rate > 0 are considered invested
+            deposits.forEach(item => {
+                if (item.interestRate && item.interestRate > 0) {
+                    investedCapital += item.balance;
+                }
+            });
+            
+            return investedCapital;
+        }
+
+        // Load Functions
+        async function loadCapitalMarkets() {
+            const capitalMarkets = await loadData('capitalMarkets');
+            const container = document.getElementById('capitalMarketsList');
+            
+            if (capitalMarkets.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <i class="fas fa-chart-pie"></i>
+                        <i class="fas fa-chart-line"></i>
                         <h3>Δεν υπάρχουν επενδύσεις</h3>
-                        <p>Προσθέστε την πρώτη σας επένδυση για να ξεκινήσετε</p>
+                        <p>Προσθέστε την πρώτη σας επένδυση στην κεφαλαιαγορά για να ξεκινήσετε</p>
                     </div>
                 `;
                 return;
             }
 
             container.innerHTML = '';
-            investments.forEach(item => {
-                const profit = (item.currentValue || 0) - (item.purchasePrice * item.quantity || 0);
+            capitalMarkets.forEach(item => {
+                const currentValue = item.currentPrice ? 
+                    (item.quantity * item.currentPrice) : 
+                    (item.currentValue || item.quantity * item.purchasePrice);
+                const purchaseValue = item.quantity * item.purchasePrice;
+                const profit = currentValue - purchaseValue;
                 const profitClass = profit >= 0 ? 'positive' : 'negative';
+                
+                const riskClass = `risk-${item.riskLevel || 'medium'}`;
+                const typeClass = `type-${item.type.replace('-', '_')}`;
                 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'item-card';
@@ -1641,38 +2280,44 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.name}</div>
-                            <div class="item-subtitle">${item.type}</div>
+                            <div class="item-subtitle">
+                                <span class="investment-type-badge ${typeClass}">${translate(item.type.replace('-', '_'))}</span>
+                                <span class="risk-indicator ${riskClass}">
+                                    <i class="fas fa-${item.riskLevel === 'low' ? 'shield-alt' : item.riskLevel === 'medium' ? 'balance-scale' : 'exclamation-triangle'}"></i>
+                                    ${translate(item.riskLevel || 'medium')}
+                                </span>
+                            </div>
                         </div>
                         <div class="item-actions">
-                            <button class="action-btn edit-btn" onclick="editItem('investments', '${item.id}')">
+                            <button class="action-btn edit-btn" onclick="editItem('capitalMarkets', '${item.id}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn delete-btn" onclick="deleteItem('investments', '${item.id}')">
+                            <button class="action-btn delete-btn" onclick="deleteItem('capitalMarkets', '${item.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Ποσότητα</div>
+                            <div class="detail-label">${translate('quantity')}</div>
                             <div class="detail-value">${item.quantity}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Τιμή Αγοράς</div>
-                            <div class="detail-value">€${parseFloat(item.purchasePrice || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('purchase_price')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.purchasePrice || 0))}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Τρέχουσα Αξία</div>
-                            <div class="detail-value">€${parseFloat(item.currentValue || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('current_value')}</div>
+                            <div class="detail-value">${formatCurrency(currentValue)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Κέρδος/Ζημία</div>
-                            <div class="detail-value ${profitClass}">€${profit.toFixed(2)}</div>
+                            <div class="detail-value ${profitClass}">${formatCurrency(profit)}</div>
                         </div>
                         ${item.monthlyInvestment ? `
                         <div class="detail-item">
-                            <div class="detail-label">Μηνιαία Επένδυση</div>
-                            <div class="detail-value">€${parseFloat(item.monthlyInvestment).toFixed(2)}</div>
+                            <div class="detail-label">${translate('monthly_investment')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.monthlyInvestment))}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -1698,7 +2343,8 @@
 
             container.innerHTML = '';
             realEstate.forEach(item => {
-                const profit = (item.currentValue || 0) - (item.purchasePrice || 0);
+                const currentValue = item.currentValue || item.purchasePrice;
+                const profit = currentValue - (item.purchasePrice || 0);
                 const profitClass = profit >= 0 ? 'positive' : 'negative';
                 
                 const itemDiv = document.createElement('div');
@@ -1707,7 +2353,7 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.name}</div>
-                            <div class="item-subtitle">${item.type} - ${item.location}</div>
+                            <div class="item-subtitle">${translate(item.type)} - ${item.location}</div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('realEstate', '${item.id}')">
@@ -1720,21 +2366,21 @@
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Τιμή Αγοράς</div>
-                            <div class="detail-value">€${parseFloat(item.purchasePrice || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('purchase_price')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.purchasePrice || 0))}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Τρέχουσα Αξία</div>
-                            <div class="detail-value">€${parseFloat(item.currentValue || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('current_value')}</div>
+                            <div class="detail-value">${formatCurrency(currentValue)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Κέρδος/Ζημία</div>
-                            <div class="detail-value ${profitClass}">€${profit.toFixed(2)}</div>
+                            <div class="detail-value ${profitClass}">${formatCurrency(profit)}</div>
                         </div>
                         ${item.monthlyRent ? `
                         <div class="detail-item">
-                            <div class="detail-label">Μηνιαίο Ενοίκιο</div>
-                            <div class="detail-value positive">€${parseFloat(item.monthlyRent).toFixed(2)}</div>
+                            <div class="detail-label">${translate('monthly_rent')}</div>
+                            <div class="detail-value positive">${formatCurrency(parseFloat(item.monthlyRent))}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -1760,13 +2406,18 @@
 
             container.innerHTML = '';
             deposits.forEach(item => {
+                const isInvested = item.interestRate && item.interestRate > 0;
+                
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'item-card';
                 itemDiv.innerHTML = `
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.bank}</div>
-                            <div class="item-subtitle">${item.type}</div>
+                            <div class="item-subtitle">
+                                ${translate(item.type)}
+                                ${isInvested ? '<span style="color: #8b5cf6; font-weight: 600; margin-left: 8px;">💼 Επενδυμένο</span>' : ''}
+                            </div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('deposits', '${item.id}')">
@@ -1779,19 +2430,25 @@
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Υπόλοιπο</div>
-                            <div class="detail-value">€${parseFloat(item.balance || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('balance')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.balance || 0))}</div>
                         </div>
                         ${item.interestRate ? `
                         <div class="detail-item">
-                            <div class="detail-label">Επιτόκιο</div>
+                            <div class="detail-label">${translate('interest_rate')}</div>
                             <div class="detail-value">${parseFloat(item.interestRate).toFixed(2)}%</div>
                         </div>
                         ` : ''}
                         ${item.lockupPeriod ? `
                         <div class="detail-item">
-                            <div class="detail-label">Δέσμευση</div>
+                            <div class="detail-label">${translate('lockup_period')}</div>
                             <div class="detail-value">${item.lockupPeriod} μήνες</div>
+                        </div>
+                        ` : ''}
+                        ${item.terms ? `
+                        <div class="detail-item" style="grid-column: span 2;">
+                            <div class="detail-label">Όροι</div>
+                            <div class="detail-value" style="font-size: 14px; line-height: 1.4;">${item.terms}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -1823,7 +2480,7 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.bank}</div>
-                            <div class="item-subtitle">${item.type}</div>
+                            <div class="item-subtitle">${translate(item.type)}</div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('loans', '${item.id}')">
@@ -1836,19 +2493,19 @@
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Υπόλοιπο</div>
-                            <div class="detail-value negative">€${parseFloat(item.balance || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('balance')}</div>
+                            <div class="detail-value negative">${formatCurrency(parseFloat(item.balance || 0))}</div>
                         </div>
                         ${item.interestRate ? `
                         <div class="detail-item">
-                            <div class="detail-label">Επιτόκιο</div>
+                            <div class="detail-label">${translate('interest_rate')}</div>
                             <div class="detail-value">${parseFloat(item.interestRate).toFixed(2)}%</div>
                         </div>
                         ` : ''}
                         ${item.monthlyPayment ? `
                         <div class="detail-item">
-                            <div class="detail-label">Μηνιαία Δόση</div>
-                            <div class="detail-value">€${parseFloat(item.monthlyPayment).toFixed(2)}</div>
+                            <div class="detail-label">${translate('monthly_payment')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.monthlyPayment))}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -1882,7 +2539,7 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.source}</div>
-                            <div class="item-subtitle">${item.type}</div>
+                            <div class="item-subtitle">${translate(item.type)}</div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('income', '${item.id}')">
@@ -1895,16 +2552,16 @@
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Μικτό</div>
-                            <div class="detail-value">€${parseFloat(item.monthlyGross || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('monthly_gross')}</div>
+                            <div class="detail-value">${formatCurrency(parseFloat(item.monthlyGross || 0))}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Καθαρό</div>
-                            <div class="detail-value positive">€${netIncome.toFixed(2)}</div>
+                            <div class="detail-label">Μηνιαίο Καθαρό</div>
+                            <div class="detail-value positive">${formatCurrency(netIncome)}</div>
                         </div>
                         ${item.taxRate ? `
                         <div class="detail-item">
-                            <div class="detail-label">Φόρος</div>
+                            <div class="detail-label">${translate('tax_rate')}</div>
                             <div class="detail-value">${parseFloat(item.taxRate).toFixed(1)}%</div>
                         </div>
                         ` : ''}
@@ -1939,7 +2596,7 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.description}</div>
-                            <div class="item-subtitle">${item.category}</div>
+                            <div class="item-subtitle">${translate(item.category)}</div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('transactions', '${item.id}')">
@@ -1952,12 +2609,12 @@
                     </div>
                     <div class="item-details">
                         <div class="detail-item">
-                            <div class="detail-label">Ημερομηνία</div>
+                            <div class="detail-label">${translate('date')}</div>
                             <div class="detail-value">${new Date(item.date).toLocaleDateString('el-GR')}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Ποσό</div>
-                            <div class="detail-value ${amountClass}">€${parseFloat(item.amount || 0).toFixed(2)}</div>
+                            <div class="detail-label">${translate('amount')}</div>
+                            <div class="detail-value ${amountClass}">${formatCurrency(parseFloat(item.amount || 0))}</div>
                         </div>
                     </div>
                 `;
@@ -1993,7 +2650,7 @@
                     <div class="item-header">
                         <div>
                             <div class="item-title">${item.description}</div>
-                            <div class="item-subtitle">${item.category}</div>
+                            <div class="item-subtitle">${translate(item.category)}</div>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn edit-btn" onclick="editItem('expenses', '${item.id}')">
@@ -2007,15 +2664,15 @@
                     <div class="item-details">
                         <div class="detail-item">
                             <div class="detail-label">Προϋπολογισμός</div>
-                            <div class="detail-value">€${amount.toFixed(2)}</div>
+                            <div class="detail-value">${formatCurrency(amount)}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Ξοδεμένο</div>
-                            <div class="detail-value negative">€${spent.toFixed(2)}</div>
+                            <div class="detail-label">${translate('spent')}</div>
+                            <div class="detail-value negative">${formatCurrency(spent)}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Υπόλοιπο</div>
-                            <div class="detail-value ${remainingClass}">€${remaining.toFixed(2)}</div>
+                            <div class="detail-value ${remainingClass}">${formatCurrency(remaining)}</div>
                         </div>
                     </div>
                 `;
@@ -2025,35 +2682,100 @@
 
         async function updateSummary() {
             try {
-                const [investments, realEstate, deposits, loans, income] = await Promise.all([
-                    loadData('investments'),
+                const [capitalMarkets, realEstate, deposits, loans, income] = await Promise.all([
+                    loadData('capitalMarkets'),
                     loadData('realEstate'),
                     loadData('deposits'),
                     loadData('loans'),
                     loadData('income')
                 ]);
 
-                const totalInvestments = investments.reduce((sum, item) => sum + parseFloat(item.currentValue || 0), 0);
-                const totalRealEstate = realEstate.reduce((sum, item) => sum + parseFloat(item.currentValue || 0), 0);
+                // Calculate capital markets total
+                const totalCapitalMarkets = capitalMarkets.reduce((sum, item) => {
+                    const currentValue = item.currentPrice ? 
+                        (item.quantity * item.currentPrice) : 
+                        (item.currentValue || item.quantity * item.purchasePrice);
+                    return sum + currentValue;
+                }, 0);
+
+                const totalRealEstate = realEstate.reduce((sum, item) => sum + (item.currentValue || item.purchasePrice), 0);
                 const totalDeposits = deposits.reduce((sum, item) => sum + parseFloat(item.balance || 0), 0);
                 const totalLoans = loans.reduce((sum, item) => sum + parseFloat(item.balance || 0), 0);
+                
                 const monthlyIncome = income.reduce((sum, item) => {
                     return sum + (item.monthlyGross * (1 - (item.taxRate || 0) / 100));
                 }, 0);
-                const netWorth = totalInvestments + totalRealEstate + totalDeposits - totalLoans;
 
-                document.getElementById('totalInvestments').textContent = `€${totalInvestments.toLocaleString()}`;
-                document.getElementById('totalRealEstate').textContent = `€${totalRealEstate.toLocaleString()}`;
-                document.getElementById('totalDeposits').textContent = `€${totalDeposits.toLocaleString()}`;
-                document.getElementById('totalLoans').textContent = `€${totalLoans.toLocaleString()}`;
-                document.getElementById('monthlyIncome').textContent = `€${monthlyIncome.toLocaleString()}`;
-                document.getElementById('netWorth').textContent = `€${netWorth.toLocaleString()}`;
+                // Calculate invested capital
+                const totalInvestedCapital = calculateInvestedCapital(capitalMarkets, realEstate, deposits);
+                
+                const netWorth = totalCapitalMarkets + totalRealEstate + totalDeposits - totalLoans;
 
+                // Update dashboard
+                document.getElementById('totalCapitalMarkets').textContent = formatCurrency(totalCapitalMarkets);
+                document.getElementById('totalRealEstate').textContent = formatCurrency(totalRealEstate);
+                document.getElementById('totalDeposits').textContent = formatCurrency(totalDeposits);
+                document.getElementById('totalLoans').textContent = formatCurrency(totalLoans);
+                document.getElementById('totalInvestedCapital').textContent = formatCurrency(totalInvestedCapital);
+                document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncome);
+                document.getElementById('netWorth').textContent = formatCurrency(netWorth);
+
+                // Update invested capital indicator in top bar
+                document.getElementById('investedCapitalAmount').textContent = formatCurrency(totalInvestedCapital);
+
+                // Update net worth color
                 const netWorthElement = document.getElementById('netWorth');
                 netWorthElement.className = 'stat-value ' + (netWorth >= 0 ? 'positive' : 'negative');
 
             } catch (error) {
                 console.error('❌ Error updating summary:', error);
+            }
+        }
+
+        async function updateAnalytics() {
+            try {
+                const capitalMarkets = await loadData('capitalMarkets');
+                
+                let lowRisk = 0, mediumRisk = 0, highRisk = 0, total = 0;
+                
+                capitalMarkets.forEach(item => {
+                    const currentValue = item.currentPrice ? 
+                        (item.quantity * item.currentPrice) : 
+                        (item.currentValue || item.quantity * item.purchasePrice);
+                    
+                    total += currentValue;
+                    
+                    switch(item.riskLevel) {
+                        case 'low':
+                            lowRisk += currentValue;
+                            break;
+                        case 'medium':
+                            mediumRisk += currentValue;
+                            break;
+                        case 'high':
+                            highRisk += currentValue;
+                            break;
+                        default:
+                            mediumRisk += currentValue;
+                    }
+                });
+
+                document.getElementById('lowRiskAmount').textContent = formatCurrency(lowRisk);
+                document.getElementById('mediumRiskAmount').textContent = formatCurrency(mediumRisk);
+                document.getElementById('highRiskAmount').textContent = formatCurrency(highRisk);
+
+                if (total > 0) {
+                    document.getElementById('lowRiskPercentage').textContent = `${(lowRisk / total * 100).toFixed(1)}%`;
+                    document.getElementById('mediumRiskPercentage').textContent = `${(mediumRisk / total * 100).toFixed(1)}%`;
+                    document.getElementById('highRiskPercentage').textContent = `${(highRisk / total * 100).toFixed(1)}%`;
+                } else {
+                    document.getElementById('lowRiskPercentage').textContent = '0%';
+                    document.getElementById('mediumRiskPercentage').textContent = '0%';
+                    document.getElementById('highRiskPercentage').textContent = '0%';
+                }
+
+            } catch (error) {
+                console.error('❌ Error updating analytics:', error);
             }
         }
 
@@ -2068,15 +2790,15 @@
                 editingType = type;
 
                 switch(type) {
-                    case 'investments':
-                        document.getElementById('investmentName').value = item.name || '';
-                        document.getElementById('investmentType').value = item.type || '';
-                        document.getElementById('investmentQuantity').value = item.quantity || '';
-                        document.getElementById('investmentPurchasePrice').value = item.purchasePrice || '';
-                        document.getElementById('investmentCurrentPrice').value = item.currentPrice || '';
-                        document.getElementById('investmentCurrentValue').value = item.currentValue || '';
-                        document.getElementById('investmentMonthlyInvestment').value = item.monthlyInvestment || '';
-                        openModal('investmentModal');
+                    case 'capitalMarkets':
+                        document.getElementById('capitalMarketsName').value = item.name || '';
+                        document.getElementById('capitalMarketsType').value = item.type || '';
+                        document.getElementById('capitalMarketsQuantity').value = item.quantity || '';
+                        document.getElementById('capitalMarketsPurchasePrice').value = item.purchasePrice || '';
+                        document.getElementById('capitalMarketsCurrentPrice').value = item.currentPrice || '';
+                        document.getElementById('capitalMarketsMonthlyInvestment').value = item.monthlyInvestment || '';
+                        document.getElementById('capitalMarketsRiskLevel').value = item.riskLevel || 'medium';
+                        openModal('capitalMarketsModal');
                         break;
                     case 'realEstate':
                         document.getElementById('realEstateName').value = item.name || '';
@@ -2091,8 +2813,17 @@
                         document.getElementById('depositBank').value = item.bank || '';
                         document.getElementById('depositType').value = item.type || '';
                         document.getElementById('depositBalance').value = item.balance || '';
+                        document.getElementById('depositTerms').value = item.terms || '';
                         document.getElementById('depositInterestRate').value = item.interestRate || '';
                         document.getElementById('depositLockupPeriod').value = item.lockupPeriod || '';
+                        
+                        // Show advanced fields if needed
+                        if (item.type === 'savings' || item.type === 'term_deposit') {
+                            document.getElementById('depositAdvancedFields').style.display = 'grid';
+                            if (item.type === 'term_deposit') {
+                                document.getElementById('lockupGroup').style.display = 'block';
+                            }
+                        }
                         openModal('depositModal');
                         break;
                     case 'loans':
@@ -2144,6 +2875,18 @@
 
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Language and Currency controls
+            document.getElementById('languageSelect').addEventListener('change', function() {
+                currentLanguage = this.value;
+                updateLanguage();
+                loadAllData(); // Reload to update translations
+            });
+
+            document.getElementById('currencySelect').addEventListener('change', function() {
+                currentCurrency = this.value;
+                loadAllData(); // Reload to update currency display
+            });
+
             // Navigation
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => {
@@ -2168,26 +2911,62 @@
                 await registerWithEmail();
             };
 
-            // Investment Form
-            document.getElementById('investmentForm').onsubmit = async (e) => {
+            // Deposit type change handler
+            document.getElementById('depositType').addEventListener('change', function() {
+                const advancedFields = document.getElementById('depositAdvancedFields');
+                const lockupGroup = document.getElementById('lockupGroup');
+                
+                if (this.value === 'savings' || this.value === 'term_deposit') {
+                    advancedFields.style.display = 'grid';
+                    if (this.value === 'term_deposit') {
+                        lockupGroup.style.display = 'block';
+                    } else {
+                        lockupGroup.style.display = 'none';
+                    }
+                } else {
+                    advancedFields.style.display = 'none';
+                }
+            });
+
+            // Form submission handlers
+            setupFormHandlers();
+
+            // Modal close events
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.add('hidden');
+                    clearForms();
+                    editingId = null;
+                    editingType = null;
+                }
+            });
+
+            // Initialize the app
+            initializeAuth();
+            updateLanguage();
+        });
+
+        function setupFormHandlers() {
+            // Capital Markets Form
+            document.getElementById('capitalMarketsForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const data = {
-                    name: document.getElementById('investmentName').value,
-                    type: document.getElementById('investmentType').value,
-                    quantity: parseFloat(document.getElementById('investmentQuantity').value),
-                    purchasePrice: parseFloat(document.getElementById('investmentPurchasePrice').value),
-                    currentPrice: parseFloat(document.getElementById('investmentCurrentPrice').value) || null,
-                    currentValue: parseFloat(document.getElementById('investmentCurrentValue').value) || null,
-                    monthlyInvestment: parseFloat(document.getElementById('investmentMonthlyInvestment').value) || null
+                    name: document.getElementById('capitalMarketsName').value,
+                    type: document.getElementById('capitalMarketsType').value,
+                    quantity: parseFloat(document.getElementById('capitalMarketsQuantity').value),
+                    purchasePrice: parseFloat(document.getElementById('capitalMarketsPurchasePrice').value),
+                    currentPrice: parseFloat(document.getElementById('capitalMarketsCurrentPrice').value) || null,
+                    monthlyInvestment: parseFloat(document.getElementById('capitalMarketsMonthlyInvestment').value) || null,
+                    riskLevel: document.getElementById('capitalMarketsRiskLevel').value
                 };
 
                 try {
-                    if (editingId && editingType === 'investments') {
-                        await updateData('investments', editingId, data);
+                    if (editingId && editingType === 'capitalMarkets') {
+                        await updateData('capitalMarkets', editingId, data);
                     } else {
-                        await addData('investments', data);
+                        await addData('capitalMarkets', data);
                     }
-                    closeModal('investmentModal');
+                    closeModal('capitalMarketsModal');
                     loadAllData();
                 } catch (error) {
                     alert('Σφάλμα: ' + error.message);
@@ -2226,6 +3005,7 @@
                     bank: document.getElementById('depositBank').value,
                     type: document.getElementById('depositType').value,
                     balance: parseFloat(document.getElementById('depositBalance').value),
+                    terms: document.getElementById('depositTerms').value || null,
                     interestRate: parseFloat(document.getElementById('depositInterestRate').value) || null,
                     lockupPeriod: parseInt(document.getElementById('depositLockupPeriod').value) || null
                 };
@@ -2335,20 +3115,7 @@
                     alert('Σφάλμα: ' + error.message);
                 }
             };
-
-            // Modal close events
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('modal')) {
-                    e.target.classList.add('hidden');
-                    clearForms();
-                    editingId = null;
-                    editingType = null;
-                }
-            });
-
-            // Initialize the app
-            initializeAuth();
-        });
+        }
 
         // Global functions for onclick handlers
         window.editItem = editItem;
@@ -2358,4 +3125,3 @@
     </script>
 </body>
 </html>
-                    
