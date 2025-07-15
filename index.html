@@ -12,6 +12,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"></script>
     
     <style>
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -33,6 +35,59 @@
         .risk-low { background: #10b981; }
         .risk-medium { background: #f59e0b; }
         .risk-high { background: #ef4444; }
+        
+        /* AI Insights Styling */
+        .ai-insight {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba240 100%);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .ai-insight:hover {
+            background: linear-gradient(135deg, #667eea30 0%, #764ba250 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        /* Chart Container Styling */
+        .chart-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Sankey specific styles */
+        .sankey-node rect {
+            stroke: #000;
+            stroke-width: 1px;
+            cursor: pointer;
+        }
+        .sankey-link {
+            fill: none;
+            stroke-opacity: 0.6;
+            cursor: pointer;
+        }
+        .sankey-link:hover {
+            stroke-opacity: 0.8;
+        }
+        
+        /* Interactive elements */
+        .interactive-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Edit button styling */
+        .edit-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .item-row:hover .edit-btn {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -175,9 +230,24 @@
             <main class="p-6">
                 <!-- Dashboard Tab -->
                 <div id="dashboard-content" class="tab-content active">
+                    <!-- AI Insights Panel -->
+                    <div class="mb-8">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="p-2 bg-purple-100 rounded-lg">
+                                    <i data-lucide="brain" class="w-5 h-5 text-purple-600"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900" data-translate="ai.insights_title">AI Financial Insights</h3>
+                            </div>
+                            <div id="aiInsightsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- AI insights will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Key Metrics -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 interactive-card">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-500" data-translate="dashboard.net_worth">Net Worth</p>
@@ -190,7 +260,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 interactive-card">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-500" data-translate="dashboard.total_assets">Total Assets</p>
@@ -203,7 +273,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 interactive-card">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-500" data-translate="dashboard.invested_capital">Invested Capital</p>
@@ -216,7 +286,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 interactive-card">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-500" data-translate="dashboard.monthly_balance">Monthly Balance</p>
@@ -226,6 +296,25 @@
                                 <div class="p-3 bg-yellow-50 rounded-xl">
                                     <i data-lucide="calculator" class="w-6 h-6 text-yellow-600"></i>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Asset Allocation Pie Chart -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 chart-container">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="dashboard.asset_allocation">Asset Allocation</h3>
+                            <div class="h-64">
+                                <canvas id="assetAllocationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Risk Distribution -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 chart-container">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="dashboard.risk_distribution">Risk Distribution</h3>
+                            <div class="h-64">
+                                <canvas id="riskDistributionChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -458,8 +547,16 @@
                 <!-- Cash Flow Analysis Tab -->
                 <div id="cashflow-analysis-content" class="tab-content">
                     <div class="space-y-6">
+                        <!-- Interactive Sankey Diagram -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 chart-container">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="cashflow.sankey_title">Interactive Cash Flow Diagram</h3>
+                            <div class="h-96" id="sankeyDiagram">
+                                <!-- Sankey diagram will be rendered here -->
+                            </div>
+                        </div>
+
                         <!-- Cash Flow Chart -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 chart-container">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="cashflow.chart_title">Monthly Cash Flow Analysis</h3>
                             <div class="h-64">
                                 <canvas id="cashFlowChart"></canvas>
@@ -468,15 +565,15 @@
 
                         <!-- Cash Flow Summary -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 interactive-card">
                                 <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.total_income">Total Monthly Income</h4>
                                 <p class="text-2xl font-bold text-green-600" id="totalMonthlyIncome">€0</p>
                             </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 interactive-card">
                                 <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.total_expenses">Total Monthly Expenses</h4>
                                 <p class="text-2xl font-bold text-red-600" id="totalMonthlyExpenses">€0</p>
                             </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 interactive-card">
                                 <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.net_flow">Net Cash Flow</h4>
                                 <p class="text-2xl font-bold" id="netCashFlow">€0</p>
                             </div>
@@ -553,6 +650,9 @@
                 'dashboard.low_risk': 'Low Risk',
                 'dashboard.medium_risk': 'Medium Risk',
                 'dashboard.high_risk': 'High Risk',
+                'dashboard.asset_allocation': 'Asset Allocation',
+                'dashboard.risk_distribution': 'Risk Distribution',
+                'ai.insights_title': 'AI Financial Insights',
                 'common.add_investment': 'Add Investment',
                 'common.add_property': 'Add Property',
                 'common.add_account': 'Add Account',
@@ -561,7 +661,8 @@
                 'common.add_income': 'Add Income',
                 'common.add_expense': 'Add Expense',
                 'common.cancel': 'Cancel',
-                'common.save': 'Save'
+                'common.save': 'Save',
+                'common.edit': 'Edit'
             },
             el: {
                 'login.subtitle': 'Συνδεθείτε για να διαχειριστείτε τα οικονομικά σας',
@@ -600,6 +701,9 @@
                 'dashboard.low_risk': 'Χαμηλός Κίνδυνος',
                 'dashboard.medium_risk': 'Μέτριος Κίνδυνος',
                 'dashboard.high_risk': 'Υψηλός Κίνδυνος',
+                'dashboard.asset_allocation': 'Κατανομή Περιουσιακών',
+                'dashboard.risk_distribution': 'Κατανομή Κινδύνου',
+                'ai.insights_title': 'Οικονομικές Γνώσεις AI',
                 'common.add_investment': 'Προσθήκη Επένδυσης',
                 'common.add_property': 'Προσθήκη Ακινήτου',
                 'common.add_account': 'Προσθήκη Λογαριασμού',
@@ -608,7 +712,8 @@
                 'common.add_income': 'Προσθήκη Εισοδήματος',
                 'common.add_expense': 'Προσθήκη Εξόδου',
                 'common.cancel': 'Ακύρωση',
-                'common.save': 'Αποθήκευση'
+                'common.save': 'Αποθήκευση',
+                'common.edit': 'Επεξεργασία'
             }
         };
 
@@ -640,6 +745,12 @@
         let currentCurrency = 'EUR';
         let isDemoMode = false;
         let currentLanguage = 'en';
+        let editingItem = null;
+
+        // Chart instances for cleanup
+        let assetAllocationChartInstance = null;
+        let riskDistributionChartInstance = null;
+        let cashFlowChartInstance = null;
 
         // 🌍 TRANSLATION SYSTEM
         function translate() {
@@ -672,17 +783,36 @@
                 try {
                     if (!isDemoMode && currentUser && db) {
                         // Save to Firebase
-                        const docRef = await db.collection('users').doc(currentUser.uid).collection(type).add(data);
-                        data.id = docRef.id;
-                        console.log('✅ Saved to Firebase:', type, data.id);
+                        if (data.id) {
+                            // Update existing
+                            await db.collection('users').doc(currentUser.uid).collection(type).doc(data.id).set(data);
+                            console.log('✅ Updated in Firebase:', type, data.id);
+                        } else {
+                            // Create new
+                            const docRef = await db.collection('users').doc(currentUser.uid).collection(type).add(data);
+                            data.id = docRef.id;
+                            console.log('✅ Saved to Firebase:', type, data.id);
+                        }
                     } else {
                         // Save to localStorage
                         const storageKey = this.getStorageKey(type);
                         const existingData = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                        data.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
-                        existingData.push(data);
+                        
+                        if (data.id) {
+                            // Update existing
+                            const index = existingData.findIndex(item => item.id === data.id);
+                            if (index !== -1) {
+                                existingData[index] = data;
+                            }
+                            console.log('✅ Updated in localStorage:', storageKey, data.id);
+                        } else {
+                            // Create new
+                            data.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
+                            existingData.push(data);
+                            console.log('✅ Saved to localStorage:', storageKey, data.id);
+                        }
+                        
                         localStorage.setItem(storageKey, JSON.stringify(existingData));
-                        console.log('✅ Saved to localStorage:', storageKey, data.id);
                     }
                     return data;
                 } catch (error) {
@@ -737,6 +867,225 @@
             }
         }
 
+        // 🤖 AI INSIGHTS ENGINE
+        class AIInsights {
+            static async generateInsights() {
+                const [capitalMarkets, realEstate, bankAccounts, otherAssets, liabilities, income, expenses] = await Promise.all([
+                    DataManager.loadData('capital-markets'),
+                    DataManager.loadData('real-estate'),
+                    DataManager.loadData('bank-accounts'),
+                    DataManager.loadData('other-assets'),
+                    DataManager.loadData('liabilities'),
+                    DataManager.loadData('income'),
+                    DataManager.loadData('expenses')
+                ]);
+
+                const insights = [];
+
+                // Portfolio Diversification Analysis
+                const assetTypes = [
+                    capitalMarkets.length > 0 ? 'capital_markets' : null,
+                    realEstate.length > 0 ? 'real_estate' : null,
+                    bankAccounts.length > 0 ? 'bank_accounts' : null,
+                    otherAssets.length > 0 ? 'other_assets' : null
+                ].filter(Boolean);
+
+                if (assetTypes.length < 3) {
+                    insights.push({
+                        type: 'warning',
+                        icon: 'alert-triangle',
+                        title: 'Diversification Alert',
+                        message: 'Consider diversifying across more asset classes to reduce risk.',
+                        priority: 'high'
+                    });
+                } else {
+                    insights.push({
+                        type: 'success',
+                        icon: 'check-circle',
+                        title: 'Well Diversified',
+                        message: 'Your portfolio shows good diversification across asset classes.',
+                        priority: 'medium'
+                    });
+                }
+
+                // Risk Analysis
+                let highRiskAssets = 0;
+                capitalMarkets.forEach(item => {
+                    if (item.riskLevel === 'high') {
+                        const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                        highRiskAssets += value;
+                    }
+                });
+
+                const totalAssets = await this.calculateTotalAssets();
+                const highRiskPercentage = totalAssets > 0 ? (highRiskAssets / totalAssets) * 100 : 0;
+
+                if (highRiskPercentage > 30) {
+                    insights.push({
+                        type: 'warning',
+                        icon: 'trending-down',
+                        title: 'High Risk Exposure',
+                        message: `${highRiskPercentage.toFixed(1)}% of your portfolio is in high-risk assets.`,
+                        priority: 'high'
+                    });
+                }
+
+                // Cash Flow Analysis
+                const totalIncome = income.reduce((sum, item) => sum + (item.afterTaxAmount || item.monthlyAmount || 0), 0);
+                const totalExpenses = expenses.reduce((sum, item) => {
+                    let monthlyAmount = item.amount || 0;
+                    if (item.frequency === 'weekly') monthlyAmount *= 4.33;
+                    else if (item.frequency === 'yearly') monthlyAmount /= 12;
+                    else if (item.frequency === 'daily') monthlyAmount *= 30;
+                    return sum + monthlyAmount;
+                }, 0);
+
+                const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
+
+                if (savingsRate < 20) {
+                    insights.push({
+                        type: 'info',
+                        icon: 'piggy-bank',
+                        title: 'Savings Opportunity',
+                        message: `Your savings rate is ${savingsRate.toFixed(1)}%. Aim for 20%+ for better financial health.`,
+                        priority: 'medium'
+                    });
+                } else {
+                    insights.push({
+                        type: 'success',
+                        icon: 'trending-up',
+                        title: 'Excellent Savings Rate',
+                        message: `Your ${savingsRate.toFixed(1)}% savings rate is above the recommended 20%.`,
+                        priority: 'low'
+                    });
+                }
+
+                // Emergency Fund Analysis
+                const liquidAssets = bankAccounts.reduce((sum, account) => sum + (account.balance || 0), 0);
+                const emergencyFundMonths = totalExpenses > 0 ? liquidAssets / totalExpenses : 0;
+
+                if (emergencyFundMonths < 3) {
+                    insights.push({
+                        type: 'warning',
+                        icon: 'shield-alert',
+                        title: 'Emergency Fund Low',
+                        message: `You have ${emergencyFundMonths.toFixed(1)} months of expenses saved. Aim for 3-6 months.`,
+                        priority: 'high'
+                    });
+                }
+
+                // Investment Performance Insights
+                let totalInvested = 0;
+                let totalCurrentValue = 0;
+
+                capitalMarkets.forEach(item => {
+                    const invested = item.quantity * item.purchasePrice || item.monthlyInvestment * 12 || 0;
+                    const current = item.currentValue || invested;
+                    totalInvested += invested;
+                    totalCurrentValue += current;
+                });
+
+                const performancePercent = totalInvested > 0 ? ((totalCurrentValue - totalInvested) / totalInvested) * 100 : 0;
+
+                if (performancePercent > 10) {
+                    insights.push({
+                        type: 'success',
+                        icon: 'trophy',
+                        title: 'Strong Performance',
+                        message: `Your investments are up ${performancePercent.toFixed(1)}% from purchase price.`,
+                        priority: 'low'
+                    });
+                } else if (performancePercent < -10) {
+                    insights.push({
+                        type: 'info',
+                        icon: 'info',
+                        title: 'Market Volatility',
+                        message: `Your investments are down ${Math.abs(performancePercent).toFixed(1)}%. Stay patient for long-term gains.`,
+                        priority: 'medium'
+                    });
+                }
+
+                return insights.sort((a, b) => {
+                    const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                });
+            }
+
+            static async calculateTotalAssets() {
+                const [capitalMarkets, realEstate, bankAccounts, otherAssets] = await Promise.all([
+                    DataManager.loadData('capital-markets'),
+                    DataManager.loadData('real-estate'),
+                    DataManager.loadData('bank-accounts'),
+                    DataManager.loadData('other-assets')
+                ]);
+
+                let total = 0;
+                
+                capitalMarkets.forEach(item => {
+                    const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                    total += value || 0;
+                });
+
+                realEstate.forEach(item => {
+                    total += item.currentValue || item.purchasePrice || 0;
+                });
+
+                bankAccounts.forEach(item => {
+                    total += item.balance || 0;
+                });
+
+                otherAssets.forEach(item => {
+                    total += item.currentValue || item.purchasePrice || 0;
+                });
+
+                return total;
+            }
+
+            static async renderInsights() {
+                const insights = await this.generateInsights();
+                const container = document.getElementById('aiInsightsContainer');
+
+                if (!container) return;
+
+                if (insights.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center text-gray-500 py-4">
+                            <i data-lucide="brain" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                            <p>Add some financial data to get AI insights!</p>
+                        </div>
+                    `;
+                    createIcons();
+                    return;
+                }
+
+                let insightsHtml = '';
+                insights.forEach(insight => {
+                    const colorClass = {
+                        'success': 'text-green-600 bg-green-50 border-green-200',
+                        'warning': 'text-amber-600 bg-amber-50 border-amber-200',
+                        'info': 'text-blue-600 bg-blue-50 border-blue-200'
+                    }[insight.type];
+
+                    insightsHtml += `
+                        <div class="ai-insight p-4 rounded-lg border ${colorClass}">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 mt-1">
+                                    <i data-lucide="${insight.icon}" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-sm mb-1">${insight.title}</h4>
+                                    <p class="text-sm opacity-90">${insight.message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = insightsHtml;
+                createIcons();
+            }
+        }
+
         // 🛠️ UTILITY FUNCTIONS
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-EU', {
@@ -764,6 +1113,420 @@
         function createIcons() {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
                 lucide.createIcons();
+            }
+        }
+
+        // 📊 ADVANCED CHARTS SYSTEM
+        class ChartManager {
+            static async createAssetAllocationChart() {
+                const ctx = document.getElementById('assetAllocationChart');
+                if (!ctx) return;
+
+                const [capitalMarkets, realEstate, bankAccounts, otherAssets] = await Promise.all([
+                    DataManager.loadData('capital-markets'),
+                    DataManager.loadData('real-estate'),
+                    DataManager.loadData('bank-accounts'),
+                    DataManager.loadData('other-assets')
+                ]);
+
+                // Calculate totals
+                let totalCapitalMarkets = 0;
+                let totalRealEstate = 0;
+                let totalBankAccounts = 0;
+                let totalOtherAssets = 0;
+
+                capitalMarkets.forEach(item => {
+                    const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                    totalCapitalMarkets += value || 0;
+                });
+
+                realEstate.forEach(item => {
+                    totalRealEstate += item.currentValue || item.purchasePrice || 0;
+                });
+
+                bankAccounts.forEach(item => {
+                    totalBankAccounts += item.balance || 0;
+                });
+
+                otherAssets.forEach(item => {
+                    totalOtherAssets += item.currentValue || item.purchasePrice || 0;
+                });
+
+                // Destroy existing chart
+                if (assetAllocationChartInstance) {
+                    assetAllocationChartInstance.destroy();
+                }
+
+                assetAllocationChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Capital Markets', 'Real Estate', 'Bank Accounts', 'Other Assets'],
+                        datasets: [{
+                            data: [totalCapitalMarkets, totalRealEstate, totalBankAccounts, totalOtherAssets],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(147, 51, 234, 0.8)',
+                                'rgba(99, 102, 241, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(59, 130, 246)',
+                                'rgb(34, 197, 94)',
+                                'rgb(147, 51, 234)',
+                                'rgb(99, 102, 241)'
+                            ],
+                            borderWidth: 2,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = formatCurrency(context.parsed);
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        animation: {
+                            animateRotate: true,
+                            duration: 1000
+                        }
+                    }
+                });
+            }
+
+            static async createRiskDistributionChart() {
+                const ctx = document.getElementById('riskDistributionChart');
+                if (!ctx) return;
+
+                const [capitalMarkets, realEstate, bankAccounts, otherAssets] = await Promise.all([
+                    DataManager.loadData('capital-markets'),
+                    DataManager.loadData('real-estate'),
+                    DataManager.loadData('bank-accounts'),
+                    DataManager.loadData('other-assets')
+                ]);
+
+                // Calculate risk distribution
+                let lowRisk = 0;
+                let mediumRisk = 0;
+                let highRisk = 0;
+
+                // Capital markets by risk level
+                capitalMarkets.forEach(item => {
+                    const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                    if (item.riskLevel === 'low') lowRisk += value || 0;
+                    else if (item.riskLevel === 'medium') mediumRisk += value || 0;
+                    else if (item.riskLevel === 'high') highRisk += value || 0;
+                });
+
+                // Real estate is medium risk
+                realEstate.forEach(item => {
+                    mediumRisk += item.currentValue || item.purchasePrice || 0;
+                });
+
+                // Bank accounts are low risk
+                bankAccounts.forEach(item => {
+                    lowRisk += item.balance || 0;
+                });
+
+                // Other assets are medium risk
+                otherAssets.forEach(item => {
+                    mediumRisk += item.currentValue || item.purchasePrice || 0;
+                });
+
+                // Destroy existing chart
+                if (riskDistributionChartInstance) {
+                    riskDistributionChartInstance.destroy();
+                }
+
+                riskDistributionChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                        datasets: [{
+                            label: 'Amount',
+                            data: [lowRisk, mediumRisk, highRisk],
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(34, 197, 94)',
+                                'rgb(245, 158, 11)',
+                                'rgb(239, 68, 68)'
+                            ],
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return formatCurrency(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            }
+
+            static async createSankeyDiagram() {
+                const container = document.getElementById('sankeyDiagram');
+                if (!container) return;
+
+                const [income, expenses] = await Promise.all([
+                    DataManager.loadData('income'),
+                    DataManager.loadData('expenses')
+                ]);
+
+                // Clear previous content
+                container.innerHTML = '';
+
+                if (income.length === 0 && expenses.length === 0) {
+                    container.innerHTML = `
+                        <div class="flex items-center justify-center h-full text-gray-500">
+                            <div class="text-center">
+                                <i data-lucide="bar-chart-3" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+                                <p>Add income and expenses to see cash flow diagram</p>
+                            </div>
+                        </div>
+                    `;
+                    createIcons();
+                    return;
+                }
+
+                // Prepare Sankey data
+                const nodes = [];
+                const links = [];
+                let nodeIndex = 0;
+
+                // Add income nodes
+                const incomeNodes = {};
+                income.forEach(item => {
+                    const amount = item.afterTaxAmount || item.monthlyAmount || 0;
+                    if (amount > 0) {
+                        nodes.push({ name: item.name, id: nodeIndex });
+                        incomeNodes[item.name] = nodeIndex;
+                        nodeIndex++;
+                    }
+                });
+
+                // Add "Total Income" node
+                const totalIncomeIndex = nodeIndex++;
+                nodes.push({ name: 'Total Income', id: totalIncomeIndex });
+
+                // Add expense categories
+                const expenseCategories = {};
+                const categoryTotals = {};
+
+                expenses.forEach(item => {
+                    let monthlyAmount = item.amount || 0;
+                    if (item.frequency === 'weekly') monthlyAmount *= 4.33;
+                    else if (item.frequency === 'yearly') monthlyAmount /= 12;
+                    else if (item.frequency === 'daily') monthlyAmount *= 30;
+
+                    if (monthlyAmount > 0) {
+                        const category = item.category || 'Other';
+                        if (!expenseCategories[category]) {
+                            expenseCategories[category] = nodeIndex;
+                            nodes.push({ name: category.charAt(0).toUpperCase() + category.slice(1), id: nodeIndex });
+                            categoryTotals[category] = 0;
+                            nodeIndex++;
+                        }
+                        categoryTotals[category] += monthlyAmount;
+                    }
+                });
+
+                // Calculate total income
+                const totalIncome = income.reduce((sum, item) => sum + (item.afterTaxAmount || item.monthlyAmount || 0), 0);
+                const totalExpenses = Object.values(categoryTotals).reduce((sum, amount) => sum + amount, 0);
+
+                // Add savings/surplus node if there's leftover money
+                let savingsIndex = null;
+                if (totalIncome > totalExpenses) {
+                    savingsIndex = nodeIndex++;
+                    nodes.push({ name: 'Savings/Surplus', id: savingsIndex });
+                }
+
+                // Create links from income sources to total income
+                income.forEach(item => {
+                    const amount = item.afterTaxAmount || item.monthlyAmount || 0;
+                    if (amount > 0) {
+                        links.push({
+                            source: incomeNodes[item.name],
+                            target: totalIncomeIndex,
+                            value: amount
+                        });
+                    }
+                });
+
+                // Create links from total income to expense categories
+                Object.entries(categoryTotals).forEach(([category, amount]) => {
+                    links.push({
+                        source: totalIncomeIndex,
+                        target: expenseCategories[category],
+                        value: amount
+                    });
+                });
+
+                // Create link to savings if there's surplus
+                if (savingsIndex !== null && totalIncome > totalExpenses) {
+                    links.push({
+                        source: totalIncomeIndex,
+                        target: savingsIndex,
+                        value: totalIncome - totalExpenses
+                    });
+                }
+
+                // Set up D3 Sankey
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+
+                const svg = d3.select(container)
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                const sankey = d3.sankey()
+                    .nodeWidth(15)
+                    .nodePadding(10)
+                    .extent([[1, 1], [width - 1, height - 6]]);
+
+                const graph = sankey({
+                    nodes: nodes.map(d => Object.assign({}, d)),
+                    links: links.map(d => Object.assign({}, d))
+                });
+
+                // Color scale
+                const color = d3.scaleOrdinal()
+                    .domain(['income', 'total', 'expense', 'savings'])
+                    .range(['#3b82f6', '#6366f1', '#ef4444', '#10b981']);
+
+                // Draw links
+                svg.append('g')
+                    .selectAll('path')
+                    .data(graph.links)
+                    .join('path')
+                    .attr('class', 'sankey-link')
+                    .attr('d', d3.sankeyLinkHorizontal())
+                    .attr('stroke', d => color('expense'))
+                    .attr('stroke-width', d => Math.max(1, d.width))
+                    .attr('opacity', 0.6)
+                    .on('mouseover', function(event, d) {
+                        d3.select(this).attr('opacity', 0.8);
+                        // Show tooltip
+                        const tooltip = d3.select('body').append('div')
+                            .attr('class', 'tooltip')
+                            .style('position', 'absolute')
+                            .style('background', 'rgba(0,0,0,0.8)')
+                            .style('color', 'white')
+                            .style('padding', '8px')
+                            .style('border-radius', '4px')
+                            .style('font-size', '12px')
+                            .style('pointer-events', 'none')
+                            .style('opacity', 0);
+
+                        tooltip.transition().duration(200).style('opacity', 1);
+                        tooltip.html(`${d.source.name} → ${d.target.name}<br/>${formatCurrency(d.value)}`)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 10) + 'px');
+                    })
+                    .on('mouseout', function() {
+                        d3.select(this).attr('opacity', 0.6);
+                        d3.selectAll('.tooltip').remove();
+                    });
+
+                // Draw nodes
+                svg.append('g')
+                    .selectAll('rect')
+                    .data(graph.nodes)
+                    .join('rect')
+                    .attr('class', 'sankey-node')
+                    .attr('x', d => d.x0)
+                    .attr('y', d => d.y0)
+                    .attr('height', d => d.y1 - d.y0)
+                    .attr('width', d => d.x1 - d.x0)
+                    .attr('fill', d => {
+                        if (d.name === 'Total Income') return color('total');
+                        if (d.name === 'Savings/Surplus') return color('savings');
+                        if (Object.keys(incomeNodes).includes(d.name)) return color('income');
+                        return color('expense');
+                    })
+                    .on('mouseover', function(event, d) {
+                        const tooltip = d3.select('body').append('div')
+                            .attr('class', 'tooltip')
+                            .style('position', 'absolute')
+                            .style('background', 'rgba(0,0,0,0.8)')
+                            .style('color', 'white')
+                            .style('padding', '8px')
+                            .style('border-radius', '4px')
+                            .style('font-size', '12px')
+                            .style('pointer-events', 'none')
+                            .style('opacity', 0);
+
+                        tooltip.transition().duration(200).style('opacity', 1);
+                        tooltip.html(`${d.name}<br/>${formatCurrency(d.value)}`)
+                            .style('left', (event.pageX + 10) + 'px')
+                            .style('top', (event.pageY - 10) + 'px');
+                    })
+                    .on('mouseout', function() {
+                        d3.selectAll('.tooltip').remove();
+                    });
+
+                // Add labels
+                svg.append('g')
+                    .selectAll('text')
+                    .data(graph.nodes)
+                    .join('text')
+                    .attr('x', d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+                    .attr('y', d => (d.y1 + d.y0) / 2)
+                    .attr('dy', '0.35em')
+                    .attr('text-anchor', d => d.x0 < width / 2 ? 'start' : 'end')
+                    .style('font-size', '12px')
+                    .style('font-weight', '500')
+                    .text(d => d.name);
             }
         }
 
@@ -833,272 +1596,273 @@
             }
         }
 
-        // 📋 MODAL SYSTEM
-        function openModal(type) {
-            console.log('🎯 Opening modal for:', type);
+        // 📋 MODAL SYSTEM WITH EDIT FUNCTIONALITY
+        function openModal(type, itemToEdit = null) {
+            console.log('🎯 Opening modal for:', type, itemToEdit ? 'EDIT MODE' : 'CREATE MODE');
             
+            editingItem = itemToEdit;
             const modal = document.getElementById('addModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
 
             const modalConfigs = {
                 'capital-markets': {
-                    title: 'Add Capital Market Investment',
+                    title: itemToEdit ? 'Edit Investment' : 'Add Capital Market Investment',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Investment Name</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Apple Stock, Bitcoin" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Apple Stock, Bitcoin" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                                 <select id="form_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="stock">Stock</option>
-                                    <option value="etf">ETF</option>
-                                    <option value="crypto">Cryptocurrency</option>
-                                    <option value="bond">Bond</option>
-                                    <option value="mutual_fund">Mutual Fund</option>
-                                    <option value="life_insurance">Life Insurance</option>
+                                    <option value="stock" ${itemToEdit?.type === 'stock' ? 'selected' : ''}>Stock</option>
+                                    <option value="etf" ${itemToEdit?.type === 'etf' ? 'selected' : ''}>ETF</option>
+                                    <option value="crypto" ${itemToEdit?.type === 'crypto' ? 'selected' : ''}>Cryptocurrency</option>
+                                    <option value="bond" ${itemToEdit?.type === 'bond' ? 'selected' : ''}>Bond</option>
+                                    <option value="mutual_fund" ${itemToEdit?.type === 'mutual_fund' ? 'selected' : ''}>Mutual Fund</option>
+                                    <option value="life_insurance" ${itemToEdit?.type === 'life_insurance' ? 'selected' : ''}>Life Insurance</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                    <input type="number" id="form_quantity" step="0.001" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="100">
+                                    <input type="number" id="form_quantity" step="0.001" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="100" value="${itemToEdit?.quantity || ''}">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
-                                    <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150.00">
+                                    <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150.00" value="${itemToEdit?.purchasePrice || ''}">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Current Value (optional)</label>
-                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="15500.00">
+                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="15500.00" value="${itemToEdit?.currentValue || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Investment (for life insurance)</label>
-                                <input type="number" id="form_monthly_investment" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="600">
+                                <input type="number" id="form_monthly_investment" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="600" value="${itemToEdit?.monthlyInvestment || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
                                 <select id="form_risk_level" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="low">Low Risk</option>
-                                    <option value="medium">Medium Risk</option>
-                                    <option value="high">High Risk</option>
+                                    <option value="low" ${itemToEdit?.riskLevel === 'low' ? 'selected' : ''}>Low Risk</option>
+                                    <option value="medium" ${itemToEdit?.riskLevel === 'medium' ? 'selected' : ''}>Medium Risk</option>
+                                    <option value="high" ${itemToEdit?.riskLevel === 'high' ? 'selected' : ''}>High Risk</option>
                                 </select>
                             </div>
                         </div>
                     `
                 },
                 'real-estate': {
-                    title: 'Add Real Estate Property',
+                    title: itemToEdit ? 'Edit Property' : 'Add Real Estate Property',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Property Name</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Downtown Apartment" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Downtown Apartment" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                                 <select id="form_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="residential">Residential</option>
-                                    <option value="commercial">Commercial</option>
-                                    <option value="land">Land</option>
-                                    <option value="rental">Rental Property</option>
+                                    <option value="residential" ${itemToEdit?.type === 'residential' ? 'selected' : ''}>Residential</option>
+                                    <option value="commercial" ${itemToEdit?.type === 'commercial' ? 'selected' : ''}>Commercial</option>
+                                    <option value="land" ${itemToEdit?.type === 'land' ? 'selected' : ''}>Land</option>
+                                    <option value="rental" ${itemToEdit?.type === 'rental' ? 'selected' : ''}>Rental Property</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
-                                <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="250000" required>
+                                <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="250000" required value="${itemToEdit?.purchasePrice || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Current Value</label>
-                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="270000">
+                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="270000" value="${itemToEdit?.currentValue || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Rental Income (if applicable)</label>
-                                <input type="number" id="form_monthly_rental" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1200">
+                                <input type="number" id="form_monthly_rental" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1200" value="${itemToEdit?.monthlyRental || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                                <input type="text" id="form_location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Athens, Greece">
+                                <input type="text" id="form_location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Athens, Greece" value="${itemToEdit?.location || ''}">
                             </div>
                         </div>
                     `
                 },
                 'bank-accounts': {
-                    title: 'Add Bank Account',
+                    title: itemToEdit ? 'Edit Account' : 'Add Bank Account',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Main Checking Account" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Main Checking Account" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Bank</label>
-                                <input type="text" id="form_bank" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., National Bank">
+                                <input type="text" id="form_bank" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., National Bank" value="${itemToEdit?.bank || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
                                 <select id="form_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="checking">Checking</option>
-                                    <option value="savings">Savings</option>
-                                    <option value="deposit">Term Deposit</option>
-                                    <option value="business">Business</option>
+                                    <option value="checking" ${itemToEdit?.type === 'checking' ? 'selected' : ''}>Checking</option>
+                                    <option value="savings" ${itemToEdit?.type === 'savings' ? 'selected' : ''}>Savings</option>
+                                    <option value="deposit" ${itemToEdit?.type === 'deposit' ? 'selected' : ''}>Term Deposit</option>
+                                    <option value="business" ${itemToEdit?.type === 'business' ? 'selected' : ''}>Business</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Current Balance</label>
-                                <input type="number" id="form_balance" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="5000" required>
+                                <input type="number" id="form_balance" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="5000" required value="${itemToEdit?.balance || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
-                                <input type="number" id="form_interest_rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2.5">
+                                <input type="number" id="form_interest_rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2.5" value="${itemToEdit?.interestRate || ''}">
                             </div>
-                            <div id="termDepositFields" class="space-y-4 hidden">
+                            <div id="termDepositFields" class="space-y-4 ${itemToEdit?.type === 'deposit' ? '' : 'hidden'}">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Lock Period (months)</label>
-                                    <input type="number" id="form_lock_period" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12">
+                                    <input type="number" id="form_lock_period" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12" value="${itemToEdit?.lockPeriod || ''}">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Maturity Date</label>
-                                    <input type="date" id="form_maturity_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="date" id="form_maturity_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="${itemToEdit?.maturityDate || ''}">
                                 </div>
                             </div>
                         </div>
                     `
                 },
                 'other-assets': {
-                    title: 'Add Other Asset',
+                    title: itemToEdit ? 'Edit Asset' : 'Add Other Asset',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Asset Name</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Gold, Art, Vehicle" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Gold, Art, Vehicle" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                 <select id="form_category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="precious_metals">Precious Metals</option>
-                                    <option value="art_collectibles">Art & Collectibles</option>
-                                    <option value="vehicles">Vehicles</option>
-                                    <option value="business_assets">Business Assets</option>
-                                    <option value="other">Other</option>
+                                    <option value="precious_metals" ${itemToEdit?.category === 'precious_metals' ? 'selected' : ''}>Precious Metals</option>
+                                    <option value="art_collectibles" ${itemToEdit?.category === 'art_collectibles' ? 'selected' : ''}>Art & Collectibles</option>
+                                    <option value="vehicles" ${itemToEdit?.category === 'vehicles' ? 'selected' : ''}>Vehicles</option>
+                                    <option value="business_assets" ${itemToEdit?.category === 'business_assets' ? 'selected' : ''}>Business Assets</option>
+                                    <option value="other" ${itemToEdit?.category === 'other' ? 'selected' : ''}>Other</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
-                                <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10000" required>
+                                <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10000" required value="${itemToEdit?.purchasePrice || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Current Value</label>
-                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12000">
+                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12000" value="${itemToEdit?.currentValue || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea id="form_description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Additional details about this asset"></textarea>
+                                <textarea id="form_description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Additional details about this asset">${itemToEdit?.description || ''}</textarea>
                             </div>
                         </div>
                     `
                 },
                 'liabilities': {
-                    title: 'Add Liability/Debt',
+                    title: itemToEdit ? 'Edit Liability' : 'Add Liability/Debt',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Liability Name</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Home Mortgage" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Home Mortgage" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                                 <select id="form_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="mortgage">Mortgage</option>
-                                    <option value="loan">Personal Loan</option>
-                                    <option value="credit_card">Credit Card</option>
-                                    <option value="student_loan">Student Loan</option>
-                                    <option value="other">Other</option>
+                                    <option value="mortgage" ${itemToEdit?.type === 'mortgage' ? 'selected' : ''}>Mortgage</option>
+                                    <option value="loan" ${itemToEdit?.type === 'loan' ? 'selected' : ''}>Personal Loan</option>
+                                    <option value="credit_card" ${itemToEdit?.type === 'credit_card' ? 'selected' : ''}>Credit Card</option>
+                                    <option value="student_loan" ${itemToEdit?.type === 'student_loan' ? 'selected' : ''}>Student Loan</option>
+                                    <option value="other" ${itemToEdit?.type === 'other' ? 'selected' : ''}>Other</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Outstanding Balance</label>
-                                <input type="number" id="form_balance" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150000" required>
+                                <input type="number" id="form_balance" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150000" required value="${itemToEdit?.balance || ''}">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
-                                    <input type="number" id="form_interest_rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="3.5">
+                                    <input type="number" id="form_interest_rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="3.5" value="${itemToEdit?.interestRate || ''}">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Payment</label>
-                                    <input type="number" id="form_monthly_payment" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1200">
+                                    <input type="number" id="form_monthly_payment" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1200" value="${itemToEdit?.monthlyPayment || ''}">
                                 </div>
                             </div>
                         </div>
                     `
                 },
                 'income': {
-                    title: 'Add Income Source',
+                    title: itemToEdit ? 'Edit Income' : 'Add Income Source',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Income Source</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Salary, Freelance" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Salary, Freelance" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                                 <select id="form_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="salary">Salary</option>
-                                    <option value="freelance">Freelance</option>
-                                    <option value="business">Business</option>
-                                    <option value="rental">Rental Income</option>
-                                    <option value="dividends">Dividends</option>
-                                    <option value="other">Other</option>
+                                    <option value="salary" ${itemToEdit?.type === 'salary' ? 'selected' : ''}>Salary</option>
+                                    <option value="freelance" ${itemToEdit?.type === 'freelance' ? 'selected' : ''}>Freelance</option>
+                                    <option value="business" ${itemToEdit?.type === 'business' ? 'selected' : ''}>Business</option>
+                                    <option value="rental" ${itemToEdit?.type === 'rental' ? 'selected' : ''}>Rental Income</option>
+                                    <option value="dividends" ${itemToEdit?.type === 'dividends' ? 'selected' : ''}>Dividends</option>
+                                    <option value="other" ${itemToEdit?.type === 'other' ? 'selected' : ''}>Other</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Amount</label>
-                                <input type="number" id="form_monthly_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="3500" required>
+                                <input type="number" id="form_monthly_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="3500" required value="${itemToEdit?.monthlyAmount || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">After Tax Amount</label>
-                                <input type="number" id="form_after_tax_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2800">
+                                <input type="number" id="form_after_tax_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2800" value="${itemToEdit?.afterTaxAmount || ''}">
                             </div>
                         </div>
                     `
                 },
                 'expenses': {
-                    title: 'Add Expense',
+                    title: itemToEdit ? 'Edit Expense' : 'Add Expense',
                     form: `
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Expense Description</label>
-                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Groceries, Rent" required>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Groceries, Rent" required value="${itemToEdit?.name || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                                 <select id="form_category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="housing">Housing</option>
-                                    <option value="food">Food & Dining</option>
-                                    <option value="transportation">Transportation</option>
-                                    <option value="utilities">Utilities</option>
-                                    <option value="entertainment">Entertainment</option>
-                                    <option value="health">Health</option>
-                                    <option value="shopping">Shopping</option>
-                                    <option value="other">Other</option>
+                                    <option value="housing" ${itemToEdit?.category === 'housing' ? 'selected' : ''}>Housing</option>
+                                    <option value="food" ${itemToEdit?.category === 'food' ? 'selected' : ''}>Food & Dining</option>
+                                    <option value="transportation" ${itemToEdit?.category === 'transportation' ? 'selected' : ''}>Transportation</option>
+                                    <option value="utilities" ${itemToEdit?.category === 'utilities' ? 'selected' : ''}>Utilities</option>
+                                    <option value="entertainment" ${itemToEdit?.category === 'entertainment' ? 'selected' : ''}>Entertainment</option>
+                                    <option value="health" ${itemToEdit?.category === 'health' ? 'selected' : ''}>Health</option>
+                                    <option value="shopping" ${itemToEdit?.category === 'shopping' ? 'selected' : ''}>Shopping</option>
+                                    <option value="other" ${itemToEdit?.category === 'other' ? 'selected' : ''}>Other</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                                <input type="number" id="form_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="250" required>
+                                <input type="number" id="form_amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="250" required value="${itemToEdit?.amount || ''}">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
                                 <select id="form_frequency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="monthly">Monthly</option>
-                                    <option value="weekly">Weekly</option>
-                                    <option value="daily">Daily</option>
-                                    <option value="yearly">Yearly</option>
-                                    <option value="one-time">One-time</option>
+                                    <option value="monthly" ${itemToEdit?.frequency === 'monthly' ? 'selected' : ''}>Monthly</option>
+                                    <option value="weekly" ${itemToEdit?.frequency === 'weekly' ? 'selected' : ''}>Weekly</option>
+                                    <option value="daily" ${itemToEdit?.frequency === 'daily' ? 'selected' : ''}>Daily</option>
+                                    <option value="yearly" ${itemToEdit?.frequency === 'yearly' ? 'selected' : ''}>Yearly</option>
+                                    <option value="one-time" ${itemToEdit?.frequency === 'one-time' ? 'selected' : ''}>One-time</option>
                                 </select>
                             </div>
                         </div>
@@ -1137,16 +1901,17 @@
                 if (firstInput) firstInput.focus();
             }, 100);
 
-            console.log('✅ Modal opened for:', type);
+            console.log('✅ Modal opened for:', type, itemToEdit ? 'EDIT' : 'CREATE');
         }
 
         function closeModal() {
             const modal = document.getElementById('addModal');
             modal.classList.add('hidden');
             modal.removeAttribute('data-type');
+            editingItem = null;
         }
 
-        // 💾 SAVE SYSTEM
+        // 💾 SAVE SYSTEM WITH EDIT SUPPORT
         async function saveModalData() {
             const modal = document.getElementById('addModal');
             const saveBtn = document.getElementById('saveModal');
@@ -1163,13 +1928,19 @@
             saveBtn.disabled = true;
 
             try {
-                console.log('💾 Collecting form data for:', type);
+                console.log('💾 Collecting form data for:', type, editingItem ? 'UPDATE' : 'CREATE');
 
                 // Collect form data
                 const formData = {
-                    createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 };
+
+                // If editing, preserve original data and ID
+                if (editingItem) {
+                    Object.assign(formData, editingItem);
+                } else {
+                    formData.createdAt = new Date().toISOString();
+                }
 
                 // Get form values based on type
                 const nameField = document.getElementById('form_name');
@@ -1241,7 +2012,8 @@
                 const savedData = await DataManager.saveData(type, formData);
                 console.log('✅ Data saved successfully:', savedData);
 
-                showToast(`${type.replace('-', ' ')} added successfully!`, 'success');
+                const action = editingItem ? 'updated' : 'added';
+                showToast(`${type.replace('-', ' ')} ${action} successfully!`, 'success');
                 closeModal();
                 
                 // Refresh current view
@@ -1260,7 +2032,7 @@
             }
         }
 
-        // 📊 DATA RENDERING SYSTEM
+        // 📊 DATA RENDERING SYSTEM WITH EDIT BUTTONS
         async function renderTabContent(tabName) {
             console.log('🎨 Rendering content for:', tabName);
             
@@ -1317,7 +2089,7 @@
                 return;
             }
 
-            // Render data items
+            // Render data items with edit functionality
             let itemsHtml = '<div class="space-y-4">';
             
             data.forEach(item => {
@@ -1367,7 +2139,7 @@
                 }
 
                 itemsHtml += `
-                    <div class="bg-gray-50 rounded-lg p-4 flex justify-between items-center hover:bg-gray-100 transition-colors">
+                    <div class="bg-gray-50 rounded-lg p-4 flex justify-between items-center hover:bg-gray-100 transition-colors item-row">
                         <div class="flex items-center space-x-3">
                             ${riskIndicator}
                             <div>
@@ -1378,8 +2150,11 @@
                         <div class="text-right">
                             <p class="font-bold text-gray-900">${valueDisplay}</p>
                             <div class="flex space-x-2 mt-1">
-                                <button onclick="deleteItem('${tabName}', '${item.id}')" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                    Delete
+                                <button onclick="editItem('${tabName}', '${item.id}')" class="edit-btn text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteItem('${tabName}', '${item.id}')" class="edit-btn text-red-600 hover:text-red-800 text-sm font-medium">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
@@ -1389,6 +2164,7 @@
             
             itemsHtml += '</div>';
             container.innerHTML = itemsHtml;
+            createIcons();
 
             console.log('✅ Rendered', data.length, 'items for', tabName);
         }
@@ -1409,6 +2185,24 @@
             } catch (error) {
                 console.error('❌ Error deleting item:', error);
                 showToast('Error deleting item', 'error');
+            }
+        };
+
+        // ✏️ EDIT FUNCTION
+        window.editItem = async function(type, id) {
+            try {
+                const data = await DataManager.loadData(type);
+                const item = data.find(item => item.id === id);
+                
+                if (!item) {
+                    showToast('Item not found', 'error');
+                    return;
+                }
+
+                openModal(type, item);
+            } catch (error) {
+                console.error('❌ Error loading item for edit:', error);
+                showToast('Error loading item', 'error');
             }
         };
 
@@ -1548,15 +2342,18 @@
             document.getElementById('netCashFlow').textContent = formatCurrency(netCashFlow);
             document.getElementById('netCashFlow').className = `text-2xl font-bold ${netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`;
 
-            // Create chart
+            // Create Sankey diagram
+            await ChartManager.createSankeyDiagram();
+
+            // Create regular cash flow chart
             const ctx = document.getElementById('cashFlowChart');
             if (ctx) {
                 // Destroy existing chart if it exists
-                if (window.cashFlowChartInstance) {
-                    window.cashFlowChartInstance.destroy();
+                if (cashFlowChartInstance) {
+                    cashFlowChartInstance.destroy();
                 }
 
-                window.cashFlowChartInstance = new Chart(ctx, {
+                cashFlowChartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: ['Income', 'Expenses', 'Net Flow'],
@@ -1709,6 +2506,13 @@
                 document.getElementById('lowRiskTotal').textContent = formatCurrency(lowRiskTotal);
                 document.getElementById('mediumRiskTotal').textContent = formatCurrency(mediumRiskTotal);
                 document.getElementById('highRiskTotal').textContent = formatCurrency(highRiskTotal);
+
+                // Create advanced charts
+                await ChartManager.createAssetAllocationChart();
+                await ChartManager.createRiskDistributionChart();
+
+                // Generate AI insights
+                await AIInsights.renderInsights();
 
                 console.log('✅ Dashboard updated:', {
                     netWorth, totalAssets, monthlyBalance, investedCapital,
@@ -1879,7 +2683,7 @@
             }
         });
 
-        console.log('🎯 WealthTracker Pro script loaded successfully!');
+        console.log('🎯 WealthTracker Pro Advanced Analytics loaded successfully!');
     </script>
 </body>
 </html>
