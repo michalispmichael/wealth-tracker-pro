@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     
     <style>
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -23,6 +24,15 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .dropdown-menu { display: none; }
+        .dropdown-menu.active { display: block; }
+        .dropdown-item { padding: 8px 16px; cursor: pointer; transition: background 0.2s; }
+        .dropdown-item:hover { background: #f3f4f6; }
+        .dropdown-item.active { background: #3b82f6; color: white; }
+        .risk-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .risk-low { background: #10b981; }
+        .risk-medium { background: #f59e0b; }
+        .risk-high { background: #ef4444; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -43,7 +53,7 @@
                         <i data-lucide="trending-up" class="w-8 h-8 text-blue-600"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900">WealthTracker Pro</h2>
-                    <p class="text-gray-600 mt-2">Sign in to manage your finances</p>
+                    <p class="text-gray-600 mt-2" data-translate="login.subtitle">Sign in to manage your finances</p>
                 </div>
 
                 <div class="space-y-4">
@@ -54,11 +64,11 @@
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
-                        Continue with Google
+                        <span data-translate="login.google">Continue with Google</span>
                     </button>
                     
                     <div class="text-center mt-4">
-                        <button id="demoModeBtn" class="text-sm text-blue-600 hover:text-blue-800">Continue in Demo Mode</button>
+                        <button id="demoModeBtn" class="text-sm text-blue-600 hover:text-blue-800" data-translate="login.demo">Continue in Demo Mode</button>
                     </div>
                 </div>
             </div>
@@ -80,43 +90,68 @@
                     </div>
                 </div>
 
+                <!-- Language Toggle -->
+                <div class="px-4 py-2 border-b border-gray-200">
+                    <select id="languageSelect" class="w-full px-3 py-1 text-sm border border-gray-300 rounded">
+                        <option value="en">English</option>
+                        <option value="el">Ελληνικά</option>
+                    </select>
+                </div>
+
                 <!-- Navigation -->
                 <nav class="flex-1 px-4 py-4 space-y-2">
+                    <!-- Dashboard -->
                     <button data-tab="dashboard" class="nav-item active w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg">
                         <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                        <span>Dashboard</span>
+                        <span data-translate="nav.dashboard">Dashboard & Analytics</span>
                     </button>
-                    <button data-tab="capital-markets" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                        <span>Capital Markets</span>
-                    </button>
-                    <button data-tab="real-estate" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
-                        <i data-lucide="home" class="w-5 h-5"></i>
-                        <span>Real Estate</span>
-                    </button>
-                    <button data-tab="accounts" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
-                        <i data-lucide="credit-card" class="w-5 h-5"></i>
-                        <span>Bank Accounts</span>
-                    </button>
+
+                    <!-- Assets Dropdown -->
+                    <div class="relative">
+                        <button id="assetsDropdown" class="nav-item w-full flex items-center justify-between space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                <span data-translate="nav.assets">Assets</span>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div id="assetsDropdownMenu" class="dropdown-menu ml-6 mt-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div data-tab="capital-markets" class="dropdown-item text-sm" data-translate="nav.capital_markets">Capital Markets</div>
+                            <div data-tab="real-estate" class="dropdown-item text-sm" data-translate="nav.real_estate">Real Estate</div>
+                            <div data-tab="bank-accounts" class="dropdown-item text-sm" data-translate="nav.bank_accounts">Bank Accounts</div>
+                            <div data-tab="other-assets" class="dropdown-item text-sm" data-translate="nav.other_assets">Other Assets</div>
+                            <div data-tab="investments-overview" class="dropdown-item text-sm" data-translate="nav.investments_overview">Investments Overview</div>
+                        </div>
+                    </div>
+
+                    <!-- Liabilities -->
                     <button data-tab="liabilities" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
                         <i data-lucide="minus-circle" class="w-5 h-5"></i>
-                        <span>Liabilities</span>
+                        <span data-translate="nav.liabilities">Liabilities</span>
                     </button>
-                    <button data-tab="income" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
-                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
-                        <span>Income</span>
-                    </button>
-                    <button data-tab="expenses" class="nav-item w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
-                        <i data-lucide="receipt" class="w-5 h-5"></i>
-                        <span>Expenses</span>
-                    </button>
+
+                    <!-- Cash Flow Dropdown -->
+                    <div class="relative">
+                        <button id="cashflowDropdown" class="nav-item w-full flex items-center justify-between space-x-3 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                <span data-translate="nav.cash_flow">Cash Flow</span>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <div id="cashflowDropdownMenu" class="dropdown-menu ml-6 mt-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div data-tab="income" class="dropdown-item text-sm" data-translate="nav.income">Income</div>
+                            <div data-tab="expenses" class="dropdown-item text-sm" data-translate="nav.expenses">Expenses</div>
+                            <div data-tab="cashflow-analysis" class="dropdown-item text-sm" data-translate="nav.cashflow_analysis">Cash Flow Analysis</div>
+                        </div>
+                    </div>
                 </nav>
 
                 <!-- Logout -->
                 <div class="p-4 border-t">
                     <button id="logoutBtn" class="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>Logout</span>
+                        <span data-translate="nav.logout">Logout</span>
                     </button>
                 </div>
             </div>
@@ -129,14 +164,8 @@
                 <div class="px-6 py-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h1 class="text-2xl font-bold text-gray-900" id="pageTitle">Dashboard</h1>
-                            <p class="text-sm text-gray-500">Welcome to your financial overview</p>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <button id="addItemBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                                <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Item</span>
-                            </button>
+                            <h1 class="text-2xl font-bold text-gray-900" id="pageTitle" data-translate="dashboard.title">Dashboard & Analytics</h1>
+                            <p class="text-sm text-gray-500" id="pageSubtitle" data-translate="dashboard.subtitle">Welcome to your financial overview</p>
                         </div>
                     </div>
                 </div>
@@ -146,13 +175,14 @@
             <main class="p-6">
                 <!-- Dashboard Tab -->
                 <div id="dashboard-content" class="tab-content active">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Key Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-500">Net Worth</p>
+                                    <p class="text-sm font-medium text-gray-500" data-translate="dashboard.net_worth">Net Worth</p>
                                     <p class="text-2xl font-bold text-gray-900" id="netWorthValue">€0</p>
-                                    <p class="text-sm text-green-600 mt-1">Total Wealth</p>
+                                    <p class="text-sm text-green-600 mt-1" data-translate="dashboard.total_wealth">Total Wealth</p>
                                 </div>
                                 <div class="p-3 bg-blue-50 rounded-xl">
                                     <i data-lucide="trending-up" class="w-6 h-6 text-blue-600"></i>
@@ -163,9 +193,9 @@
                         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-500">Total Assets</p>
+                                    <p class="text-sm font-medium text-gray-500" data-translate="dashboard.total_assets">Total Assets</p>
                                     <p class="text-2xl font-bold text-gray-900" id="totalAssetsValue">€0</p>
-                                    <p class="text-sm text-gray-500 mt-1">All Holdings</p>
+                                    <p class="text-sm text-gray-500 mt-1" data-translate="dashboard.all_holdings">All Holdings</p>
                                 </div>
                                 <div class="p-3 bg-green-50 rounded-xl">
                                     <i data-lucide="arrow-up-right" class="w-6 h-6 text-green-600"></i>
@@ -176,35 +206,84 @@
                         <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-500">Monthly Balance</p>
-                                    <p class="text-2xl font-bold text-gray-900" id="monthlyBalanceValue">€0</p>
-                                    <p class="text-sm text-gray-500 mt-1">Income - Expenses</p>
+                                    <p class="text-sm font-medium text-gray-500" data-translate="dashboard.invested_capital">Invested Capital</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="investedCapitalValue">€0</p>
+                                    <p class="text-sm text-purple-600 mt-1" data-translate="dashboard.growth_potential">Growth Potential</p>
                                 </div>
                                 <div class="p-3 bg-purple-50 rounded-xl">
-                                    <i data-lucide="calculator" class="w-6 h-6 text-purple-600"></i>
+                                    <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500" data-translate="dashboard.monthly_balance">Monthly Balance</p>
+                                    <p class="text-2xl font-bold text-gray-900" id="monthlyBalanceValue">€0</p>
+                                    <p class="text-sm text-gray-500 mt-1" data-translate="dashboard.income_minus_expenses">Income - Expenses</p>
+                                </div>
+                                <div class="p-3 bg-yellow-50 rounded-xl">
+                                    <i data-lucide="calculator" class="w-6 h-6 text-yellow-600"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Portfolio Summary</h3>
-                        <div id="portfolioSummary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="text-center">
-                                <p class="text-sm text-gray-500">Capital Markets</p>
-                                <p class="text-xl font-bold text-blue-600" id="capitalMarketsTotal">€0</p>
+                    <!-- Portfolio Overview -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="dashboard.portfolio_breakdown">Portfolio Breakdown</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600" data-translate="dashboard.capital_markets">Capital Markets</span>
+                                    <span class="font-bold text-blue-600" id="capitalMarketsTotal">€0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600" data-translate="dashboard.real_estate">Real Estate</span>
+                                    <span class="font-bold text-green-600" id="realEstateTotal">€0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600" data-translate="dashboard.bank_accounts">Bank Accounts</span>
+                                    <span class="font-bold text-purple-600" id="bankAccountsTotal">€0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600" data-translate="dashboard.other_assets">Other Assets</span>
+                                    <span class="font-bold text-indigo-600" id="otherAssetsTotal">€0</span>
+                                </div>
+                                <div class="border-t pt-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600" data-translate="dashboard.total_liabilities">Total Liabilities</span>
+                                        <span class="font-bold text-red-600" id="liabilitiesTotal">€0</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-center">
-                                <p class="text-sm text-gray-500">Real Estate</p>
-                                <p class="text-xl font-bold text-green-600" id="realEstateTotal">€0</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-sm text-gray-500">Bank Accounts</p>
-                                <p class="text-xl font-bold text-purple-600" id="accountsTotal">€0</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-sm text-gray-500">Total Liabilities</p>
-                                <p class="text-xl font-bold text-red-600" id="liabilitiesTotal">€0</p>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="dashboard.risk_analysis">Risk Analysis</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="risk-indicator risk-low"></span>
+                                        <span class="text-sm text-gray-600" data-translate="dashboard.low_risk">Low Risk</span>
+                                    </div>
+                                    <span class="font-bold text-green-600" id="lowRiskTotal">€0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="risk-indicator risk-medium"></span>
+                                        <span class="text-sm text-gray-600" data-translate="dashboard.medium_risk">Medium Risk</span>
+                                    </div>
+                                    <span class="font-bold text-yellow-600" id="mediumRiskTotal">€0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="risk-indicator risk-high"></span>
+                                        <span class="text-sm text-gray-600" data-translate="dashboard.high_risk">High Risk</span>
+                                    </div>
+                                    <span class="font-bold text-red-600" id="highRiskTotal">€0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -214,17 +293,17 @@
                 <div id="capital-markets-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Capital Markets Portfolio</h3>
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="capital_markets.title">Capital Markets Portfolio</h3>
                             <button id="addCapitalMarketBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Investment</span>
+                                <span data-translate="common.add_investment">Add Investment</span>
                             </button>
                         </div>
                         <div class="p-6" id="capitalMarketsContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="bar-chart-3" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No investments added yet</p>
-                                <p class="text-sm">Click "Add Investment" to get started</p>
+                                <p data-translate="capital_markets.empty">No investments added yet</p>
+                                <p class="text-sm" data-translate="capital_markets.empty_help">Click "Add Investment" to get started</p>
                             </div>
                         </div>
                     </div>
@@ -234,38 +313,84 @@
                 <div id="real-estate-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Real Estate Portfolio</h3>
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="real_estate.title">Real Estate Portfolio</h3>
                             <button id="addRealEstateBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Property</span>
+                                <span data-translate="common.add_property">Add Property</span>
                             </button>
                         </div>
                         <div class="p-6" id="realEstateContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="home" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No properties added yet</p>
-                                <p class="text-sm">Click "Add Property" to get started</p>
+                                <p data-translate="real_estate.empty">No properties added yet</p>
+                                <p class="text-sm" data-translate="real_estate.empty_help">Click "Add Property" to get started</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Accounts Tab -->
-                <div id="accounts-content" class="tab-content">
+                <!-- Bank Accounts Tab -->
+                <div id="bank-accounts-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Bank Accounts</h3>
-                            <button id="addAccountBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="bank_accounts.title">Bank Accounts</h3>
+                            <button id="addBankAccountBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Account</span>
+                                <span data-translate="common.add_account">Add Account</span>
                             </button>
                         </div>
-                        <div class="p-6" id="accountsContainer">
+                        <div class="p-6" id="bankAccountsContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="credit-card" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No accounts added yet</p>
-                                <p class="text-sm">Click "Add Account" to get started</p>
+                                <p data-translate="bank_accounts.empty">No accounts added yet</p>
+                                <p class="text-sm" data-translate="bank_accounts.empty_help">Click "Add Account" to get started</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Assets Tab -->
+                <div id="other-assets-content" class="tab-content">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="other_assets.title">Other Assets</h3>
+                            <button id="addOtherAssetBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span data-translate="common.add_asset">Add Asset</span>
+                            </button>
+                        </div>
+                        <div class="p-6" id="otherAssetsContainer">
+                            <div class="text-center text-gray-500 py-8">
+                                <i data-lucide="package" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+                                <p data-translate="other_assets.empty">No other assets added yet</p>
+                                <p class="text-sm" data-translate="other_assets.empty_help">Click "Add Asset" to get started</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investments Overview Tab -->
+                <div id="investments-overview-content" class="tab-content">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6" data-translate="investments_overview.title">Investments Overview</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-900 mb-2" data-translate="investments_overview.total_invested">Total Invested Capital</h4>
+                                <p class="text-2xl font-bold text-blue-700" id="totalInvestedAmount">€0</p>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+                                <h4 class="font-medium text-green-900 mb-2" data-translate="investments_overview.growth_potential">Growth Potential</h4>
+                                <p class="text-2xl font-bold text-green-700" id="growthPotentialAmount">€0</p>
+                            </div>
+                            <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+                                <h4 class="font-medium text-purple-900 mb-2" data-translate="investments_overview.diversification">Diversification Score</h4>
+                                <p class="text-2xl font-bold text-purple-700" id="diversificationScore">0%</p>
+                            </div>
+                        </div>
+
+                        <div id="investmentsBreakdown">
+                            <!-- Investments breakdown will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -274,17 +399,17 @@
                 <div id="liabilities-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Liabilities & Debts</h3>
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="liabilities.title">Liabilities & Debts</h3>
                             <button id="addLiabilityBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Liability</span>
+                                <span data-translate="common.add_liability">Add Liability</span>
                             </button>
                         </div>
                         <div class="p-6" id="liabilitiesContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="minus-circle" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No liabilities added yet</p>
-                                <p class="text-sm">Click "Add Liability" to get started</p>
+                                <p data-translate="liabilities.empty">No liabilities added yet</p>
+                                <p class="text-sm" data-translate="liabilities.empty_help">Click "Add Liability" to get started</p>
                             </div>
                         </div>
                     </div>
@@ -294,17 +419,17 @@
                 <div id="income-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Income Sources</h3>
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="income.title">Income Sources</h3>
                             <button id="addIncomeBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Income</span>
+                                <span data-translate="common.add_income">Add Income</span>
                             </button>
                         </div>
                         <div class="p-6" id="incomeContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="dollar-sign" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No income sources added yet</p>
-                                <p class="text-sm">Click "Add Income" to get started</p>
+                                <p data-translate="income.empty">No income sources added yet</p>
+                                <p class="text-sm" data-translate="income.empty_help">Click "Add Income" to get started</p>
                             </div>
                         </div>
                     </div>
@@ -314,17 +439,46 @@
                 <div id="expenses-content" class="tab-content">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-900">Expenses</h3>
+                            <h3 class="text-lg font-semibold text-gray-900" data-translate="expenses.title">Expenses</h3>
                             <button id="addExpenseBtn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
-                                <span>Add Expense</span>
+                                <span data-translate="common.add_expense">Add Expense</span>
                             </button>
                         </div>
                         <div class="p-6" id="expensesContainer">
                             <div class="text-center text-gray-500 py-8">
                                 <i data-lucide="receipt" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>No expenses added yet</p>
-                                <p class="text-sm">Click "Add Expense" to get started</p>
+                                <p data-translate="expenses.empty">No expenses added yet</p>
+                                <p class="text-sm" data-translate="expenses.empty_help">Click "Add Expense" to get started</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cash Flow Analysis Tab -->
+                <div id="cashflow-analysis-content" class="tab-content">
+                    <div class="space-y-6">
+                        <!-- Cash Flow Chart -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4" data-translate="cashflow.chart_title">Monthly Cash Flow Analysis</h3>
+                            <div class="h-64">
+                                <canvas id="cashFlowChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Cash Flow Summary -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.total_income">Total Monthly Income</h4>
+                                <p class="text-2xl font-bold text-green-600" id="totalMonthlyIncome">€0</p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.total_expenses">Total Monthly Expenses</h4>
+                                <p class="text-2xl font-bold text-red-600" id="totalMonthlyExpenses">€0</p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                <h4 class="font-medium text-gray-900 mb-2" data-translate="cashflow.net_flow">Net Cash Flow</h4>
+                                <p class="text-2xl font-bold" id="netCashFlow">€0</p>
                             </div>
                         </div>
                     </div>
@@ -350,8 +504,8 @@
             </div>
             
             <div class="p-6 border-t border-gray-200 flex space-x-3">
-                <button id="cancelModal" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                <button id="saveModal" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Save</button>
+                <button id="cancelModal" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors" data-translate="common.cancel">Cancel</button>
+                <button id="saveModal" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" data-translate="common.save">Save</button>
             </div>
         </div>
     </div>
@@ -360,6 +514,104 @@
     <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <script>
+        // 🌍 TRANSLATIONS
+        const translations = {
+            en: {
+                'login.subtitle': 'Sign in to manage your finances',
+                'login.google': 'Continue with Google',
+                'login.demo': 'Continue in Demo Mode',
+                'nav.dashboard': 'Dashboard & Analytics',
+                'nav.assets': 'Assets',
+                'nav.capital_markets': 'Capital Markets',
+                'nav.real_estate': 'Real Estate',
+                'nav.bank_accounts': 'Bank Accounts',
+                'nav.other_assets': 'Other Assets',
+                'nav.investments_overview': 'Investments Overview',
+                'nav.liabilities': 'Liabilities',
+                'nav.cash_flow': 'Cash Flow',
+                'nav.income': 'Income',
+                'nav.expenses': 'Expenses',
+                'nav.cashflow_analysis': 'Cash Flow Analysis',
+                'nav.logout': 'Logout',
+                'dashboard.title': 'Dashboard & Analytics',
+                'dashboard.subtitle': 'Welcome to your financial overview',
+                'dashboard.net_worth': 'Net Worth',
+                'dashboard.total_wealth': 'Total Wealth',
+                'dashboard.total_assets': 'Total Assets',
+                'dashboard.all_holdings': 'All Holdings',
+                'dashboard.invested_capital': 'Invested Capital',
+                'dashboard.growth_potential': 'Growth Potential',
+                'dashboard.monthly_balance': 'Monthly Balance',
+                'dashboard.income_minus_expenses': 'Income - Expenses',
+                'dashboard.portfolio_breakdown': 'Portfolio Breakdown',
+                'dashboard.capital_markets': 'Capital Markets',
+                'dashboard.real_estate': 'Real Estate',
+                'dashboard.bank_accounts': 'Bank Accounts',
+                'dashboard.other_assets': 'Other Assets',
+                'dashboard.total_liabilities': 'Total Liabilities',
+                'dashboard.risk_analysis': 'Risk Analysis',
+                'dashboard.low_risk': 'Low Risk',
+                'dashboard.medium_risk': 'Medium Risk',
+                'dashboard.high_risk': 'High Risk',
+                'common.add_investment': 'Add Investment',
+                'common.add_property': 'Add Property',
+                'common.add_account': 'Add Account',
+                'common.add_asset': 'Add Asset',
+                'common.add_liability': 'Add Liability',
+                'common.add_income': 'Add Income',
+                'common.add_expense': 'Add Expense',
+                'common.cancel': 'Cancel',
+                'common.save': 'Save'
+            },
+            el: {
+                'login.subtitle': 'Συνδεθείτε για να διαχειριστείτε τα οικονομικά σας',
+                'login.google': 'Συνέχεια με Google',
+                'login.demo': 'Συνέχεια σε δοκιμαστική λειτουργία',
+                'nav.dashboard': 'Ταμπλό & Αναλυτικά',
+                'nav.assets': 'Περιουσιακά Στοιχεία',
+                'nav.capital_markets': 'Κεφαλαιαγορά',
+                'nav.real_estate': 'Ακίνητα',
+                'nav.bank_accounts': 'Τραπεζικοί Λογαριασμοί',
+                'nav.other_assets': 'Άλλα Περιουσιακά',
+                'nav.investments_overview': 'Επισκόπηση Επενδύσεων',
+                'nav.liabilities': 'Υποχρεώσεις',
+                'nav.cash_flow': 'Ταμειακές Ροές',
+                'nav.income': 'Εισόδημα',
+                'nav.expenses': 'Έξοδα',
+                'nav.cashflow_analysis': 'Ανάλυση Ταμειακών Ροών',
+                'nav.logout': 'Αποσύνδεση',
+                'dashboard.title': 'Ταμπλό & Αναλυτικά',
+                'dashboard.subtitle': 'Καλώς ήρθατε στην οικονομική σας επισκόπηση',
+                'dashboard.net_worth': 'Καθαρή Περιουσία',
+                'dashboard.total_wealth': 'Συνολικός Πλούτος',
+                'dashboard.total_assets': 'Συνολικά Περιουσιακά',
+                'dashboard.all_holdings': 'Όλες οι Συμμετοχές',
+                'dashboard.invested_capital': 'Επενδυμένο Κεφάλαιο',
+                'dashboard.growth_potential': 'Δυναμικό Ανάπτυξης',
+                'dashboard.monthly_balance': 'Μηνιαίο Υπόλοιπο',
+                'dashboard.income_minus_expenses': 'Εισόδημα - Έξοδα',
+                'dashboard.portfolio_breakdown': 'Ανάλυση Χαρτοφυλακίου',
+                'dashboard.capital_markets': 'Κεφαλαιαγορά',
+                'dashboard.real_estate': 'Ακίνητα',
+                'dashboard.bank_accounts': 'Τραπεζικοί Λογαριασμοί',
+                'dashboard.other_assets': 'Άλλα Περιουσιακά',
+                'dashboard.total_liabilities': 'Συνολικές Υποχρεώσεις',
+                'dashboard.risk_analysis': 'Ανάλυση Κινδύνου',
+                'dashboard.low_risk': 'Χαμηλός Κίνδυνος',
+                'dashboard.medium_risk': 'Μέτριος Κίνδυνος',
+                'dashboard.high_risk': 'Υψηλός Κίνδυνος',
+                'common.add_investment': 'Προσθήκη Επένδυσης',
+                'common.add_property': 'Προσθήκη Ακινήτου',
+                'common.add_account': 'Προσθήκη Λογαριασμού',
+                'common.add_asset': 'Προσθήκη Περιουσιακού',
+                'common.add_liability': 'Προσθήκη Υποχρέωσης',
+                'common.add_income': 'Προσθήκη Εισοδήματος',
+                'common.add_expense': 'Προσθήκη Εξόδου',
+                'common.cancel': 'Ακύρωση',
+                'common.save': 'Αποθήκευση'
+            }
+        };
+
         // 🔥 FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyDOi3pkTY7Nof19auZkLzs4KnhJ8DTPqwI",
@@ -387,6 +639,25 @@
         let activeTab = 'dashboard';
         let currentCurrency = 'EUR';
         let isDemoMode = false;
+        let currentLanguage = 'en';
+
+        // 🌍 TRANSLATION SYSTEM
+        function translate() {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('languageSelect').value = lang;
+            translate();
+            localStorage.setItem('preferred_language', lang);
+        }
 
         // 🎯 DATA STORAGE SYSTEM
         class DataManager {
@@ -507,10 +778,24 @@
                 btn.classList.add('text-gray-600');
             });
 
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
             const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
             if (activeBtn) {
-                activeBtn.classList.add('active');
-                activeBtn.classList.remove('text-gray-600');
+                if (activeBtn.classList.contains('nav-item')) {
+                    activeBtn.classList.add('active');
+                    activeBtn.classList.remove('text-gray-600');
+                } else if (activeBtn.classList.contains('dropdown-item')) {
+                    activeBtn.classList.add('active');
+                    // Also activate parent dropdown
+                    const parentDropdown = activeBtn.closest('.relative').querySelector('.nav-item');
+                    if (parentDropdown) {
+                        parentDropdown.classList.add('active');
+                        parentDropdown.classList.remove('text-gray-600');
+                    }
+                }
             }
 
             // Update content
@@ -524,12 +809,27 @@
             }
 
             // Update page title
-            document.getElementById('pageTitle').textContent = 
-                tabName.charAt(0).toUpperCase() + tabName.slice(1).replace('-', ' ');
+            const titleMap = {
+                'dashboard': 'Dashboard & Analytics',
+                'capital-markets': 'Capital Markets',
+                'real-estate': 'Real Estate',
+                'bank-accounts': 'Bank Accounts',
+                'other-assets': 'Other Assets',
+                'investments-overview': 'Investments Overview',
+                'liabilities': 'Liabilities',
+                'income': 'Income',
+                'expenses': 'Expenses',
+                'cashflow-analysis': 'Cash Flow Analysis'
+            };
+
+            const title = titleMap[tabName] || tabName.charAt(0).toUpperCase() + tabName.slice(1).replace('-', ' ');
+            document.getElementById('pageTitle').textContent = title;
 
             // Load data for this tab
             if (tabName !== 'dashboard') {
                 renderTabContent(tabName);
+            } else {
+                updateDashboard();
             }
         }
 
@@ -558,21 +858,26 @@
                                     <option value="crypto">Cryptocurrency</option>
                                     <option value="bond">Bond</option>
                                     <option value="mutual_fund">Mutual Fund</option>
+                                    <option value="life_insurance">Life Insurance</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                    <input type="number" id="form_quantity" step="0.001" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="100" required>
+                                    <input type="number" id="form_quantity" step="0.001" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="100">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
-                                    <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150.00" required>
+                                    <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="150.00">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Current Value (optional)</label>
                                 <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="15500.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Investment (for life insurance)</label>
+                                <input type="number" id="form_monthly_investment" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="600">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
@@ -621,7 +926,7 @@
                         </div>
                     `
                 },
-                'accounts': {
+                'bank-accounts': {
                     title: 'Add Bank Account',
                     form: `
                         <div class="space-y-4">
@@ -649,6 +954,49 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
                                 <input type="number" id="form_interest_rate" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="2.5">
+                            </div>
+                            <div id="termDepositFields" class="space-y-4 hidden">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Lock Period (months)</label>
+                                    <input type="number" id="form_lock_period" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Maturity Date</label>
+                                    <input type="date" id="form_maturity_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                'other-assets': {
+                    title: 'Add Other Asset',
+                    form: `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Asset Name</label>
+                                <input type="text" id="form_name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Gold, Art, Vehicle" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <select id="form_category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="precious_metals">Precious Metals</option>
+                                    <option value="art_collectibles">Art & Collectibles</option>
+                                    <option value="vehicles">Vehicles</option>
+                                    <option value="business_assets">Business Assets</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Price</label>
+                                <input type="number" id="form_purchase_price" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="10000" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Value</label>
+                                <input type="number" id="form_current_value" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea id="form_description" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Additional details about this asset"></textarea>
                             </div>
                         </div>
                     `
@@ -769,6 +1117,20 @@
             modal.setAttribute('data-type', type);
             modal.classList.remove('hidden');
 
+            // Setup special field handlers
+            if (type === 'bank-accounts') {
+                const typeSelect = document.getElementById('form_type');
+                const termDepositFields = document.getElementById('termDepositFields');
+                
+                typeSelect.addEventListener('change', function() {
+                    if (this.value === 'deposit') {
+                        termDepositFields.classList.remove('hidden');
+                    } else {
+                        termDepositFields.classList.add('hidden');
+                    }
+                });
+            }
+
             // Focus first input
             setTimeout(() => {
                 const firstInput = modalBody.querySelector('input');
@@ -823,6 +1185,7 @@
                         formData.quantity = parseFloat(document.getElementById('form_quantity').value) || 0;
                         formData.purchasePrice = parseFloat(document.getElementById('form_purchase_price').value) || 0;
                         formData.currentValue = parseFloat(document.getElementById('form_current_value').value) || null;
+                        formData.monthlyInvestment = parseFloat(document.getElementById('form_monthly_investment').value) || 0;
                         formData.riskLevel = document.getElementById('form_risk_level').value;
                         break;
 
@@ -834,11 +1197,22 @@
                         formData.location = document.getElementById('form_location').value || '';
                         break;
 
-                    case 'accounts':
+                    case 'bank-accounts':
                         formData.bank = document.getElementById('form_bank').value || '';
                         formData.type = document.getElementById('form_type').value;
                         formData.balance = parseFloat(document.getElementById('form_balance').value) || 0;
                         formData.interestRate = parseFloat(document.getElementById('form_interest_rate').value) || 0;
+                        if (formData.type === 'deposit') {
+                            formData.lockPeriod = parseInt(document.getElementById('form_lock_period').value) || 0;
+                            formData.maturityDate = document.getElementById('form_maturity_date').value || '';
+                        }
+                        break;
+
+                    case 'other-assets':
+                        formData.category = document.getElementById('form_category').value;
+                        formData.purchasePrice = parseFloat(document.getElementById('form_purchase_price').value) || 0;
+                        formData.currentValue = parseFloat(document.getElementById('form_current_value').value) || formData.purchasePrice;
+                        formData.description = document.getElementById('form_description').value || '';
                         break;
 
                     case 'liabilities':
@@ -890,8 +1264,29 @@
         async function renderTabContent(tabName) {
             console.log('🎨 Rendering content for:', tabName);
             
+            // Handle special tabs
+            if (tabName === 'investments-overview') {
+                await renderInvestmentsOverview();
+                return;
+            }
+            
+            if (tabName === 'cashflow-analysis') {
+                await renderCashFlowAnalysis();
+                return;
+            }
+            
             const data = await DataManager.loadData(tabName);
-            const containerId = `${tabName.replace('-', '')}Container`;
+            const containerMap = {
+                'capital-markets': 'capitalMarketsContainer',
+                'real-estate': 'realEstateContainer',
+                'bank-accounts': 'bankAccountsContainer',
+                'other-assets': 'otherAssetsContainer',
+                'liabilities': 'liabilitiesContainer',
+                'income': 'incomeContainer',
+                'expenses': 'expensesContainer'
+            };
+            
+            const containerId = containerMap[tabName];
             const container = document.getElementById(containerId);
 
             if (!container) {
@@ -904,7 +1299,8 @@
                 const iconMap = {
                     'capital-markets': 'bar-chart-3',
                     'real-estate': 'home',
-                    'accounts': 'credit-card',
+                    'bank-accounts': 'credit-card',
+                    'other-assets': 'package',
                     'liabilities': 'minus-circle',
                     'income': 'dollar-sign',
                     'expenses': 'receipt'
@@ -927,22 +1323,32 @@
             data.forEach(item => {
                 let valueDisplay = '';
                 let detailsDisplay = '';
+                let riskIndicator = '';
 
                 switch (tabName) {
                     case 'capital-markets':
-                        const totalValue = item.currentValue || (item.quantity * item.purchasePrice);
+                        const totalValue = item.currentValue || (item.quantity * item.purchasePrice) || item.monthlyInvestment * 12;
                         valueDisplay = formatCurrency(totalValue);
-                        detailsDisplay = `${item.quantity} shares • ${item.type} • ${item.riskLevel} risk`;
+                        detailsDisplay = `${item.type}`;
+                        if (item.quantity > 0) detailsDisplay += ` • ${item.quantity} shares`;
+                        if (item.monthlyInvestment > 0) detailsDisplay += ` • ${formatCurrency(item.monthlyInvestment)}/month`;
+                        riskIndicator = `<span class="risk-indicator risk-${item.riskLevel}"></span>`;
                         break;
                     case 'real-estate':
                         valueDisplay = formatCurrency(item.currentValue || item.purchasePrice);
                         detailsDisplay = `${item.type} ${item.location ? '• ' + item.location : ''}`;
                         if (item.monthlyRental > 0) detailsDisplay += ` • ${formatCurrency(item.monthlyRental)}/month`;
                         break;
-                    case 'accounts':
+                    case 'bank-accounts':
                         valueDisplay = formatCurrency(item.balance);
                         detailsDisplay = `${item.bank} • ${item.type}`;
                         if (item.interestRate > 0) detailsDisplay += ` • ${item.interestRate}% APY`;
+                        if (item.lockPeriod > 0) detailsDisplay += ` • ${item.lockPeriod} months lock`;
+                        break;
+                    case 'other-assets':
+                        valueDisplay = formatCurrency(item.currentValue || item.purchasePrice);
+                        detailsDisplay = `${item.category}`;
+                        if (item.description) detailsDisplay += ` • ${item.description}`;
                         break;
                     case 'liabilities':
                         valueDisplay = formatCurrency(item.balance);
@@ -962,9 +1368,12 @@
 
                 itemsHtml += `
                     <div class="bg-gray-50 rounded-lg p-4 flex justify-between items-center hover:bg-gray-100 transition-colors">
-                        <div>
-                            <h4 class="font-medium text-gray-900">${item.name}</h4>
-                            <p class="text-sm text-gray-500">${detailsDisplay}</p>
+                        <div class="flex items-center space-x-3">
+                            ${riskIndicator}
+                            <div>
+                                <h4 class="font-medium text-gray-900">${item.name}</h4>
+                                <p class="text-sm text-gray-500">${detailsDisplay}</p>
+                            </div>
                         </div>
                         <div class="text-right">
                             <p class="font-bold text-gray-900">${valueDisplay}</p>
@@ -1003,16 +1412,211 @@
             }
         };
 
+        // 📈 CALCULATE INVESTED CAPITAL
+        async function calculateInvestedCapital() {
+            const [capitalMarkets, realEstate, bankAccounts] = await Promise.all([
+                DataManager.loadData('capital-markets'),
+                DataManager.loadData('real-estate'),
+                DataManager.loadData('bank-accounts')
+            ]);
+
+            let investedCapital = 0;
+
+            // All capital markets investments are considered invested
+            capitalMarkets.forEach(item => {
+                const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                investedCapital += value || 0;
+            });
+
+            // All real estate is considered invested
+            realEstate.forEach(item => {
+                investedCapital += item.currentValue || item.purchasePrice || 0;
+            });
+
+            // Bank accounts with interest are considered invested
+            bankAccounts.forEach(item => {
+                if (item.interestRate > 0) {
+                    investedCapital += item.balance || 0;
+                }
+            });
+
+            return investedCapital;
+        }
+
+        // 📊 INVESTMENTS OVERVIEW
+        async function renderInvestmentsOverview() {
+            const investedCapital = await calculateInvestedCapital();
+            
+            const [capitalMarkets, realEstate, bankAccounts] = await Promise.all([
+                DataManager.loadData('capital-markets'),
+                DataManager.loadData('real-estate'),
+                DataManager.loadData('bank-accounts')
+            ]);
+
+            // Update totals
+            document.getElementById('totalInvestedAmount').textContent = formatCurrency(investedCapital);
+            document.getElementById('growthPotentialAmount').textContent = formatCurrency(investedCapital * 0.07); // Estimated 7% growth
+            
+            // Calculate diversification score
+            let assetTypes = 0;
+            if (capitalMarkets.length > 0) assetTypes++;
+            if (realEstate.length > 0) assetTypes++;
+            if (bankAccounts.filter(acc => acc.interestRate > 0).length > 0) assetTypes++;
+            
+            const diversificationScore = Math.min(100, (assetTypes / 3) * 100);
+            document.getElementById('diversificationScore').textContent = diversificationScore.toFixed(0) + '%';
+
+            // Render breakdown
+            const breakdown = document.getElementById('investmentsBreakdown');
+            let breakdownHtml = '<div class="space-y-4">';
+
+            if (capitalMarkets.length > 0) {
+                breakdownHtml += '<div class="border rounded-lg p-4"><h4 class="font-medium mb-2">Capital Markets</h4><div class="space-y-2">';
+                capitalMarkets.forEach(item => {
+                    const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
+                    breakdownHtml += `
+                        <div class="flex justify-between text-sm">
+                            <span>${item.name}</span>
+                            <span>${formatCurrency(value)}</span>
+                        </div>
+                    `;
+                });
+                breakdownHtml += '</div></div>';
+            }
+
+            if (realEstate.length > 0) {
+                breakdownHtml += '<div class="border rounded-lg p-4"><h4 class="font-medium mb-2">Real Estate</h4><div class="space-y-2">';
+                realEstate.forEach(item => {
+                    const value = item.currentValue || item.purchasePrice;
+                    breakdownHtml += `
+                        <div class="flex justify-between text-sm">
+                            <span>${item.name}</span>
+                            <span>${formatCurrency(value)}</span>
+                        </div>
+                    `;
+                });
+                breakdownHtml += '</div></div>';
+            }
+
+            const interestBearingAccounts = bankAccounts.filter(acc => acc.interestRate > 0);
+            if (interestBearingAccounts.length > 0) {
+                breakdownHtml += '<div class="border rounded-lg p-4"><h4 class="font-medium mb-2">Interest-Bearing Accounts</h4><div class="space-y-2">';
+                interestBearingAccounts.forEach(item => {
+                    breakdownHtml += `
+                        <div class="flex justify-between text-sm">
+                            <span>${item.name}</span>
+                            <span>${formatCurrency(item.balance)}</span>
+                        </div>
+                    `;
+                });
+                breakdownHtml += '</div></div>';
+            }
+
+            breakdownHtml += '</div>';
+            breakdown.innerHTML = breakdownHtml;
+        }
+
+        // 📊 CASH FLOW ANALYSIS
+        async function renderCashFlowAnalysis() {
+            const [income, expenses] = await Promise.all([
+                DataManager.loadData('income'),
+                DataManager.loadData('expenses')
+            ]);
+
+            let totalMonthlyIncome = 0;
+            let totalMonthlyExpenses = 0;
+
+            // Calculate monthly income
+            income.forEach(item => {
+                totalMonthlyIncome += item.afterTaxAmount || item.monthlyAmount || 0;
+            });
+
+            // Calculate monthly expenses
+            expenses.forEach(item => {
+                let monthlyAmount = item.amount || 0;
+                if (item.frequency === 'weekly') monthlyAmount *= 4.33;
+                else if (item.frequency === 'yearly') monthlyAmount /= 12;
+                else if (item.frequency === 'daily') monthlyAmount *= 30;
+                totalMonthlyExpenses += monthlyAmount;
+            });
+
+            const netCashFlow = totalMonthlyIncome - totalMonthlyExpenses;
+
+            // Update summary cards
+            document.getElementById('totalMonthlyIncome').textContent = formatCurrency(totalMonthlyIncome);
+            document.getElementById('totalMonthlyExpenses').textContent = formatCurrency(totalMonthlyExpenses);
+            document.getElementById('netCashFlow').textContent = formatCurrency(netCashFlow);
+            document.getElementById('netCashFlow').className = `text-2xl font-bold ${netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`;
+
+            // Create chart
+            const ctx = document.getElementById('cashFlowChart');
+            if (ctx) {
+                // Destroy existing chart if it exists
+                if (window.cashFlowChartInstance) {
+                    window.cashFlowChartInstance.destroy();
+                }
+
+                window.cashFlowChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Income', 'Expenses', 'Net Flow'],
+                        datasets: [{
+                            label: 'Amount (€)',
+                            data: [totalMonthlyIncome, totalMonthlyExpenses, netCashFlow],
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(239, 68, 68, 0.8)',
+                                netCashFlow >= 0 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(239, 68, 68, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(34, 197, 94)',
+                                'rgb(239, 68, 68)',
+                                netCashFlow >= 0 ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '€' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '€' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         // 📈 DASHBOARD UPDATE SYSTEM
         async function updateDashboard() {
             console.log('📊 Updating dashboard...');
             
             try {
                 // Load all data
-                const [capitalMarkets, realEstate, accounts, liabilities, income, expenses] = await Promise.all([
+                const [capitalMarkets, realEstate, bankAccounts, otherAssets, liabilities, income, expenses] = await Promise.all([
                     DataManager.loadData('capital-markets'),
                     DataManager.loadData('real-estate'),
-                    DataManager.loadData('accounts'),
+                    DataManager.loadData('bank-accounts'),
+                    DataManager.loadData('other-assets'),
                     DataManager.loadData('liabilities'),
                     DataManager.loadData('income'),
                     DataManager.loadData('expenses')
@@ -1021,25 +1625,47 @@
                 // Calculate totals
                 let totalCapitalMarkets = 0;
                 let totalRealEstate = 0;
-                let totalAccounts = 0;
+                let totalBankAccounts = 0;
+                let totalOtherAssets = 0;
                 let totalLiabilities = 0;
                 let monthlyIncome = 0;
                 let monthlyExpenses = 0;
 
+                // Risk analysis
+                let lowRiskTotal = 0;
+                let mediumRiskTotal = 0;
+                let highRiskTotal = 0;
+
                 // Capital Markets
                 capitalMarkets.forEach(item => {
-                    const value = item.currentValue || (item.quantity * item.purchasePrice);
+                    const value = item.currentValue || (item.quantity * item.purchasePrice) || (item.monthlyInvestment * 12);
                     totalCapitalMarkets += value || 0;
+
+                    // Risk analysis
+                    if (item.riskLevel === 'low') lowRiskTotal += value || 0;
+                    else if (item.riskLevel === 'medium') mediumRiskTotal += value || 0;
+                    else if (item.riskLevel === 'high') highRiskTotal += value || 0;
                 });
 
                 // Real Estate
                 realEstate.forEach(item => {
-                    totalRealEstate += item.currentValue || item.purchasePrice || 0;
+                    const value = item.currentValue || item.purchasePrice || 0;
+                    totalRealEstate += value;
+                    mediumRiskTotal += value; // Real estate considered medium risk
                 });
 
-                // Accounts
-                accounts.forEach(item => {
-                    totalAccounts += item.balance || 0;
+                // Bank Accounts
+                bankAccounts.forEach(item => {
+                    const value = item.balance || 0;
+                    totalBankAccounts += value;
+                    lowRiskTotal += value; // Bank accounts considered low risk
+                });
+
+                // Other Assets
+                otherAssets.forEach(item => {
+                    const value = item.currentValue || item.purchasePrice || 0;
+                    totalOtherAssets += value;
+                    mediumRiskTotal += value; // Other assets considered medium risk
                 });
 
                 // Liabilities
@@ -1061,24 +1687,32 @@
                     monthlyExpenses += monthlyAmount;
                 });
 
-                const totalAssets = totalCapitalMarkets + totalRealEstate + totalAccounts;
+                const totalAssets = totalCapitalMarkets + totalRealEstate + totalBankAccounts + totalOtherAssets;
                 const netWorth = totalAssets - totalLiabilities;
                 const monthlyBalance = monthlyIncome - monthlyExpenses;
+                const investedCapital = await calculateInvestedCapital();
 
                 // Update main dashboard values
                 document.getElementById('netWorthValue').textContent = formatCurrency(netWorth);
                 document.getElementById('totalAssetsValue').textContent = formatCurrency(totalAssets);
+                document.getElementById('investedCapitalValue').textContent = formatCurrency(investedCapital);
                 document.getElementById('monthlyBalanceValue').textContent = formatCurrency(monthlyBalance);
 
-                // Update portfolio summary
+                // Update portfolio breakdown
                 document.getElementById('capitalMarketsTotal').textContent = formatCurrency(totalCapitalMarkets);
                 document.getElementById('realEstateTotal').textContent = formatCurrency(totalRealEstate);
-                document.getElementById('accountsTotal').textContent = formatCurrency(totalAccounts);
+                document.getElementById('bankAccountsTotal').textContent = formatCurrency(totalBankAccounts);
+                document.getElementById('otherAssetsTotal').textContent = formatCurrency(totalOtherAssets);
                 document.getElementById('liabilitiesTotal').textContent = formatCurrency(totalLiabilities);
 
+                // Update risk analysis
+                document.getElementById('lowRiskTotal').textContent = formatCurrency(lowRiskTotal);
+                document.getElementById('mediumRiskTotal').textContent = formatCurrency(mediumRiskTotal);
+                document.getElementById('highRiskTotal').textContent = formatCurrency(highRiskTotal);
+
                 console.log('✅ Dashboard updated:', {
-                    netWorth, totalAssets, monthlyBalance,
-                    breakdown: { totalCapitalMarkets, totalRealEstate, totalAccounts, totalLiabilities }
+                    netWorth, totalAssets, monthlyBalance, investedCapital,
+                    breakdown: { totalCapitalMarkets, totalRealEstate, totalBankAccounts, totalOtherAssets, totalLiabilities }
                 });
 
             } catch (error) {
@@ -1143,12 +1777,57 @@
                 // Initialize Lucide icons
                 createIcons();
 
+                // Load preferred language
+                const savedLanguage = localStorage.getItem('preferred_language') || 'en';
+                setLanguage(savedLanguage);
+
+                // Setup Language Toggle
+                document.getElementById('languageSelect').addEventListener('change', function() {
+                    setLanguage(this.value);
+                });
+
                 // Setup Navigation
                 document.querySelectorAll('.nav-item').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const tabName = btn.getAttribute('data-tab');
-                        switchTab(tabName);
+                        if (tabName) {
+                            switchTab(tabName);
+                        }
                     });
+                });
+
+                // Setup Dropdown Navigation
+                document.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const tabName = item.getAttribute('data-tab');
+                        if (tabName) {
+                            switchTab(tabName);
+                            // Hide dropdown
+                            item.closest('.dropdown-menu').classList.remove('active');
+                        }
+                    });
+                });
+
+                // Setup Dropdown Toggles
+                document.getElementById('assetsDropdown').addEventListener('click', function() {
+                    const menu = document.getElementById('assetsDropdownMenu');
+                    menu.classList.toggle('active');
+                    document.getElementById('cashflowDropdownMenu').classList.remove('active');
+                });
+
+                document.getElementById('cashflowDropdown').addEventListener('click', function() {
+                    const menu = document.getElementById('cashflowDropdownMenu');
+                    menu.classList.toggle('active');
+                    document.getElementById('assetsDropdownMenu').classList.remove('active');
+                });
+
+                // Close dropdowns when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.relative')) {
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            menu.classList.remove('active');
+                        });
+                    }
                 });
 
                 // Setup Authentication
@@ -1176,18 +1855,10 @@
                 document.getElementById('saveModal').addEventListener('click', saveModalData);
 
                 // Setup Add Buttons
-                document.getElementById('addItemBtn').addEventListener('click', () => {
-                    if (activeTab !== 'dashboard') {
-                        openModal(activeTab);
-                    } else {
-                        showToast('Please navigate to a specific section to add items', 'error');
-                    }
-                });
-
-                // Specific add buttons
                 document.getElementById('addCapitalMarketBtn').addEventListener('click', () => openModal('capital-markets'));
                 document.getElementById('addRealEstateBtn').addEventListener('click', () => openModal('real-estate'));
-                document.getElementById('addAccountBtn').addEventListener('click', () => openModal('accounts'));
+                document.getElementById('addBankAccountBtn').addEventListener('click', () => openModal('bank-accounts'));
+                document.getElementById('addOtherAssetBtn').addEventListener('click', () => openModal('other-assets'));
                 document.getElementById('addLiabilityBtn').addEventListener('click', () => openModal('liabilities'));
                 document.getElementById('addIncomeBtn').addEventListener('click', () => openModal('income'));
                 document.getElementById('addExpenseBtn').addEventListener('click', () => openModal('expenses'));
